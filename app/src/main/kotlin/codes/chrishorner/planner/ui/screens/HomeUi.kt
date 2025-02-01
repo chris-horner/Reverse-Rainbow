@@ -1,5 +1,6 @@
 package codes.chrishorner.planner.ui.screens
 
+import android.R.attr.category
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -64,12 +65,16 @@ private fun Loaded(game: Game) {
     Spacer(modifier = Modifier.height(32.dp))
     Grid(gameState.cards, game::select)
     Spacer(modifier = Modifier.height(32.dp))
-    CategorySubmissions(gameState.selectionCount, gameState.categoryAssignments)
+    CategorySubmissions(
+      selectionCount = gameState.selectionCount,
+      categoryAssignments = gameState.categoryAssignments,
+      onCategoryClick = { category -> game.submit(category) }
+    )
   }
 }
 
 @Composable
-private fun Grid(cards: Map<Int, Card>, onSelect: (Card) -> Unit) {
+private fun Grid(cards: List<Card>, onSelect: (Card) -> Unit) {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -83,12 +88,25 @@ private fun Grid(cards: Map<Int, Card>, onSelect: (Card) -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
       ) {
         repeat(4) { column ->
-          val card = cards.getValue((row * 4) + column)
+          val card = cards[(row * 4) + column]
 
           Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-              .background(if (card.selected) Color.Magenta else Color.Gray, RoundedCornerShape(4.dp))
+              .background(
+                color = if (card.selected) {
+                  Color.Magenta
+                } else {
+                  when (card.category) {
+                    Category.YELLOW -> Color.Yellow
+                    Category.GREEN -> Color.Green
+                    Category.BLUE -> Color.Blue
+                    Category.PURPLE -> Color(0xFFAE81FF)
+                    null -> Color.Gray
+                  }
+                },
+                shape = RoundedCornerShape(4.dp)
+              )
               .weight(1f)
               .aspectRatio(1f)
               .clickable { onSelect(card) }
@@ -109,16 +127,20 @@ private fun Grid(cards: Map<Int, Card>, onSelect: (Card) -> Unit) {
 private fun CategorySubmissions(
   selectionCount: Int,
   categoryAssignments: Map<Category, Boolean>,
+  onCategoryClick: (Category) -> Unit,
 ) {
+
   Row(
     horizontalArrangement = Arrangement.SpaceEvenly,
     modifier = Modifier.fillMaxWidth()
   ) {
     for ((category, assigned) in categoryAssignments) {
+      val enabled = !assigned && selectionCount == 4
+
       Box(
         modifier = Modifier
           .size(64.dp)
-          .alpha(if (assigned || selectionCount < 4) 0.5f else 1f)
+          .alpha(if (enabled) 1f else 0.5f)
           .background(
             shape = RoundedCornerShape(8.dp),
             color = when (category) {
@@ -129,6 +151,10 @@ private fun CategorySubmissions(
             }
           )
           .border(width = 2.dp, color = Color.Gray, shape = RoundedCornerShape(8.dp))
+          .clickable(
+            enabled = enabled,
+            onClick = { onCategoryClick(category) },
+          )
       )
     }
   }

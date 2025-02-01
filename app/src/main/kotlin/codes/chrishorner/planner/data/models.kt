@@ -29,7 +29,7 @@ enum class Category {
 
 @Parcelize
 data class GameState(
-  val cards: Map<Int, Card>,
+  val cards: List<Card>,
   val selectionCount: Int = 0,
   val categoryAssignments: Map<Category, Boolean> = mapOf(
     Category.YELLOW to false,

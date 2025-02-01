@@ -1,12 +1,19 @@
 package codes.chrishorner.planner.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Card(
   val content: Content,
   val selected: Boolean = false,
   val category: Category? = null,
-) {
-  sealed interface Content {
+) : Parcelable {
+  @Parcelize
+  sealed interface Content : Parcelable {
+    @Parcelize
     data class Text(val content: String) : Content
+    @Parcelize
     data class Image(val url: String, val description: String?) : Content
   }
 }
@@ -18,6 +25,7 @@ enum class Category {
   PURPLE,
 }
 
+@Parcelize
 data class GameState(
   val cardRows: List<List<Card>>,
   val selectionCount: Int = 0,
@@ -27,4 +35,4 @@ data class GameState(
     Category.BLUE to false,
     Category.PURPLE to false,
   ),
-)
+) : Parcelable

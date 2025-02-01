@@ -91,6 +91,7 @@ private data class ApiCard(
 
 private fun ApiCard.asCard(): Card {
   return Card(
+    initialPosition = position,
     content = when {
       image_url != null -> Card.Content.Image(image_url, image_alt_text)
       content != null -> Card.Content.Text(content)

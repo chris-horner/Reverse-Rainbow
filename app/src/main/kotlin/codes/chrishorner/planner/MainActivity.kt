@@ -15,6 +15,9 @@ class MainActivity : ComponentActivity() {
 
     val viewModel by viewModels<GameLoader.ViewModelWrapper>()
     val gameLoader = viewModel.gameLoader
+    if (savedInstanceState == null) {
+      gameLoader.refresh()
+    }
 
     setContent {
       PlannerTheme {

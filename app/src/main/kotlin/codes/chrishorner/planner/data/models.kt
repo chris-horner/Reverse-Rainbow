@@ -5,7 +5,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Card(
+  val initialPosition: Int,
   val content: Content,
+  val currentPosition: Int = initialPosition,
   val selected: Boolean = false,
   val category: Category? = null,
 ) : Parcelable {
@@ -27,7 +29,7 @@ enum class Category {
 
 @Parcelize
 data class GameState(
-  val cardRows: List<List<Card>>,
+  val cards: Map<Int, Card>,
   val selectionCount: Int = 0,
   val categoryAssignments: Map<Category, Boolean> = mapOf(
     Category.YELLOW to false,

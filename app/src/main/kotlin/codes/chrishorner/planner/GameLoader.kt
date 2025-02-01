@@ -62,7 +62,7 @@ class GameLoader private constructor(
           val loaderState = gameLoader.state.value
 
           if (loaderState is LoaderState.Success) {
-            putParcelable("game_state", loaderState.game.state)
+            putParcelable("game_state", loaderState.game.state.value)
           }
         }
       }

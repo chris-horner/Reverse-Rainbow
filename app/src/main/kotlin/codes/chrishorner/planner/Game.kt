@@ -50,6 +50,10 @@ private class RealGame(initialState: GameState) : Game {
   }
 
   override fun submit(category: Category) {
+    check(selectionCount == 4) {
+      "Attempting to submit a category with selectionCount: $selectionCount"
+    }
+
     val selectedCards = cards.filter { it.selected }
     val firstUncategorizedPosition = cards.first { it.category == null }.currentPosition
 

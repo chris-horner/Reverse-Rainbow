@@ -1,6 +1,7 @@
 package codes.chrishorner.planner.ui.screens
 
-import android.R.attr.category
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.animateBounds
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,11 +20,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEachIndexed
+import androidx.compose.ui.util.fastMap
+import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.Game
 import codes.chrishorner.planner.GameLoader
 import codes.chrishorner.planner.data.Card
@@ -68,31 +76,34 @@ private fun Loaded(game: Game) {
     CategorySubmissions(
       selectionCount = gameState.selectionCount,
       categoryAssignments = gameState.categoryAssignments,
-      onCategoryClick = { category -> game.submit(category) }
+      onCategoryClick = { category ->
+        gameState.cards.filter { it.selected }
+
+        game.submit(category)
+      }
     )
   }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun Grid(cards: List<Card>, onSelect: (Card) -> Unit) {
-  Column(
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(8.dp),
-    modifier = Modifier
-      .fillMaxWidth()
-      .widthIn(max = 400.dp)
-      .padding(8.dp)
-  ) {
-    repeat(4) { row ->
-      Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-      ) {
-        repeat(4) { column ->
-          val card = cards[(row * 4) + column]
-
+private fun Grid(
+  cards: List<Card>,
+  onSelect: (Card) -> Unit,
+) {
+  LookaheadScope {
+    ConnectionsLayout(
+      modifier = Modifier
+        .fillMaxWidth()
+        .widthIn(max = 400.dp)
+        .padding(8.dp)
+    ) {
+      for ((index, card) in cards.withIndex()) {
+        key(card.initialPosition) {
           Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
+              .animateBounds(this@LookaheadScope)
               .background(
                 color = if (card.selected) {
                   Color.Magenta
@@ -107,9 +118,8 @@ private fun Grid(cards: List<Card>, onSelect: (Card) -> Unit) {
                 },
                 shape = RoundedCornerShape(4.dp)
               )
-              .weight(1f)
-              .aspectRatio(1f)
               .clickable { onSelect(card) }
+              .zIndex(4f - index) // Makes sure cards animating to the top render over others.
           ) {
             Text(
               text = (card.content as Card.Content.Text).content,
@@ -124,15 +134,49 @@ private fun Grid(cards: List<Card>, onSelect: (Card) -> Unit) {
 }
 
 @Composable
+private fun ConnectionsLayout(
+  modifier: Modifier,
+  itemSpacing: Dp = 8.dp,
+  content: @Composable () -> Unit,
+) {
+  // We could use `LazyGrid`, but this gives us more control over the animations as items move. Not
+  // to mention it's much simpler.
+  Layout(
+    content = content,
+    modifier = modifier,
+  ) { measurables, constraints ->
+    require(measurables.size == 16) {
+      "ConnectionsLayout layout requires 16 children exactly."
+    }
+
+    val width = constraints.maxWidth
+    val height = width // Square up.
+    val itemSpacingPx = itemSpacing.roundToPx()
+    val itemSize = (width / 4)- itemSpacingPx
+    val itemConstraints = Constraints.fixed(width = itemSize, height = itemSize)
+    val placeables = measurables.fastMap { it.measure(itemConstraints) }
+
+    layout(width, height) {
+      placeables.fastForEachIndexed { index, placeable ->
+        val horizontalIndex = index % 4
+        val horizontalOffset = (itemSize + itemSpacingPx) * horizontalIndex
+        val verticalIndex = index / 4
+        val verticalOffset = (itemSize + itemSpacingPx) * verticalIndex
+        placeable.place(x = horizontalOffset, y = verticalOffset)
+      }
+    }
+  }
+}
+
+@Composable
 private fun CategorySubmissions(
   selectionCount: Int,
   categoryAssignments: Map<Category, Boolean>,
   onCategoryClick: (Category) -> Unit,
 ) {
-
   Row(
     horizontalArrangement = Arrangement.SpaceEvenly,
-    modifier = Modifier.fillMaxWidth()
+    modifier = Modifier.fillMaxWidth(),
   ) {
     for ((category, assigned) in categoryAssignments) {
       val enabled = !assigned && selectionCount == 4

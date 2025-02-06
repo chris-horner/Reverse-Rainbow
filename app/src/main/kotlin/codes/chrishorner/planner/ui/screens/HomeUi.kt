@@ -33,10 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.zIndex
-import codes.chrishorner.planner.Game
+import codes.chrishorner.planner.Game2
 import codes.chrishorner.planner.GameLoader
 import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.Category
+import codes.chrishorner.planner.data.CategoryStatus
 
 @Composable
 fun HomeUi(
@@ -67,19 +68,17 @@ private fun Loading() {
 }
 
 @Composable
-private fun Loaded(game: Game) {
-  val gameState = game.state.value
+private fun Loaded(game: Game2) {
+  val model = game.model.value
   Column {
     Spacer(modifier = Modifier.height(32.dp))
-    Grid(gameState.cards, game::select)
+    Grid(model.cards, game::select)
     Spacer(modifier = Modifier.height(32.dp))
     CategorySubmissions(
-      selectionCount = gameState.selectionCount,
-      categoryAssignments = gameState.categoryAssignments,
+      categoryStatuses = model.categoryStatuses,
       onCategoryClick = { category ->
-        gameState.cards.filter { it.selected }
-
-        game.submit(category)
+        //model.cards.filter { it.selected }
+        game.select(category)
       }
     )
   }
@@ -170,21 +169,18 @@ private fun ConnectionsLayout(
 
 @Composable
 private fun CategorySubmissions(
-  selectionCount: Int,
-  categoryAssignments: Map<Category, Boolean>,
+  categoryStatuses: Map<Category, CategoryStatus>,
   onCategoryClick: (Category) -> Unit,
 ) {
   Row(
     horizontalArrangement = Arrangement.SpaceEvenly,
     modifier = Modifier.fillMaxWidth(),
   ) {
-    for ((category, assigned) in categoryAssignments) {
-      val enabled = !assigned && selectionCount == 4
-
+    for ((category, status) in categoryStatuses) {
       Box(
         modifier = Modifier
           .size(64.dp)
-          .alpha(if (enabled) 1f else 0.5f)
+          .alpha(if (status == CategoryStatus.DISABLED) 0.5f else 1f)
           .background(
             shape = RoundedCornerShape(8.dp),
             color = when (category) {
@@ -196,7 +192,7 @@ private fun CategorySubmissions(
           )
           .border(width = 2.dp, color = Color.Gray, shape = RoundedCornerShape(8.dp))
           .clickable(
-            enabled = enabled,
+            enabled = status != CategoryStatus.DISABLED,
             onClick = { onCategoryClick(category) },
           )
       )

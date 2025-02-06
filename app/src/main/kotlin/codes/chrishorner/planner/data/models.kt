@@ -15,6 +15,7 @@ data class Card(
   sealed interface Content : Parcelable {
     @Parcelize
     data class Text(val content: String) : Content
+
     @Parcelize
     data class Image(val url: String, val description: String?) : Content
   }
@@ -31,10 +32,28 @@ enum class Category {
 data class GameState(
   val cards: List<Card>,
   val selectionCount: Int = 0,
-  val categoryAssignments: Map<Category, Boolean> = mapOf(
-    Category.YELLOW to false,
-    Category.GREEN to false,
-    Category.BLUE to false,
-    Category.PURPLE to false,
+  val categoryStatuses: Map<Category, CategoryState> = mapOf(
+    Category.YELLOW to CategoryState(),
+    Category.GREEN to CategoryState(),
+    Category.BLUE to CategoryState(),
+    Category.PURPLE to CategoryState(),
   ),
 ) : Parcelable
+
+@Parcelize
+data class CategoryState(
+  val assigned: Boolean = false,
+  val status: CategoryStatus = CategoryStatus.DISABLED,
+) : Parcelable
+
+enum class CategoryStatus {
+  DISABLED,
+  ENABLED,
+  CLEARABLE,
+  SWAPPABLE,
+}
+
+class GameModel(
+  val cards: List<Card>,
+  val categoryStatuses: Map<Category, CategoryStatus>,
+)

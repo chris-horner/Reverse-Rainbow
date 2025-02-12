@@ -88,10 +88,19 @@ class Game2(cards: List<Card>) {
 
       CategoryStatus.ENABLED -> {
         val selectedCards = cards.filter { it.selected }
-        val firstUncategorizedRow = cards
-          .chunked(4)
-          .first { row -> row.all { it.category == null } }
-        var swapPosition = firstUncategorizedRow.first().currentPosition
+        val categoryHasAssignedCards = cards.any { it.category == selectedCategory }
+
+        val row = if (categoryHasAssignedCards) {
+          cards.chunked(4).single { row -> row.any { it.category == selectedCategory } }
+        } else {
+          cards.chunked(4).first { row -> row.all { it.category == null } }
+        }
+
+        var swapPosition = if (categoryHasAssignedCards) {
+          row.first { it.category == null }.currentPosition
+        } else {
+          row.first().currentPosition
+        }
 
         for (card in selectedCards) {
           val updatedCard = card.copy(category = selectedCategory, selected = false)
@@ -113,7 +122,7 @@ class Game2(cards: List<Card>) {
           val row = cards.subList(rowStartIndex, rowStartIndex + 4)
           // If some cards in a row have a category and some do not, sort them to ensure no gaps.
           if (row.any { it.category != null } && row.any { it.category == null }) {
-            for ((rowIndex, card) in row.sortedBy { it.category }.withIndex()) {
+            for ((rowIndex, card) in row.sortedByDescending { it.category }.withIndex()) {
               val cardIndex = rowStartIndex + rowIndex
               cards[cardIndex] = card.copy(currentPosition = cardIndex)
             }
@@ -169,7 +178,7 @@ class Game2(cards: List<Card>) {
         cards.filter { it.selected }.all { it.category == category } -> CategoryStatus.CLEARABLE
         cards.filter { it.selected }
           .any { it.category != category && it.category != null } -> CategoryStatus.SWAPPABLE
-        cards.none { it.category == category } -> CategoryStatus.ENABLED
+        cards.count { it.category == category } + selectionCount <= 4 -> CategoryStatus.ENABLED
         else -> CategoryStatus.DISABLED
       }
 

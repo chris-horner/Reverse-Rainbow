@@ -59,17 +59,22 @@ class Game2(cards: List<Card>) {
     // Prevent selecting more than 4 cards.
     if (!card.selected && selectionCount >= 4) return
 
-    // Prevent selecting cards in more than one category at once.
-    if (cards.any { it.selected && it.category != null } && card.category != null) return
+    when {
+      // If the first card selected already has a category, select all cards in that category.
+      card.category != null && selectionCount == 0 -> {
+        cards.replaceAll { it.copy(selected = it.category == card.category) }
+      }
 
-    // If the first card selected already has a category, select all cards in that category.
-    if (selectionCount == 0 && card.category != null) {
-      val category = card.category
-      cards.replaceAll { it.copy(selected = it.category == category) }
-      return
-    } else {
+      // If there are several cards selected of the same category, deselect them all except the
+      // current card.
+      card.category != null && cards.count { it.selected && it.category == card.category } > 1 -> {
+        cards.replaceAll { if (it != card) it.copy(selected = false) else card }
+      }
+
       // Otherwise just select the card like normal.
-      cards[card.currentPosition] = card.copy(selected = !card.selected)
+      else -> {
+        cards[card.currentPosition] = card.copy(selected = !card.selected)
+      }
     }
 
     publishModelUpdate()
@@ -83,26 +88,50 @@ class Game2(cards: List<Card>) {
 
       CategoryStatus.ENABLED -> {
         val selectedCards = cards.filter { it.selected }
+        val firstUncategorizedRow = cards
+          .chunked(4)
+          .first { row -> row.all { it.category == null } }
+        var swapPosition = firstUncategorizedRow.first().currentPosition
 
         for (card in selectedCards) {
           val updatedCard = card.copy(category = selectedCategory, selected = false)
-          val firstUncategorizedCard = cards.first { it.category == null }
-          swapCards(updatedCard, firstUncategorizedCard)
+          cards[updatedCard.currentPosition] = updatedCard
+          val cardToSwap = cards[swapPosition]
+          swapCards(updatedCard, cardToSwap)
+          swapPosition++
         }
       }
 
-      // BUG:
-      // If you clear the current lowest selected category, the one above will reorder itself.
       CategoryStatus.CLEARABLE -> {
         cards.replaceAll { card ->
-          if (card.category == selectedCategory) card.copy(category = null) else card
+          card.copy(
+            category = if (card.category == selectedCategory) null else card.category
+          )
         }
 
-        for (card in cards) {
-          if (card.category == null) continue
+        for (rowStartIndex in 0..12 step 4) {
+          val row = cards.subList(rowStartIndex, rowStartIndex + 4)
+          // If some cards in a row have a category and some do not, sort them to ensure no gaps.
+          if (row.any { it.category != null } && row.any { it.category == null }) {
+            for ((rowIndex, card) in row.sortedBy { it.category }.withIndex()) {
+              val cardIndex = rowStartIndex + rowIndex
+              cards[cardIndex] = card.copy(currentPosition = cardIndex)
+            }
+          }
 
-          val firstUncategorizedCard = cards.first { it.category == null }
-          swapCards(card, firstUncategorizedCard)
+          // Check that there will actually be a next row.
+          if (rowStartIndex > 8) continue
+
+          // If this entire row has no category, and the next row _does_ have a category, swap all
+          // cards from the next row that do have an assigned category.
+          val nextRow = cards.subList(rowStartIndex + 4, rowStartIndex + 8)
+          if (row.all { it.category == null } && nextRow.any { it.category != null }) {
+            row.zip(nextRow)
+              .filter { (_, card2) -> card2.category != null }
+              .forEach { (card1, card2) ->
+                swapCards(card1, card2)
+              }
+          }
         }
       }
 
@@ -136,10 +165,11 @@ class Game2(cards: List<Card>) {
     val selectionCount = cards.count { it.selected }
 
     return when {
-      selectionCount == 4 -> when {
+      selectionCount > 0 -> when {
+        cards.filter { it.selected }.all { it.category == category } -> CategoryStatus.CLEARABLE
+        cards.filter { it.selected }
+          .any { it.category != category && it.category != null } -> CategoryStatus.SWAPPABLE
         cards.none { it.category == category } -> CategoryStatus.ENABLED
-        cards.count { it.category != category } == 4 -> CategoryStatus.SWAPPABLE
-        cards.count { it.category == category } < 4 -> CategoryStatus.SWAPPABLE
         else -> CategoryStatus.DISABLED
       }
 

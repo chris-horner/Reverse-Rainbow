@@ -42,15 +42,17 @@ class Game(cards: List<Card>) {
     if (!card.selected && selectionCount >= 4) return
 
     when {
-      // If the first card selected already has a category, select all cards in that category.
-      card.category != null && selectionCount == 0 -> {
-        cards.replaceAll { it.copy(selected = it.category == card.category) }
-      }
+      card.category != null -> when {
+        // If the first card selected already has a category, select all cards in that category.
+        selectionCount == 0 -> {
+          cards.replaceAll { it.copy(selected = it.category == card.category) }
+        }
 
-      // If there are several cards selected of the same category, deselect them all except the
-      // current card.
-      card.category != null && cards.count { it.selected && it.category == card.category } > 1 -> {
-        cards.replaceAll { if (it != card) it.copy(selected = false) else card }
+        // If there are several cards selected of the same category, deselect them all except the
+        // current card.
+        cards.filter { it.category == card.category }.all { it.selected } -> {
+          cards.replaceAll { if (it != card) it.copy(selected = false) else card }
+        }
       }
 
       // Otherwise just select the card like normal.

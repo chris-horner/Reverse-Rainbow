@@ -109,43 +109,36 @@ class Game2(cards: List<Card>) {
           swapCards(updatedCard, cardToSwap)
           swapPosition++
         }
+
+        sortGrid()
       }
 
       CategoryStatus.CLEARABLE -> {
         cards.replaceAll { card ->
           card.copy(
-            category = if (card.category == selectedCategory) null else card.category
+            category = if (card.category == selectedCategory) null else card.category,
+            selected = false,
           )
         }
 
-        for (rowStartIndex in 0..12 step 4) {
-          val row = cards.subList(rowStartIndex, rowStartIndex + 4)
-          // If some cards in a row have a category and some do not, sort them to ensure no gaps.
-          if (row.any { it.category != null } && row.any { it.category == null }) {
-            for ((rowIndex, card) in row.sortedByDescending { it.category }.withIndex()) {
-              val cardIndex = rowStartIndex + rowIndex
-              cards[cardIndex] = card.copy(currentPosition = cardIndex)
-            }
-          }
-
-          // Check that there will actually be a next row.
-          if (rowStartIndex > 8) continue
-
-          // If this entire row has no category, and the next row _does_ have a category, swap all
-          // cards from the next row that do have an assigned category.
-          val nextRow = cards.subList(rowStartIndex + 4, rowStartIndex + 8)
-          if (row.all { it.category == null } && nextRow.any { it.category != null }) {
-            row.zip(nextRow)
-              .filter { (_, card2) -> card2.category != null }
-              .forEach { (card1, card2) ->
-                swapCards(card1, card2)
-              }
-          }
-        }
+        sortGrid()
       }
 
       CategoryStatus.SWAPPABLE -> {
+        val selectedCards = cards.filter { it.selected }
+        val selectedCardsCategory = selectedCards.map { it.category }.distinct().single()
+        val cardsInCategory = cards.filter { it.category == selectedCategory }
 
+        for (card in selectedCards) {
+          cards[card.currentPosition] = card.copy(category = selectedCategory)
+        }
+
+        for (card in cardsInCategory) {
+          cards[card.currentPosition] = card.copy(category = selectedCardsCategory)
+        }
+
+        cards.replaceAll { it.copy(selected = false) }
+        sortGrid()
       }
     }
 
@@ -161,6 +154,36 @@ class Game2(cards: List<Card>) {
     cards[card2Position] = card1.copy(currentPosition = card2Position)
   }
 
+  private fun sortGrid() {
+    for (rowStartIndex in 0..12 step 4) {
+      val row = cards.subList(rowStartIndex, rowStartIndex + 4)
+
+      // If some cards in a row have a category and some do not, sort them to ensure no gaps.
+      if (row.any { it.category != null } && row.any { it.category == null }) {
+        for ((rowIndex, card) in row.sortedByDescending { it.category }.withIndex()) {
+          val cardIndex = rowStartIndex + rowIndex
+          cards[cardIndex] = card.copy(currentPosition = cardIndex)
+        }
+      }
+
+      // Check that there will actually be a next row.
+      if (rowStartIndex > 8) continue
+
+      // Ensure there are no empty categories in each of the rows.
+      //
+      // If this entire row has no category, and the next row _does_ have a category, swap all
+      // cards from the next row that do have an assigned category.
+      val nextRow = cards.subList(rowStartIndex + 4, rowStartIndex + 8)
+      if (row.all { it.category == null } && nextRow.any { it.category != null }) {
+        row.zip(nextRow)
+          .filter { (_, card2) -> card2.category != null }
+          .forEach { (card1, card2) ->
+            swapCards(card1, card2)
+          }
+      }
+    }
+  }
+
   private fun publishModelUpdate() {
     _model.value = generateModel()
   }
@@ -171,14 +194,23 @@ class Game2(cards: List<Card>) {
   }
 
   private fun determineCategoryStatus(category: Category): CategoryStatus {
-    val selectionCount = cards.count { it.selected }
+    val selectedCards = cards.filter { it.selected }
+    val selectionCount = selectedCards.count()
+    val categorySelected = selectedCards.any { it.category == category }
+    val cardsInCategoryCount = cards.count { it.category == category }
+    val otherCategorySelectionCount = selectedCards
+      .filter { it.category != null && it.category != category}
+      .distinctBy { it.category }
+      .count()
 
     return when {
       selectionCount > 0 -> when {
-        cards.filter { it.selected }.all { it.category == category } -> CategoryStatus.CLEARABLE
-        cards.filter { it.selected }
-          .any { it.category != category && it.category != null } -> CategoryStatus.SWAPPABLE
-        cards.count { it.category == category } + selectionCount <= 4 -> CategoryStatus.ENABLED
+        cardsInCategoryCount + selectionCount <= 4 && !categorySelected -> CategoryStatus.ENABLED
+
+        //cards.filter { it.selected }.all { it.category == category } -> CategoryStatus.CLEARABLE
+        //cards.filter { it.selected }.groupBy { it.category } -> TODO()
+        cardsInCategoryCount > 0 && otherCategorySelectionCount == 1 -> CategoryStatus.SWAPPABLE
+        //cards.filter { it.selected }.any { it.category != category && it.category != null } -> CategoryStatus.SWAPPABLE
         else -> CategoryStatus.DISABLED
       }
 

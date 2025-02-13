@@ -10,8 +10,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,12 +19,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.Category
+import codes.chrishorner.planner.ui.AutoSizeText
 import codes.chrishorner.planner.ui.theme.plannerColors
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -49,18 +47,11 @@ fun LookaheadScope.Tile(card: Card, onClick: () -> Unit) {
       .padding(8.dp)
       .zIndex(4f - card.currentPosition) // Makes sure cards animating to the top render over others.
   ) {
-    BasicText(
+    AutoSizeText(
       // TODO: Render different types of content.
       text = (card.content as Card.Content.Text).content,
-      style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-      color = { textColor },
-      maxLines = 1,
-      overflow = TextOverflow.Visible,
-      autoSize = TextAutoSize.StepBased(
-        maxFontSize = MaterialTheme.typography.titleMedium.fontSize,
-        minFontSize = 6.sp,
-        stepSize = 1.sp
-      )
+      style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
+      color = textColor,
     )
   }
 }

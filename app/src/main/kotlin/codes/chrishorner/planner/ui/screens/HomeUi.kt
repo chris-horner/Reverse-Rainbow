@@ -20,9 +20,10 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,9 +35,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.zIndex
@@ -45,6 +49,8 @@ import codes.chrishorner.planner.GameLoader
 import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.data.CategoryStatus
+import codes.chrishorner.planner.ui.Shuffle
+import codes.chrishorner.planner.ui.theme.colors
 
 @Composable
 fun HomeUi(
@@ -85,7 +91,6 @@ private fun Loaded(game: Game) {
     CategorySubmissions(
       categoryStatuses = model.categoryStatuses,
       onCategoryClick = { category ->
-        //model.cards.filter { it.selected }
         game.select(category)
       }
     )
@@ -107,28 +112,67 @@ private fun Grid(
     ) {
       for ((index, card) in cards.withIndex()) {
         key(card.initialPosition) {
+
+          val cardBackgroundColor: Color
+          val textColor: Color
+          val selectionColor: Color
+
+          when (card.category) {
+            Category.YELLOW -> {
+              cardBackgroundColor = MaterialTheme.colors.yellowSurface
+              textColor = MaterialTheme.colors.onYellowSurface
+              selectionColor = MaterialTheme.colors.onYellowSurface
+            }
+            Category.GREEN -> {
+              cardBackgroundColor = MaterialTheme.colors.greenSurface
+              textColor = MaterialTheme.colors.onGreenSurface
+              selectionColor = MaterialTheme.colors.onGreenSurface
+            }
+            Category.BLUE -> {
+              cardBackgroundColor = MaterialTheme.colors.blueSurface
+              textColor = MaterialTheme.colors.onBlueSurface
+              selectionColor = MaterialTheme.colors.onBlueSurface
+            }
+            Category.PURPLE -> {
+              cardBackgroundColor = MaterialTheme.colors.purpleSurface
+              textColor = MaterialTheme.colors.onPurpleSurface
+              selectionColor = MaterialTheme.colors.onPurpleSurface
+            }
+            null -> {
+              cardBackgroundColor = MaterialTheme.colorScheme.surfaceContainer
+              textColor = MaterialTheme.colorScheme.onSurface
+              selectionColor = MaterialTheme.colorScheme.primary
+            }
+          }
+
           Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
               .animateBounds(this@LookaheadScope)
               .background(
-                color = when (card.category) {
-                  Category.YELLOW -> Color.Yellow
-                  Category.GREEN -> Color.Green
-                  Category.BLUE -> Color.Blue
-                  Category.PURPLE -> Color(0xFFAE81FF)
-                  null -> Color.Gray
-                },
-                shape = RoundedCornerShape(4.dp)
+                color = cardBackgroundColor,
+                shape = RoundedCornerShape(6.dp)
               )
-              .then(if (card.selected) Modifier.border(4.dp, color = Color.Magenta, shape = RoundedCornerShape(4.dp)) else Modifier)
+              .then(
+                if (card.selected) Modifier.border(
+                  4.dp, color = selectionColor, shape = RoundedCornerShape(6.dp)
+                ) else Modifier
+              )
               .clickable { onSelect(card) }
+              .padding(8.dp)
               .zIndex(4f - index) // Makes sure cards animating to the top render over others.
           ) {
-            Text(
+            BasicText(
               text = (card.content as Card.Content.Text).content,
-              style = MaterialTheme.typography.titleMedium,
-              color = MaterialTheme.colorScheme.inverseOnSurface,
+              style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+              color = { textColor },
+              maxLines = 1,
+              overflow = TextOverflow.Visible,
+              autoSize = TextAutoSize.StepBased(
+                maxFontSize = MaterialTheme.typography.titleMedium.fontSize,
+                minFontSize = 1.sp,
+                stepSize = 1.sp
+              )
             )
           }
         }
@@ -182,6 +226,29 @@ private fun CategorySubmissions(
     modifier = Modifier.fillMaxWidth(),
   ) {
     for ((category, status) in categoryStatuses) {
+
+      val backgroundColor: Color
+      val iconColor: Color
+
+      when (category) {
+        Category.YELLOW -> {
+          backgroundColor = MaterialTheme.colors.yellowSurface
+          iconColor = MaterialTheme.colors.onYellowSurface
+        }
+        Category.GREEN -> {
+          backgroundColor = MaterialTheme.colors.greenSurface
+          iconColor = MaterialTheme.colors.onGreenSurface
+        }
+        Category.BLUE -> {
+          backgroundColor = MaterialTheme.colors.blueSurface
+          iconColor = MaterialTheme.colors.onBlueSurface
+        }
+        Category.PURPLE -> {
+          backgroundColor = MaterialTheme.colors.purpleSurface
+          iconColor = MaterialTheme.colors.onPurpleSurface
+        }
+      }
+
       Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -189,14 +256,9 @@ private fun CategorySubmissions(
           .alpha(if (status == CategoryStatus.DISABLED) 0.5f else 1f)
           .background(
             shape = RoundedCornerShape(8.dp),
-            color = when (category) {
-              Category.YELLOW -> Color.Yellow
-              Category.GREEN -> Color.Green
-              Category.BLUE -> Color.Blue
-              Category.PURPLE -> Color(0xFFAE81FF)
-            }
+            color = backgroundColor,
           )
-          .border(width = 2.dp, color = Color.Gray, shape = RoundedCornerShape(8.dp))
+          .border(width = 2.dp, color = backgroundColor.copy(alpha = 0.5f), shape = RoundedCornerShape(8.dp))
           .clickable(
             enabled = status != CategoryStatus.DISABLED,
             onClick = { onCategoryClick(category) },
@@ -207,11 +269,13 @@ private fun CategorySubmissions(
           Icon(
             imageVector = Icons.Rounded.Clear,
             contentDescription = null,
+            tint = iconColor,
           )
         } else if (status == CategoryStatus.SWAPPABLE) {
           Icon(
-            imageVector = Icons.Rounded.Refresh,
+            imageVector = Icons.Rounded.Shuffle,
             contentDescription = null,
+            tint = iconColor,
           )
         }
       }

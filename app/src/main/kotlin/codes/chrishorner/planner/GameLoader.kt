@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.CardFetchResult
-import codes.chrishorner.planner.data.fetchCards
+import codes.chrishorner.planner.data.fakeCards
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.ArrayList
@@ -19,12 +19,12 @@ import java.util.ArrayList
 class GameLoader private constructor(
   private val scope: CoroutineScope,
   private val initialState: LoaderState = LoaderState.Idle,
-  private val fetchCards: suspend () -> CardFetchResult = ::fetchCards,
+  private val fetchCards: suspend () -> CardFetchResult = ::fakeCards,
 ) {
 
   sealed interface LoaderState {
-    object Idle : LoaderState
-    class Success(val game: Game2) : LoaderState
+    data object Idle : LoaderState
+    class Success(val game: Game) : LoaderState
     class Failure(val type: FailureType) : LoaderState
   }
 
@@ -41,7 +41,7 @@ class GameLoader private constructor(
     val result = fetchCards()
 
     _state.value = when (result) {
-      is CardFetchResult.Success -> LoaderState.Success(Game2(result.cards))
+      is CardFetchResult.Success -> LoaderState.Success(Game(result.cards))
       is CardFetchResult.Failure -> LoaderState.Failure(
         type = when (result) {
           CardFetchResult.HttpFailure -> FailureType.HTTP
@@ -60,7 +60,7 @@ class GameLoader private constructor(
       @Suppress("DEPRECATION") // Alternative only available API 33 and up.
       val previousCards = previousBundle?.getParcelableArrayList<Card>("cards")
       val initialLoaderState = if (previousCards != null) {
-        LoaderState.Success(Game2(previousCards))
+        LoaderState.Success(Game(previousCards))
       } else {
         LoaderState.Idle
       }

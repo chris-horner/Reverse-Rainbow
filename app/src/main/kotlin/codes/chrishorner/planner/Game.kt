@@ -7,26 +7,8 @@ import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.data.CategoryStatus
 import codes.chrishorner.planner.data.GameModel
-import codes.chrishorner.planner.data.GameState
 
-interface Game {
-  val state: State<GameState>
-  fun select(card: Card)
-  fun submit(category: Category)
-
-  companion object {
-    fun from(cards: List<Card>): Game {
-      val state = GameState(cards = cards.sortedBy { it.initialPosition })
-      return RealGame(state)
-    }
-
-    fun from(state: GameState): Game {
-      return RealGame(state)
-    }
-  }
-}
-
-class Game2(cards: List<Card>) {
+class Game(cards: List<Card>) {
   private val cards = cards.toMutableList()
 
   private val _model: MutableState<GameModel>
@@ -217,90 +199,5 @@ class Game2(cards: List<Card>) {
       cards.any { it.category == category } -> CategoryStatus.CLEARABLE
       else -> CategoryStatus.DISABLED
     }
-  }
-}
-
-private class RealGame(initialState: GameState) : Game {
-  private var _state = mutableStateOf(initialState)
-  override val state: State<GameState> = _state
-
-  private val cards = initialState.cards.toMutableList()
-  private var selectionCount: Int = initialState.selectionCount
-  private val categoryStates = initialState.categoryStatuses.toMutableMap()
-
-  override fun select(card: Card) {
-    if (!card.selected && selectionCount >= 4) {
-      return
-    }
-
-    if (card.category != null) return
-
-    if (card.selected) {
-      selectionCount--
-    } else {
-      selectionCount++
-    }
-
-    cards[card.currentPosition] = card.copy(selected = !card.selected)
-
-    if (selectionCount == 4) {
-      categoryStates.replaceAll { category, state ->
-        state.copy(
-          status = if (cards.any { it.category == category }) {
-            CategoryStatus.ENABLED
-          } else if (state.assigned) {
-            CategoryStatus.CLEARABLE
-          } else {
-            CategoryStatus.ENABLED
-          }
-        )
-      }
-    }
-
-    publishStateUpdate()
-  }
-
-  override fun submit(selectedCategory: Category) {
-    check(selectionCount == 4) {
-      "Attempting to submit a category with selectionCount: $selectionCount"
-    }
-
-    val selectedCards = cards.filter { it.selected }
-    val firstUncategorizedPosition = cards.first { it.category == null }.currentPosition
-
-    for ((index, proposedCard) in selectedCards.withIndex()) {
-      val position = firstUncategorizedPosition + index
-      val currentCard = cards[position]
-      val proposedCardPosition = proposedCard.currentPosition
-
-      cards[position] =
-        proposedCard.copy(currentPosition = position, category = selectedCategory, selected = false)
-
-      if (currentCard != proposedCard) {
-        cards[proposedCardPosition] = currentCard.copy(currentPosition = proposedCardPosition)
-      }
-    }
-
-    selectionCount = 0
-    categoryStates.replaceAll { category, state ->
-      state.copy(
-        assigned = state.assigned || category == selectedCategory,
-        status = if (state.assigned || category == selectedCategory) {
-          CategoryStatus.CLEARABLE
-        } else {
-          CategoryStatus.DISABLED
-        }
-      )
-    }
-
-    publishStateUpdate()
-  }
-
-  private fun publishStateUpdate() {
-    _state.value = GameState(
-      cards = cards.toList(),
-      selectionCount = selectionCount,
-      //categoryAssignments = categoryAssignments.toMap(),
-    )
   }
 }

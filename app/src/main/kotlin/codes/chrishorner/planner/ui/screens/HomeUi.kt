@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.zIndex
-import codes.chrishorner.planner.Game2
+import codes.chrishorner.planner.Game
 import codes.chrishorner.planner.GameLoader
 import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.Category
@@ -76,7 +76,7 @@ private fun Loading() {
 }
 
 @Composable
-private fun Loaded(game: Game2) {
+private fun Loaded(game: Game) {
   val model = game.model.value
   Column {
     Spacer(modifier = Modifier.height(32.dp))

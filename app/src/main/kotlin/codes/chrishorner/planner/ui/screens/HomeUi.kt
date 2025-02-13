@@ -50,7 +50,7 @@ import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.data.CategoryStatus
 import codes.chrishorner.planner.ui.Shuffle
-import codes.chrishorner.planner.ui.theme.colors
+import codes.chrishorner.planner.ui.theme.plannerColors
 
 @Composable
 fun HomeUi(
@@ -119,24 +119,24 @@ private fun Grid(
 
           when (card.category) {
             Category.YELLOW -> {
-              cardBackgroundColor = MaterialTheme.colors.yellowSurface
-              textColor = MaterialTheme.colors.onYellowSurface
-              selectionColor = MaterialTheme.colors.onYellowSurface
+              cardBackgroundColor = MaterialTheme.plannerColors.yellowSurface
+              textColor = MaterialTheme.plannerColors.onYellowSurface
+              selectionColor = MaterialTheme.plannerColors.onYellowSurface
             }
             Category.GREEN -> {
-              cardBackgroundColor = MaterialTheme.colors.greenSurface
-              textColor = MaterialTheme.colors.onGreenSurface
-              selectionColor = MaterialTheme.colors.onGreenSurface
+              cardBackgroundColor = MaterialTheme.plannerColors.greenSurface
+              textColor = MaterialTheme.plannerColors.onGreenSurface
+              selectionColor = MaterialTheme.plannerColors.onGreenSurface
             }
             Category.BLUE -> {
-              cardBackgroundColor = MaterialTheme.colors.blueSurface
-              textColor = MaterialTheme.colors.onBlueSurface
-              selectionColor = MaterialTheme.colors.onBlueSurface
+              cardBackgroundColor = MaterialTheme.plannerColors.blueSurface
+              textColor = MaterialTheme.plannerColors.onBlueSurface
+              selectionColor = MaterialTheme.plannerColors.onBlueSurface
             }
             Category.PURPLE -> {
-              cardBackgroundColor = MaterialTheme.colors.purpleSurface
-              textColor = MaterialTheme.colors.onPurpleSurface
-              selectionColor = MaterialTheme.colors.onPurpleSurface
+              cardBackgroundColor = MaterialTheme.plannerColors.purpleSurface
+              textColor = MaterialTheme.plannerColors.onPurpleSurface
+              selectionColor = MaterialTheme.plannerColors.onPurpleSurface
             }
             null -> {
               cardBackgroundColor = MaterialTheme.colorScheme.surfaceContainer
@@ -232,20 +232,20 @@ private fun CategorySubmissions(
 
       when (category) {
         Category.YELLOW -> {
-          backgroundColor = MaterialTheme.colors.yellowSurface
-          iconColor = MaterialTheme.colors.onYellowSurface
+          backgroundColor = MaterialTheme.plannerColors.yellowSurface
+          iconColor = MaterialTheme.plannerColors.onYellowSurface
         }
         Category.GREEN -> {
-          backgroundColor = MaterialTheme.colors.greenSurface
-          iconColor = MaterialTheme.colors.onGreenSurface
+          backgroundColor = MaterialTheme.plannerColors.greenSurface
+          iconColor = MaterialTheme.plannerColors.onGreenSurface
         }
         Category.BLUE -> {
-          backgroundColor = MaterialTheme.colors.blueSurface
-          iconColor = MaterialTheme.colors.onBlueSurface
+          backgroundColor = MaterialTheme.plannerColors.blueSurface
+          iconColor = MaterialTheme.plannerColors.onBlueSurface
         }
         Category.PURPLE -> {
-          backgroundColor = MaterialTheme.colors.purpleSurface
-          iconColor = MaterialTheme.colors.onPurpleSurface
+          backgroundColor = MaterialTheme.plannerColors.purpleSurface
+          iconColor = MaterialTheme.plannerColors.onPurpleSurface
         }
       }
 

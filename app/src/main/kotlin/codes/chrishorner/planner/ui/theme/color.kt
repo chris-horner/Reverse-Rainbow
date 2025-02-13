@@ -21,11 +21,11 @@ interface PlannerColors {
   val onPurpleSurface: Color
 }
 
-val MaterialTheme.colors: PlannerColors
+val MaterialTheme.plannerColors: PlannerColors
   @Composable
-  get() = if (isSystemInDarkTheme()) ColorsLight else ColorsDark
+  get() = if (isSystemInDarkTheme()) ColorsDark else ColorsLight
 
-val lightScheme = lightColorScheme(
+val MaterialLightScheme = lightColorScheme(
   primary = ColorsLight.primary,
   background = ColorsLight.background,
   surfaceContainer = ColorsLight.card,
@@ -33,7 +33,7 @@ val lightScheme = lightColorScheme(
   onBackground = ColorsLight.onCard,
 )
 
-val darkScheme = lightColorScheme(
+val MaterialDarkScheme = lightColorScheme(
   primary = ColorsDark.primary,
   background = ColorsDark.background,
   surfaceContainer = ColorsDark.card,
@@ -46,13 +46,13 @@ object ColorsLight : PlannerColors {
   override val background = Color(0xFFFEFAF9)
   override val card = Color(0xFFF8EFEC)
   override val onCard = Color(0xFF29242B)
-  override val yellowSurface = Color(0xFFF3BE0F)
-  override val onYellowSurface = Color(0xFF4D3C04)
-  override val greenSurface = Color(0xFF6EEA80)
-  override val onGreenSurface = Color(0xFF0A4612)
-  override val blueSurface = Color(0xFF24B5DA)
-  override val onBlueSurface = Color(0xFF0B3742)
-  override val purpleSurface = Color(0xFF836EC7)
+  override val yellowSurface = Color(0xFFFFD979)
+  override val onYellowSurface = Color(0xFF513E01)
+  override val greenSurface = Color(0xFFB2E083)
+  override val onGreenSurface = Color(0xFF32410C)
+  override val blueSurface = Color(0xFF7ADDE8)
+  override val onBlueSurface = Color(0xFF00424C)
+  override val purpleSurface = Color(0xFFA597F1)
   override val onPurpleSurface = Color(0xFF2C2140)
 }
 

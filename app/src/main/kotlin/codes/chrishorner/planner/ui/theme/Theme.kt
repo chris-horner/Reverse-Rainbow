@@ -10,8 +10,8 @@ fun PlannerTheme(
   content: @Composable () -> Unit
 ) {
   MaterialTheme(
-    colorScheme = if (isSystemInDarkTheme()) darkScheme else lightScheme,
+    colorScheme = if (isSystemInDarkTheme()) MaterialDarkScheme else MaterialLightScheme,
     typography = Typography(),
-    content = content
+    content = content,
   )
 }

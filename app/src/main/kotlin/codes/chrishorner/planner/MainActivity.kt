@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import codes.chrishorner.planner.ui.screens.HomeUi
+import codes.chrishorner.planner.ui.screens.MainUi
 import codes.chrishorner.planner.ui.theme.PlannerTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
 
     setContent {
       PlannerTheme {
-        HomeUi(
+        MainUi(
           loaderState = gameLoader.state.value,
           onRefresh = { gameLoader.refresh() },
         )

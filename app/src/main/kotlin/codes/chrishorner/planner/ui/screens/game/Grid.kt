@@ -1,21 +1,10 @@
-package codes.chrishorner.planner.ui.screens
+package codes.chrishorner.planner.ui.screens.game
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LookaheadScope
@@ -24,57 +13,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
-import codes.chrishorner.planner.Game
-import codes.chrishorner.planner.GameLoader
 import codes.chrishorner.planner.data.Card
-import codes.chrishorner.planner.ui.screens.game.CategoryActions
-import codes.chrishorner.planner.ui.screens.game.Tile
 
 @Composable
-fun HomeUi(
-  loaderState: GameLoader.LoaderState,
-  onRefresh: () -> Unit,
-) {
-  Box(
-    modifier = Modifier
-      .fillMaxSize()
-      .background(MaterialTheme.colorScheme.background)
-      .windowInsetsPadding(WindowInsets.systemBars)
-  ) {
-    when (loaderState) {
-      GameLoader.LoaderState.Loading -> Loading()
-      is GameLoader.LoaderState.Failure -> {}
-      is GameLoader.LoaderState.Success -> Loaded(loaderState.game)
-    }
-  }
-}
-
-@Composable
-private fun Loading() {
-  Box(
-    contentAlignment = Alignment.Center,
-    modifier = Modifier.fillMaxSize(),
-  ) {
-    LoadingAnimation()
-  }
-}
-
-@Composable
-private fun Loaded(game: Game) {
-  val model = game.model.value
-  Column {
-    Spacer(modifier = Modifier.height(32.dp))
-    Grid(model.cards, game::select)
-    Spacer(modifier = Modifier.height(32.dp))
-    CategoryActions(
-      categoryStatuses = model.categoryStatuses,
-      onCategoryClick = { category -> game.select(category) }
-    )
-  }
-}
-
-@Composable
-private fun Grid(
+fun Grid(
   cards: List<Card>,
   onSelect: (Card) -> Unit,
 ) {

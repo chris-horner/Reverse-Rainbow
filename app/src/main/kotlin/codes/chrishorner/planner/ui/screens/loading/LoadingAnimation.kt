@@ -1,4 +1,4 @@
-package codes.chrishorner.planner.ui.screens
+package codes.chrishorner.planner.ui.screens.loading
 
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable

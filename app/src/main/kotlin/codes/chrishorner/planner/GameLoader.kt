@@ -10,21 +10,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.CardFetchResult
-import codes.chrishorner.planner.data.fakeCards
+import codes.chrishorner.planner.data.fetchCards
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.ArrayList
+import java.time.Clock
+import java.time.LocalDate
 
 @Stable
 class GameLoader private constructor(
   private val scope: CoroutineScope,
-  private val initialState: LoaderState = LoaderState.Idle,
-  private val fetchCards: suspend () -> CardFetchResult = ::fakeCards,
+  private val initialState: LoaderState = LoaderState.Loading,
+  private val fetchCards: suspend () -> CardFetchResult = ::fetchCards,
+  private val clock: Clock = Clock.systemDefaultZone(),
 ) {
 
   sealed interface LoaderState {
-    data object Idle : LoaderState
-    class Success(val game: Game) : LoaderState
+    data object Loading : LoaderState
+    class Success(val date: LocalDate, val game: Game) : LoaderState
     class Failure(val type: FailureType) : LoaderState
   }
 
@@ -34,14 +36,14 @@ class GameLoader private constructor(
     PARSING,
   }
 
-  private var _state = mutableStateOf<LoaderState>(initialState)
+  private var _state = mutableStateOf(initialState)
   val state: State<LoaderState> = _state
 
   fun refresh() = scope.launch {
     val result = fetchCards()
 
     _state.value = when (result) {
-      is CardFetchResult.Success -> LoaderState.Success(Game(result.cards))
+      is CardFetchResult.Success -> LoaderState.Success(LocalDate.now(clock), Game(result.cards))
       is CardFetchResult.Failure -> LoaderState.Failure(
         type = when (result) {
           CardFetchResult.HttpFailure -> FailureType.HTTP
@@ -52,17 +54,30 @@ class GameLoader private constructor(
     }
   }
 
+  fun refreshIfNecessary() {
+    val currentState = _state.value
+
+    if (currentState !is LoaderState.Success || currentState.date != LocalDate.now(clock)) {
+      refresh()
+    }
+  }
+
+  /**
+   * Use as little of the ViewModel API as possible to persist the game's loaded state and survive
+   * Activity restarts.
+   */
+  @Suppress("DEPRECATION") // Alternatives only available API 33 and up.
   class ViewModelWrapper(savedStateHandle: SavedStateHandle) : ViewModel() {
     val gameLoader: GameLoader
 
     init {
       val previousBundle = savedStateHandle.get<Bundle>("wrapper_state")
-      @Suppress("DEPRECATION") // Alternative only available API 33 and up.
       val previousCards = previousBundle?.getParcelableArrayList<Card>("cards")
-      val initialLoaderState = if (previousCards != null) {
-        LoaderState.Success(Game(previousCards))
+      val previousDate = previousBundle?.getString("date")?.let { LocalDate.parse(it) }
+      val initialLoaderState = if (previousCards != null && previousDate != null) {
+        LoaderState.Success(previousDate, Game(previousCards))
       } else {
-        LoaderState.Idle
+        LoaderState.Loading
       }
 
       gameLoader = GameLoader(
@@ -76,6 +91,7 @@ class GameLoader private constructor(
 
           if (loaderState is LoaderState.Success) {
             putParcelableArrayList("cards", ArrayList(loaderState.game.model.value.cards))
+            putString("date", loaderState.date.toString())
           }
         }
       }

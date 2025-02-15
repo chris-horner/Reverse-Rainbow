@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
@@ -43,7 +42,7 @@ fun HomeUi(
       .windowInsetsPadding(WindowInsets.systemBars)
   ) {
     when (loaderState) {
-      GameLoader.LoaderState.Idle -> Loading()
+      GameLoader.LoaderState.Loading -> Loading()
       is GameLoader.LoaderState.Failure -> {}
       is GameLoader.LoaderState.Success -> Loaded(loaderState.game)
     }
@@ -56,7 +55,7 @@ private fun Loading() {
     contentAlignment = Alignment.Center,
     modifier = Modifier.fillMaxSize(),
   ) {
-    Text("Loading...")
+    LoadingAnimation()
   }
 }
 

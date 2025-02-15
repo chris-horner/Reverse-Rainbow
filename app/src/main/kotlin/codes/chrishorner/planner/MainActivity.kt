@@ -9,15 +9,14 @@ import codes.chrishorner.planner.ui.screens.HomeUi
 import codes.chrishorner.planner.ui.theme.PlannerTheme
 
 class MainActivity : ComponentActivity() {
+
+  private val viewModel by viewModels<GameLoader.ViewModelWrapper>()
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
 
-    val viewModel by viewModels<GameLoader.ViewModelWrapper>()
     val gameLoader = viewModel.gameLoader
-    if (savedInstanceState == null) {
-      gameLoader.refresh()
-    }
 
     setContent {
       PlannerTheme {
@@ -27,5 +26,10 @@ class MainActivity : ComponentActivity() {
         )
       }
     }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    viewModel.gameLoader.refreshIfNecessary()
   }
 }

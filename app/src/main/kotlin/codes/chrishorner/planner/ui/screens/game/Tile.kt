@@ -29,14 +29,14 @@ import codes.chrishorner.planner.ui.theme.plannerColors
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun LookaheadScope.Tile(card: Card, onClick: () -> Unit) {
+fun LookaheadScope.Tile(card: Card, onClick: () -> Unit, modifier: Modifier) {
   val tileColors = getColors(card)
   val backgroundColor by animateColorAsState(tileColors.background, animationSpec = spring(stiffness = Spring.StiffnessHigh))
   val textColor by animateColorAsState(tileColors.text, animationSpec = spring(stiffness = Spring.StiffnessHigh))
 
   Box(
     contentAlignment = Alignment.Center,
-    modifier = Modifier
+    modifier = modifier
       .animateBounds(this)
       .background(
         color = backgroundColor,

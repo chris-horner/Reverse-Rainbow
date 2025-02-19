@@ -1,35 +1,68 @@
 package codes.chrishorner.planner.ui.screens.game
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import codes.chrishorner.planner.data.Card
+import kotlinx.coroutines.launch
 
 @Composable
 fun Grid(
   cards: List<Card>,
   onSelect: (Card) -> Unit,
 ) {
+  val density = LocalDensity.current
+  val alphaAnimation = remember { Animatable(0f) }
+  val offsetAnimations = remember {
+    with(density) {
+      List(cards.size) { index ->
+        Animatable(IntOffset(0, ((-8).dp * index).roundToPx()), IntOffset.VectorConverter)
+      }
+    }
+  }
+
+  LaunchedEffect(Unit) {
+    launch { alphaAnimation.animateTo(1f) }
+    for (offsetAnimation in offsetAnimations) {
+      launch { offsetAnimation.animateTo(IntOffset.Zero, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow)) }
+    }
+  }
+
   LookaheadScope {
     ConnectionsLayout(
       modifier = Modifier
         .fillMaxWidth()
         .widthIn(max = 400.dp)
         .padding(8.dp)
+        .alpha(alphaAnimation.value)
     ) {
-      for (card in cards) {
+      cards.fastForEachIndexed { index, card ->
         key(card.initialPosition) {
-          Tile(card, onClick = { onSelect(card) })
+          Tile(
+            card = card,
+            onClick = { onSelect(card) },
+            modifier = Modifier.offset { offsetAnimations[index].value }
+          )
         }
       }
     }

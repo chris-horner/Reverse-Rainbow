@@ -7,11 +7,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun LoadingUi() {
+fun LoadingUi(onReady: () -> Unit, complete: Boolean) {
   Box(
     contentAlignment = Alignment.Center,
     modifier = Modifier.fillMaxSize(),
   ) {
-    LoadingAnimation()
+    LoadingAnimation(onReady, complete)
   }
 }

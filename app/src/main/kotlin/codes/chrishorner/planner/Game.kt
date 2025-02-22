@@ -50,8 +50,13 @@ class Game(cards: List<Card>) {
 
         // If there are several cards selected of the same category, deselect them all except the
         // current card.
-        cards.filter { it.category == card.category }.all { it.selected } -> {
+        cards.filter { it.category == card.category }.all { it.selected } && selectionCount > 1 -> {
           cards.replaceAll { if (it != card) it.copy(selected = false) else card }
+        }
+
+        // Otherwise just select the card like normal.
+        else -> {
+          cards[card.currentPosition] = card.copy(selected = !card.selected)
         }
       }
 

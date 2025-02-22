@@ -44,26 +44,30 @@ fun Grid(
   LaunchedEffect(Unit) {
     launch { alphaAnimation.animateTo(1f) }
     for (offsetAnimation in offsetAnimations) {
-      launch { offsetAnimation.animateTo(IntOffset.Zero, animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow)) }
+      launch {
+        offsetAnimation.animateTo(
+          IntOffset.Zero, animationSpec = spring(
+          dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow
+        )
+        )
+      }
     }
   }
 
-  LookaheadScope {
-    ConnectionsLayout(
-      modifier = Modifier
-        .fillMaxWidth()
-        .widthIn(max = 400.dp)
-        .padding(8.dp)
-        .alpha(alphaAnimation.value)
-    ) {
-      cards.fastForEachIndexed { index, card ->
-        key(card.initialPosition) {
-          Tile(
-            card = card,
-            onClick = { onSelect(card) },
-            modifier = Modifier.offset { offsetAnimations[index].value }
-          )
-        }
+  ConnectionsLayout(
+    modifier = Modifier
+      .fillMaxWidth()
+      .widthIn(max = 400.dp)
+      .padding(8.dp)
+      .alpha(alphaAnimation.value)
+  ) {
+    cards.fastForEachIndexed { index, card ->
+      key(card.initialPosition) {
+        Tile(
+          card = card,
+          onClick = { onSelect(card) },
+          modifier = Modifier.offset { offsetAnimations[index].value }
+        )
       }
     }
   }
@@ -88,7 +92,7 @@ private fun ConnectionsLayout(
     val width = constraints.maxWidth
     val height = width // Square up.
     val itemSpacingPx = itemSpacing.roundToPx()
-    val itemSize = (width / 4)- itemSpacingPx
+    val itemSize = (width / 4) - itemSpacingPx
     val itemConstraints = Constraints.fixed(width = itemSize, height = itemSize)
     val placeables = measurables.fastMap { it.measure(itemConstraints) }
 

@@ -25,34 +25,41 @@ import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.ui.AutoSizeText
+import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.plannerColors
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun LookaheadScope.Tile(card: Card, onClick: () -> Unit, modifier: Modifier) {
+fun Tile(card: Card, onClick: () -> Unit, modifier: Modifier) {
   val tileColors = getColors(card)
   val backgroundColor by animateColorAsState(tileColors.background, animationSpec = spring(stiffness = Spring.StiffnessHigh))
   val textColor by animateColorAsState(tileColors.text, animationSpec = spring(stiffness = Spring.StiffnessHigh))
 
-  Box(
-    contentAlignment = Alignment.Center,
-    modifier = modifier
-      .animateBounds(this)
-      .background(
-        color = backgroundColor,
-        shape = RoundedCornerShape(6.dp)
+  with(LocalSharedTransitionScope.current) {
+    Box(
+      contentAlignment = Alignment.Center,
+      modifier = modifier
+        .animateBounds(this)
+        .background(
+          color = backgroundColor,
+          shape = RoundedCornerShape(6.dp)
+        )
+        .clip(RoundedCornerShape(6.dp))
+        .clickable(onClick = onClick)
+        .padding(8.dp)
+        .zIndex(
+          4f - card.currentPosition
+        ) // Makes sure cards animating to the top render over others.
+    ) {
+      AutoSizeText(
+        // TODO: Render different types of content.
+        text = (card.content as Card.Content.Text).content,
+        style = MaterialTheme.typography.titleMedium.copy(
+          fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
+        ),
+        color = textColor,
       )
-      .clip(RoundedCornerShape(6.dp))
-      .clickable(onClick = onClick)
-      .padding(8.dp)
-      .zIndex(4f - card.currentPosition) // Makes sure cards animating to the top render over others.
-  ) {
-    AutoSizeText(
-      // TODO: Render different types of content.
-      text = (card.content as Card.Content.Text).content,
-      style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
-      color = textColor,
-    )
+    }
   }
 }
 

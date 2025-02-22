@@ -101,7 +101,6 @@ class Game(cards: List<Card>) {
     }
 
     for (card in selectedCards) {
-      // We might have already swapped this card, so grab it again from the collection.
       val currentCard = cards.single { it.initialPosition == card.initialPosition }
       val updatedCard = currentCard.copy(category = selectedCategory)
       cards[updatedCard.currentPosition] = updatedCard
@@ -194,14 +193,16 @@ class Game(cards: List<Card>) {
     val categorySelected = selectedCards.any { it.category == category }
     val cardsInCategoryCount = cards.count { it.category == category }
     val otherCategorySelectionCount = selectedCards
-      .filter { it.category != null && it.category != category}
+      .filter { it.category != null && it.category != category }
       .distinctBy { it.category }
       .count()
+    val allOfOneOtherCategorySelected = selectedCards
+      .all { it.category != category && it.category != null } && otherCategorySelectionCount == 1
 
     return when {
       selectionCount > 0 -> when {
         cardsInCategoryCount + selectionCount <= 4 && !categorySelected -> CategoryStatus.ENABLED
-        cardsInCategoryCount > 0 && otherCategorySelectionCount == 1 -> CategoryStatus.SWAPPABLE
+        cardsInCategoryCount > 0 && allOfOneOtherCategorySelected -> CategoryStatus.SWAPPABLE
         else -> CategoryStatus.DISABLED
       }
 

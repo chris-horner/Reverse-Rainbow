@@ -74,7 +74,7 @@ class Game(cards: List<Card>) {
 
     when (status) {
       CategoryStatus.DISABLED -> return
-      CategoryStatus.ENABLED -> selectCards(category)
+      CategoryStatus.ENABLED -> assignCards(category)
       CategoryStatus.CLEARABLE -> clearCards(category)
       CategoryStatus.SWAPPABLE -> swapSelectedToCategory(category)
     }
@@ -84,7 +84,7 @@ class Game(cards: List<Card>) {
     publishModelUpdate()
   }
 
-  private fun selectCards(selectedCategory: Category) {
+  private fun assignCards(selectedCategory: Category) {
     val selectedCards = cards.filter { it.selected }
     val categoryHasAssignedCards = cards.any { it.category == selectedCategory }
 
@@ -101,7 +101,9 @@ class Game(cards: List<Card>) {
     }
 
     for (card in selectedCards) {
-      val updatedCard = card.copy(category = selectedCategory)
+      // We might have already swapped this card, so grab it again from the collection.
+      val currentCard = cards.single { it.initialPosition == card.initialPosition }
+      val updatedCard = currentCard.copy(category = selectedCategory)
       cards[updatedCard.currentPosition] = updatedCard
       val cardToSwap = cards[swapPosition]
       swapCards(updatedCard, cardToSwap)

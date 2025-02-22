@@ -111,8 +111,16 @@ class Game(cards: List<Card>) {
   }
 
   private fun clearCards(selectedCategory: Category) {
-    cards.replaceAll { card ->
-      card.copy(category = if (card.category == selectedCategory) null else card.category)
+    if (cards.any { it.selected }) {
+      // If any cards are selected, only clear those cards.
+      cards.replaceAll { card ->
+        if (card.selected && card.category == selectedCategory) card.copy(category = null) else card
+      }
+    } else {
+      // Otherwise clear everything in this category.
+      cards.replaceAll { card ->
+        card.copy(category = if (card.category == selectedCategory) null else card.category)
+      }
     }
   }
 
@@ -203,6 +211,7 @@ class Game(cards: List<Card>) {
       selectionCount > 0 -> when {
         cardsInCategoryCount + selectionCount <= 4 && !categorySelected -> CategoryStatus.ENABLED
         cardsInCategoryCount > 0 && allOfOneOtherCategorySelected -> CategoryStatus.SWAPPABLE
+        selectedCards.all { it.category == category } -> CategoryStatus.CLEARABLE
         else -> CategoryStatus.DISABLED
       }
 

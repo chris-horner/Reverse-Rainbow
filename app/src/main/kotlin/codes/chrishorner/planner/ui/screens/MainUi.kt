@@ -1,7 +1,6 @@
 package codes.chrishorner.planner.ui.screens
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.background
@@ -18,8 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import codes.chrishorner.planner.GameLoader
-import codes.chrishorner.planner.GameLoader.LoaderState.Loading
+import codes.chrishorner.planner.GameLoader.LoaderState
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.screens.game.GameUi
@@ -28,10 +26,10 @@ import codes.chrishorner.planner.ui.screens.loading.LoadingUi
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun MainUi(
-  loaderState: GameLoader.LoaderState,
+  loaderState: LoaderState,
   onRefresh: () -> Unit,
 ) {
-  var loadingAnimationDone by remember { mutableStateOf(loaderState !is Loading) }
+  var loadingAnimationDone by remember { mutableStateOf(loaderState !is LoaderState.Loading) }
 
   Box(
     modifier = Modifier
@@ -40,22 +38,17 @@ fun MainUi(
       .windowInsetsPadding(WindowInsets.systemBars)
   ) {
     SharedTransitionLayout {
-      AnimatedContent(targetState = loaderState, label = "MainUi") { loaderState ->
+      val state = if (!loadingAnimationDone) LoaderState.Loading else loaderState
+
+      AnimatedContent(targetState = state, label = "MainUi") { targetState ->
         CompositionLocalProvider(
           LocalSharedTransitionScope provides this@SharedTransitionLayout,
           LocalAnimatedContentScope provides this
         ) {
-          when (loaderState) {
-            Loading -> LoadingUi(onReady = { loadingAnimationDone = true }, complete = false)
-            is GameLoader.LoaderState.Failure -> {}
-            is GameLoader.LoaderState.Success -> {
-              if (!loadingAnimationDone) {
-                LoadingUi(onReady = { loadingAnimationDone = true }, complete = true)
-              } else {
-                GameUi(loaderState.game)
-              }
-            }
-          }
+          when (targetState) {
+            LoaderState.Loading -> LoadingUi(onAnimationDone = { loadingAnimationDone = true })
+            is LoaderState.Failure -> {}
+            is LoaderState.Success -> GameUi(targetState.game) }
         }
       }
     }

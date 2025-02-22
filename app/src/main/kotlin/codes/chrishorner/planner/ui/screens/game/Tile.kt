@@ -54,6 +54,7 @@ fun Tile(card: Card, onClick: () -> Unit, modifier: Modifier) {
       AutoSizeText(
         // TODO: Render different types of content.
         text = (card.content as Card.Content.Text).content,
+        maxLines = 2,
         style = MaterialTheme.typography.titleMedium.copy(
           fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
         ),

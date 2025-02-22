@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 fun AutoSizeText(
   text: String,
   modifier: Modifier = Modifier,
+  maxLines: Int = Int.MAX_VALUE,
   color: Color = Color.Unspecified,
   style: TextStyle = LocalTextStyle.current,
 ) {
@@ -27,7 +28,7 @@ fun AutoSizeText(
   Text(
     text = text,
     color = color,
-    maxLines = 1,
+    maxLines = maxLines,
     style = textStyle,
     softWrap = false,
     onTextLayout = { result ->

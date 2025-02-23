@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.DpSize
 import codes.chrishorner.planner.GameLoader.LoaderState
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
@@ -27,6 +28,7 @@ import codes.chrishorner.planner.ui.screens.loading.LoadingUi
 @Composable
 fun MainUi(
   loaderState: LoaderState,
+  splashIconSize: DpSize,
   onRefresh: () -> Unit,
 ) {
   var loadingAnimationDone by remember { mutableStateOf(loaderState !is LoaderState.Loading) }
@@ -35,7 +37,6 @@ fun MainUi(
     modifier = Modifier
       .fillMaxSize()
       .background(MaterialTheme.colorScheme.background)
-      .windowInsetsPadding(WindowInsets.systemBars)
   ) {
     SharedTransitionLayout {
       val state = if (!loadingAnimationDone) LoaderState.Loading else loaderState
@@ -46,7 +47,7 @@ fun MainUi(
           LocalAnimatedContentScope provides this
         ) {
           when (targetState) {
-            LoaderState.Loading -> LoadingUi(onAnimationDone = { loadingAnimationDone = true })
+            LoaderState.Loading -> LoadingUi(splashIconSize, onAnimationDone = { loadingAnimationDone = true })
             is LoaderState.Failure -> {}
             is LoaderState.Success -> GameUi(targetState.game) }
         }

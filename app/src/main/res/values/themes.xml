@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <style name="Theme.Planner" parent="android:Theme.DeviceDefault.NoActionBar" />
+  <style
+      name="Theme.Planner"
+      parent="android:Theme.DeviceDefault.NoActionBar">
+    <item name="android:windowSplashScreenBackground">@color/splash_background</item>
+  </style>
 </resources>

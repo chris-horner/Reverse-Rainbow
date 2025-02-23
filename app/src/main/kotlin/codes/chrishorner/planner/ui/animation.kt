@@ -14,3 +14,5 @@ val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope> {
 val LocalAnimatedContentScope = compositionLocalOf<AnimatedContentScope> {
   error("AnimatedContent missing from composable hierarchy.")
 }
+
+const val SplashScreenFadeMillis = 150L

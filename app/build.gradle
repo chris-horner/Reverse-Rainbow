@@ -24,6 +24,7 @@ android {
     release {
       minifyEnabled true
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'shrinker_rules.pro'
+      signingConfig signingConfigs.debug // TODO: Replace with real config.
     }
   }
   compileOptions {

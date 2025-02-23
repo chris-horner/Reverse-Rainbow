@@ -10,6 +10,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -29,12 +30,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
+import codes.chrishorner.planner.ui.SplashScreenFadeMillis
 import codes.chrishorner.planner.ui.theme.plannerColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -45,71 +48,77 @@ import kotlin.math.sin
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun LoadingUi(onAnimationDone: () -> Unit) {
-  Box(
-    contentAlignment = Alignment.Center,
-    modifier = Modifier.fillMaxSize(),
-  ) {
-    with(LocalSharedTransitionScope.current) {
-      LoadingTiles(onAnimationDone)
+fun LoadingUi(splashIconSize: DpSize, onAnimationDone: () -> Unit) {
+  with(LocalSharedTransitionScope.current) {
+    Box(
+      contentAlignment = Alignment.Center,
+      modifier = Modifier.fillMaxSize(),
+    ) {
+      Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.size(splashIconSize),
+      ) {
+        LoadingTiles(onAnimationDone)
+      }
     }
   }
 }
 
+context(SharedTransitionScope)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun SharedTransitionScope.LoadingTiles(onAnimationDone: () -> Unit) {
+private fun BoxScope.LoadingTiles(
+  onAnimationDone: () -> Unit,
+) {
   val scope = rememberCoroutineScope()
   val state = remember { LoadingAnimationState(scope) }
   LaunchedEffect(state.completedIntro) {
     if (state.completedIntro) onAnimationDone()
   }
 
-  Box(contentAlignment = Alignment.Center) {
-    Box(
-      modifier = Modifier
-        .offset { state.yellowOffset.toIntOffset() }
-        .sharedBounds(
-          sharedContentState = rememberSharedContentState(Category.YELLOW),
-          animatedVisibilityScope = LocalAnimatedContentScope.current,
-        )
-        .size(64.dp)
-        .background(MaterialTheme.plannerColors.yellowSurface, shape = RoundedCornerShape(6.dp))
-    )
+  Box(
+    modifier = Modifier
+      .offset { state.yellowOffset.toIntOffset() }
+      .sharedBounds(
+        sharedContentState = rememberSharedContentState(Category.YELLOW),
+        animatedVisibilityScope = LocalAnimatedContentScope.current,
+      )
+      .size(64.dp)
+      .background(MaterialTheme.plannerColors.yellowSurface, shape = RoundedCornerShape(6.dp))
+  )
 
-    Box(
-      modifier = Modifier
-        .offset { state.greenOffset.toIntOffset() }
-        .sharedBounds(
-          sharedContentState = rememberSharedContentState(Category.GREEN),
-          animatedVisibilityScope = LocalAnimatedContentScope.current,
-        )
-        .size(64.dp)
-        .background(MaterialTheme.plannerColors.greenSurface, shape = RoundedCornerShape(6.dp))
-    )
+  Box(
+    modifier = Modifier
+      .offset { state.greenOffset.toIntOffset() }
+      .sharedBounds(
+        sharedContentState = rememberSharedContentState(Category.GREEN),
+        animatedVisibilityScope = LocalAnimatedContentScope.current,
+      )
+      .size(64.dp)
+      .background(MaterialTheme.plannerColors.greenSurface, shape = RoundedCornerShape(6.dp))
+  )
 
-    Box(
-      modifier = Modifier
-        .offset { state.blueOffset.toIntOffset() }
-        .sharedBounds(
-          sharedContentState = rememberSharedContentState(Category.BLUE),
-          animatedVisibilityScope = LocalAnimatedContentScope.current,
-        )
-        .size(64.dp)
-        .background(MaterialTheme.plannerColors.blueSurface, shape = RoundedCornerShape(6.dp))
-    )
+  Box(
+    modifier = Modifier
+      .offset { state.blueOffset.toIntOffset() }
+      .sharedBounds(
+        sharedContentState = rememberSharedContentState(Category.BLUE),
+        animatedVisibilityScope = LocalAnimatedContentScope.current,
+      )
+      .size(64.dp)
+      .background(MaterialTheme.plannerColors.blueSurface, shape = RoundedCornerShape(6.dp))
+  )
 
-    Box(
-      modifier = Modifier
-        .offset { state.purpleOffset.toIntOffset() }
-        .sharedBounds(
-          sharedContentState = rememberSharedContentState(Category.PURPLE),
-          animatedVisibilityScope = LocalAnimatedContentScope.current,
-        )
-        .size(64.dp)
-        .background(MaterialTheme.plannerColors.purpleSurface, shape = RoundedCornerShape(6.dp))
-    )
-  }
+  Box(
+    modifier = Modifier
+      .offset { state.purpleOffset.toIntOffset() }
+      .sharedBounds(
+        sharedContentState = rememberSharedContentState(Category.PURPLE),
+        animatedVisibilityScope = LocalAnimatedContentScope.current,
+      )
+      .size(64.dp)
+      .background(MaterialTheme.plannerColors.purpleSurface, shape = RoundedCornerShape(6.dp))
+  )
 }
 
 @Stable
@@ -150,7 +159,7 @@ private class LoadingAnimationState(scope: CoroutineScope) {
 
   init {
     scope.launch {
-      delay(800)
+      delay(SplashScreenFadeMillis)
 
       distanceAnimatable.animateTo(
         targetValue = 80.dp,

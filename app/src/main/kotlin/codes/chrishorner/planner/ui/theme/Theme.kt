@@ -11,7 +11,6 @@ fun PlannerTheme(
 ) {
   MaterialTheme(
     colorScheme = if (isSystemInDarkTheme()) MaterialDarkScheme else MaterialLightScheme,
-    typography = Typography(),
     content = content,
   )
 }

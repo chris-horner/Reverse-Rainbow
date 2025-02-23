@@ -5,10 +5,7 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -18,9 +15,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
+import codes.chrishorner.planner.GameLoader
 import codes.chrishorner.planner.GameLoader.LoaderState
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
+import codes.chrishorner.planner.ui.screens.error.ErrorUi
 import codes.chrishorner.planner.ui.screens.game.GameUi
 import codes.chrishorner.planner.ui.screens.loading.LoadingUi
 
@@ -47,9 +46,13 @@ fun MainUi(
           LocalAnimatedContentScope provides this
         ) {
           when (targetState) {
-            LoaderState.Loading -> LoadingUi(splashIconSize, onAnimationDone = { loadingAnimationDone = true })
-            is LoaderState.Failure -> {}
-            is LoaderState.Success -> GameUi(targetState.game) }
+            LoaderState.Loading -> LoadingUi(
+              splashIconSize, onAnimationDone = { loadingAnimationDone = true },
+            )
+
+            is LoaderState.Failure -> ErrorUi(targetState.type, onRetry = onRefresh)
+            is LoaderState.Success -> GameUi(targetState.game)
+          }
         }
       }
     }

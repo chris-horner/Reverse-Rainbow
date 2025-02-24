@@ -91,7 +91,7 @@ private fun ConnectionsLayout(
     val width = constraints.maxWidth
     val height = width // Square up.
     val itemSpacingPx = itemSpacing.roundToPx()
-    val itemSize = (width / 4) - itemSpacingPx
+    val itemSize = (width - (itemSpacingPx * 3)) / 4
     val itemConstraints = Constraints.fixed(width = itemSize, height = itemSize)
     val placeables = measurables.fastMap { it.measure(itemConstraints) }
 

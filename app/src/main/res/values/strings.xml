@@ -5,6 +5,7 @@
   <string name="make_rainbow_button">Make a rainbow</string>
   <string name="reverse_rainbow_button">Reverse the rainbow</string>
   <string name="clear_button">Clear</string>
+  <string name="about">About</string>
 
   <string name="error_title">Connection issues!</string>
   <string name="error_message_network">Looks like something went wrong with your internet connection.</string>

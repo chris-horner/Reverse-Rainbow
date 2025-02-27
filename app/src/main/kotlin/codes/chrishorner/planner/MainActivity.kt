@@ -1,6 +1,8 @@
 package codes.chrishorner.planner
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.DisplayMetrics
 import androidx.activity.ComponentActivity
@@ -34,6 +36,11 @@ class MainActivity : ComponentActivity() {
           loaderState = gameLoader.state.value,
           splashIconSize = splashIconSize.value,
           onRefresh = { gameLoader.refresh() },
+          onOpenNyt = {
+            startActivity(
+              Intent(Intent.ACTION_VIEW, Uri.parse("https://www.nytimes.com/games/connections")),
+            )
+          }
         )
       }
     }

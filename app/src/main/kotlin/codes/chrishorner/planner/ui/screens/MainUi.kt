@@ -15,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
-import codes.chrishorner.planner.GameLoader
 import codes.chrishorner.planner.GameLoader.LoaderState
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
@@ -29,6 +28,7 @@ fun MainUi(
   loaderState: LoaderState,
   splashIconSize: DpSize,
   onRefresh: () -> Unit,
+  onOpenNyt: () -> Unit,
 ) {
   var loadingAnimationDone by remember { mutableStateOf(loaderState !is LoaderState.Loading) }
 
@@ -51,7 +51,7 @@ fun MainUi(
             )
 
             is LoaderState.Failure -> ErrorUi(targetState.type, onRetry = onRefresh)
-            is LoaderState.Success -> GameUi(targetState.game)
+            is LoaderState.Success -> GameUi(targetState.game, onOpenNyt)
           }
         }
       }

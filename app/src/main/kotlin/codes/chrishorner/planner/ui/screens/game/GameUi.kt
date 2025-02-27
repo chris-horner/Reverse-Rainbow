@@ -45,7 +45,7 @@ import codes.chrishorner.planner.R
 import codes.chrishorner.planner.data.RainbowStatus
 
 @Composable
-fun GameUi(game: Game) {
+fun GameUi(game: Game, onOpenNyt: () -> Unit) {
   val model = game.model.value
 
   Scaffold(
@@ -54,6 +54,7 @@ fun GameUi(game: Game) {
         showNytButton = model.mostlyComplete,
         rainbowStatus = model.rainbowStatus,
         onRainbowClick = { game.rainbowSort() },
+        onOpenNytClick = onOpenNyt,
       )
     },
   ) { paddingValues ->
@@ -83,6 +84,7 @@ private fun BottomBar(
   showNytButton: Boolean,
   rainbowStatus: RainbowStatus,
   onRainbowClick: () -> Unit,
+  onOpenNytClick: () -> Unit,
 ) {
   BottomAppBar(
     containerColor = MaterialTheme.colorScheme.background,
@@ -95,7 +97,7 @@ private fun BottomBar(
         enter = ButtonEnterSpec,
         exit = ButtonExitSpec,
       ) {
-        OutlinedButton(onClick = {}) {
+        OutlinedButton(onClick = onOpenNytClick) {
           Text(stringResource(R.string.open_nyt))
         }
       }

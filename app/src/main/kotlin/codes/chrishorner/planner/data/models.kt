@@ -63,4 +63,10 @@ class GameModel(
   val cards: List<Card>,
   val categoryStatuses: Map<Category, CategoryStatus>,
   val rainbowStatus: RainbowStatus,
+
+  /**
+   * If 3/4 or more of the categories have been fully assigned. Useful for showing the NYT app
+   * button.
+   */
+  val mostlyComplete: Boolean,
 )

@@ -49,7 +49,9 @@ fun GameUi(game: Game) {
   val model = game.model.value
 
   Scaffold(
-    bottomBar = { BottomBar(model.rainbowStatus) },
+    bottomBar = {
+      BottomBar(showNytButton = model.mostlyComplete, rainbowStatus = model.rainbowStatus)
+    },
   ) { paddingValues ->
     Column(
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -73,14 +75,24 @@ fun GameUi(game: Game) {
 }
 
 @Composable
-private fun BottomBar(rainbowStatus: RainbowStatus) {
+private fun BottomBar(showNytButton: Boolean, rainbowStatus: RainbowStatus) {
   BottomAppBar(
     containerColor = MaterialTheme.colorScheme.background,
     contentColor = MaterialTheme.colorScheme.onBackground,
     actions = {
-      Spacer(modifier = Modifier.size(52.dp))
+      Spacer(modifier = Modifier.size(16.dp))
 
-      Spacer(modifier = Modifier.weight(1f))
+      AnimatedVisibility(
+        visible = showNytButton,
+        enter = ButtonEnterSpec,
+        exit = ButtonExitSpec,
+      ) {
+        OutlinedButton(onClick = {}) {
+          Text(stringResource(R.string.open_nyt))
+        }
+      }
+
+      Spacer(modifier = Modifier.size(16.dp))
 
       RainbowButton(rainbowStatus)
 
@@ -132,30 +144,16 @@ private fun RainbowButton(status: RainbowStatus) {
     targetValue = if (status == RainbowStatus.REVERSIBLE) 180f else 0f
   )
 
-  val text = when (status) {
-    RainbowStatus.DISABLED -> ""
-    RainbowStatus.SETTABLE -> stringResource(R.string.make_rainbow_button)
-    RainbowStatus.REVERSIBLE -> stringResource(R.string.reverse_rainbow_button)
+  val text = if (status == RainbowStatus.REVERSIBLE) {
+    stringResource(R.string.reverse_rainbow_button)
+  } else {
+    stringResource(R.string.make_rainbow_button)
   }
 
   AnimatedVisibility(
     visible = status != RainbowStatus.DISABLED,
-    enter = fadeIn(
-      animationSpec = spring(stiffness = Spring.StiffnessMedium)
-    ) + slideInVertically(
-      animationSpec = spring(
-        stiffness = Spring.StiffnessMedium, dampingRatio = Spring.DampingRatioMediumBouncy
-      ),
-      initialOffsetY = { height -> height },
-    ),
-    exit = fadeOut(
-      animationSpec = spring(stiffness = Spring.StiffnessMedium)
-    ) + slideOutVertically(
-      animationSpec = spring(
-        stiffness = Spring.StiffnessMedium, dampingRatio = Spring.DampingRatioNoBouncy
-      ),
-      targetOffsetY = { height -> height },
-    ),
+    enter = ButtonEnterSpec,
+    exit = ButtonExitSpec,
   ) {
     OutlinedButton(
       onClick = {},
@@ -172,3 +170,21 @@ private fun RainbowButton(status: RainbowStatus) {
     }
   }
 }
+
+private val ButtonEnterSpec = fadeIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)) +
+  slideInVertically(
+    animationSpec = spring(
+      stiffness = Spring.StiffnessMedium,
+      dampingRatio = Spring.DampingRatioMediumBouncy,
+    ),
+    initialOffsetY = { height -> height },
+  )
+
+private val ButtonExitSpec = fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) +
+  slideOutVertically(
+    animationSpec = spring(
+      stiffness = Spring.StiffnessMedium,
+      dampingRatio = Spring.DampingRatioNoBouncy,
+    ),
+    targetOffsetY = { height -> height },
+  )

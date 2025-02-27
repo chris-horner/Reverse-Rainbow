@@ -4,7 +4,7 @@
   <string name="menu_description">Menu</string>
   <string name="make_rainbow_button">Make a rainbow</string>
   <string name="reverse_rainbow_button">Reverse the rainbow</string>
-  <string name="clear_button">Clear</string>
+  <string name="open_nyt">Open NYT</string>
   <string name="about">About</string>
 
   <string name="error_title_network">Connection issues!</string>

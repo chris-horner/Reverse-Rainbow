@@ -222,10 +222,18 @@ class Game(cards: List<Card>) {
       else -> RainbowStatus.DISABLED
     }
 
+    val completedYellow = cards.count { it.category == Category.YELLOW } == 4
+    val completedGreen = cards.count { it.category == Category.GREEN } == 4
+    val completedBlue = cards.count { it.category == Category.BLUE } == 4
+    val completedPurple = cards.count { it.category == Category.PURPLE } == 4
+    val completedCategoryCount =
+      listOf(completedYellow, completedGreen, completedBlue, completedPurple).count { it }
+
     return GameModel(
       cards = cards.toList(),
       categoryStatuses = categoryStatuses,
-      rainbowStatus = rainbowStatus
+      rainbowStatus = rainbowStatus,
+      mostlyComplete = completedCategoryCount >= 3,
     )
   }
 

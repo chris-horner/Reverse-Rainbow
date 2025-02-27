@@ -127,15 +127,38 @@ class Game(cards: List<Card>) {
 
   private fun swapSelectedToCategory(selectedCategory: Category) {
     val selectedCards = cards.filter { it.selected }
-    val selectedCardsCategory = selectedCards.map { it.category }.distinct().single()
-    val cardsInCategory = cards.filter { it.category == selectedCategory }
+    val selectedCategories = selectedCards.distinctBy { it.category }.map { it.category }
 
-    for (card in selectedCards) {
-      cards[card.currentPosition] = card.copy(category = selectedCategory)
-    }
+    if (selectedCategories.size == 1) {
+      // Only one category selected, which means we should we swapping to a _different_ category.
+      val selectedCardsCategory = selectedCards.map { it.category }.distinct().single()
+      val cardsInCategory = cards.filter { it.category == selectedCategory }
 
-    for (card in cardsInCategory) {
-      cards[card.currentPosition] = card.copy(category = selectedCardsCategory)
+      for (card in selectedCards) {
+        cards[card.currentPosition] = card.copy(category = selectedCategory)
+      }
+
+      for (card in cardsInCategory) {
+        cards[card.currentPosition] = card.copy(category = selectedCardsCategory)
+      }
+    } else {
+      // Selected cards should span across two categories, and there should be an even number
+      // between those categories.
+      require(selectedCategories.size == 2) {
+        "There can be only one or two selected categories when swapping, but had ${selectedCategories.size}"
+      }
+
+      val (category1, category2) = selectedCategories
+      val category1Cards = selectedCards.filter { it.category == category1 }
+      val category2Cards = selectedCards.filter { it.category == category2 }
+
+      require(category1Cards.size == category2Cards.size) {
+        "There should be an equal number of cards in each category when swapping, but had ${category1Cards.size} and ${category2Cards.size}"
+      }
+
+      category1Cards.zip(category2Cards) { card1, card2 ->
+        swapCards(card1.copy(category = card2.category), card2.copy(category = card1.category))
+      }
     }
   }
 
@@ -194,6 +217,7 @@ class Game(cards: List<Card>) {
         cards.slice(4..7).all { it.category == Category.GREEN } &&
         cards.slice(8..11).all { it.category == Category.BLUE } &&
         cards.slice(12..15).all { it.category == Category.PURPLE } -> RainbowStatus.REVERSIBLE
+
       cards.all { it.category != null } -> RainbowStatus.SETTABLE
       else -> RainbowStatus.DISABLED
     }
@@ -214,17 +238,23 @@ class Game(cards: List<Card>) {
     val selectionCount = selectedCards.count()
     val categorySelected = selectedCards.any { it.category == category }
     val cardsInCategoryCount = cards.count { it.category == category }
+
     val otherCategorySelectionCount = selectedCards
       .filter { it.category != null && it.category != category }
       .distinctBy { it.category }
       .count()
-    val allOfOneOtherCategorySelected = selectedCards
-      .all { it.category != category && it.category != null } && otherCategorySelectionCount == 1
+
+    val allOfOneOtherCategorySelected = otherCategorySelectionCount == 1 &&
+      selectedCards.count { it.category != category } == cardsInCategoryCount
+
+    val equalNumberFromOtherCategorySelected = otherCategorySelectionCount == 1 &&
+      selectedCards.count { it.category == category } == selectedCards.count { it.category != category }
 
     return when {
       selectionCount > 0 -> when {
         cardsInCategoryCount + selectionCount <= 4 && !categorySelected -> CategoryStatus.ENABLED
         cardsInCategoryCount > 0 && allOfOneOtherCategorySelected -> CategoryStatus.SWAPPABLE
+        equalNumberFromOtherCategorySelected -> CategoryStatus.SWAPPABLE
         selectedCards.all { it.category == category } -> CategoryStatus.CLEARABLE
         else -> CategoryStatus.DISABLED
       }

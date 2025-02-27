@@ -38,7 +38,8 @@ class MainActivity : ComponentActivity() {
           onRefresh = { gameLoader.refresh() },
           onOpenNyt = {
             startActivity(
-              Intent(Intent.ACTION_VIEW, Uri.parse("https://www.nytimes.com/games/connections")),
+              Intent(Intent.ACTION_VIEW, Uri.parse("https://www.nytimes.com/games/connections"))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             )
           }
         )

@@ -52,7 +52,11 @@ fun ErrorUi(failureType: FailureType, onRetry: () -> Unit) {
     Spacer(modifier = Modifier.weight(3f))
 
     Text(
-      text = stringResource(R.string.error_title),
+      text = when (failureType) {
+        FailureType.NETWORK -> stringResource(R.string.error_title_network)
+        FailureType.HTTP -> stringResource(R.string.error_title_http)
+        FailureType.PARSING -> stringResource(R.string.error_title_parsing)
+      },
       style = MaterialTheme.typography.headlineLarge,
       color = MaterialTheme.colorScheme.onBackground,
     )

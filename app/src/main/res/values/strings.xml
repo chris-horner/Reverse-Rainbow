@@ -7,7 +7,9 @@
   <string name="clear_button">Clear</string>
   <string name="about">About</string>
 
-  <string name="error_title">Connection issues!</string>
+  <string name="error_title_network">Connection issues!</string>
+  <string name="error_title_http">They OK?</string>
+  <string name="error_title_parsing">What\'s this!?</string>
   <string name="error_message_network">Looks like something went wrong with your internet connection.</string>
   <string name="error_message_http">Looks like something went wrong with The New York Times\' servers. Are they down right now? Check the official app.</string>
   <string name="error_message_parsing">The New York Times\' server returned something strange. Maybe today\'s game is weird? Check the official app.</string>

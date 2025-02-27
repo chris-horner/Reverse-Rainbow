@@ -42,32 +42,7 @@ fun GameUi(game: Game) {
   val model = game.model.value
 
   Scaffold(
-    bottomBar = {
-      BottomAppBar(
-        containerColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground,
-        actions = {
-          Spacer(modifier = Modifier.size(52.dp))
-
-          Spacer(modifier = Modifier.weight(1f))
-
-          RainbowButton(model.rainbowStatus)
-
-          Spacer(modifier = Modifier.weight(1f))
-
-          IconButton(
-            onClick = { /* TODO */ },
-            modifier = Modifier
-              .sizeIn(minWidth = 52.dp, minHeight = 52.dp)
-          ) {
-            Icon(
-              imageVector = Icons.Rounded.MoreVert,
-              contentDescription = stringResource(R.string.menu_description),
-            )
-          }
-        },
-      )
-    },
+    bottomBar = { BottomBar(model.rainbowStatus) },
   ) { paddingValues ->
     Column(
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -88,6 +63,34 @@ fun GameUi(game: Game) {
       Spacer(modifier = Modifier.weight(1f))
     }
   }
+}
+
+@Composable
+private fun BottomBar(rainbowStatus: RainbowStatus) {
+  BottomAppBar(
+    containerColor = MaterialTheme.colorScheme.background,
+    contentColor = MaterialTheme.colorScheme.onBackground,
+    actions = {
+      Spacer(modifier = Modifier.size(52.dp))
+
+      Spacer(modifier = Modifier.weight(1f))
+
+      RainbowButton(rainbowStatus)
+
+      Spacer(modifier = Modifier.weight(1f))
+
+      IconButton(
+        onClick = { /* TODO */ },
+        modifier = Modifier
+          .sizeIn(minWidth = 52.dp, minHeight = 52.dp)
+      ) {
+        Icon(
+          imageVector = Icons.Rounded.MoreVert,
+          contentDescription = stringResource(R.string.menu_description),
+        )
+      }
+    },
+  )
 }
 
 @Composable

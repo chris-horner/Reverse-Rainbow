@@ -7,6 +7,7 @@ import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.data.CategoryStatus
 import codes.chrishorner.planner.data.GameModel
+import codes.chrishorner.planner.data.RainbowStatus
 
 class Game(cards: List<Card>) {
   private val cards = cards.toMutableList()
@@ -188,7 +189,20 @@ class Game(cards: List<Card>) {
 
   private fun generateModel(): GameModel {
     val categoryStatuses = Category.entries.associateWith { determineCategoryStatus(it) }
-    return GameModel(cards.toList(), categoryStatuses)
+    val rainbowStatus = when {
+      cards.slice(0..3).all { it.category == Category.YELLOW } &&
+        cards.slice(4..7).all { it.category == Category.GREEN } &&
+        cards.slice(8..11).all { it.category == Category.BLUE } &&
+        cards.slice(12..15).all { it.category == Category.PURPLE } -> RainbowStatus.REVERSIBLE
+      cards.all { it.category != null } -> RainbowStatus.SETTABLE
+      else -> RainbowStatus.DISABLED
+    }
+
+    return GameModel(
+      cards = cards.toList(),
+      categoryStatuses = categoryStatuses,
+      rainbowStatus = rainbowStatus
+    )
   }
 
   /**

@@ -53,7 +53,14 @@ enum class CategoryStatus {
   SWAPPABLE,
 }
 
+enum class RainbowStatus {
+  DISABLED,
+  SETTABLE,
+  REVERSIBLE,
+}
+
 class GameModel(
   val cards: List<Card>,
   val categoryStatuses: Map<Category, CategoryStatus>,
+  val rainbowStatus: RainbowStatus,
 )

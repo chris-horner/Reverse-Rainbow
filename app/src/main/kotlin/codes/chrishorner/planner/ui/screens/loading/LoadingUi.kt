@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.times
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
+import codes.chrishorner.planner.ui.OvershootEasing
 import codes.chrishorner.planner.ui.SplashScreenFadeMillis
 import codes.chrishorner.planner.ui.theme.plannerColors
 import kotlinx.coroutines.CoroutineScope
@@ -165,7 +166,7 @@ private class LoadingAnimationState(scope: CoroutineScope) {
         targetValue = 80.dp,
         animationSpec = tween(
           durationMillis = 500,
-          easing = { OvershootInterpolator(6f).getInterpolation(it) },
+          easing = OvershootEasing,
         )
       )
 

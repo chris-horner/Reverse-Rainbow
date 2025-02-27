@@ -50,7 +50,11 @@ fun GameUi(game: Game) {
 
   Scaffold(
     bottomBar = {
-      BottomBar(showNytButton = model.mostlyComplete, rainbowStatus = model.rainbowStatus)
+      BottomBar(
+        showNytButton = model.mostlyComplete,
+        rainbowStatus = model.rainbowStatus,
+        onRainbowClick = { game.rainbowSort() },
+      )
     },
   ) { paddingValues ->
     Column(
@@ -75,7 +79,11 @@ fun GameUi(game: Game) {
 }
 
 @Composable
-private fun BottomBar(showNytButton: Boolean, rainbowStatus: RainbowStatus) {
+private fun BottomBar(
+  showNytButton: Boolean,
+  rainbowStatus: RainbowStatus,
+  onRainbowClick: () -> Unit,
+) {
   BottomAppBar(
     containerColor = MaterialTheme.colorScheme.background,
     contentColor = MaterialTheme.colorScheme.onBackground,
@@ -94,7 +102,7 @@ private fun BottomBar(showNytButton: Boolean, rainbowStatus: RainbowStatus) {
 
       Spacer(modifier = Modifier.size(16.dp))
 
-      RainbowButton(rainbowStatus)
+      RainbowButton(rainbowStatus, onRainbowClick)
 
       Spacer(modifier = Modifier.weight(1f))
 
@@ -139,7 +147,7 @@ private fun Menu() {
 }
 
 @Composable
-private fun RainbowButton(status: RainbowStatus) {
+private fun RainbowButton(status: RainbowStatus, onClick: () -> Unit) {
   val rainbowRotation by animateFloatAsState(
     targetValue = if (status == RainbowStatus.REVERSIBLE) 180f else 0f
   )
@@ -156,7 +164,7 @@ private fun RainbowButton(status: RainbowStatus) {
     exit = ButtonExitSpec,
   ) {
     OutlinedButton(
-      onClick = {},
+      onClick = onClick,
       modifier = Modifier.animateContentSize(),
     ) {
       Text("🌈", modifier = Modifier.rotate(rainbowRotation))

@@ -85,6 +85,29 @@ class Game(cards: List<Card>) {
     publishModelUpdate()
   }
 
+  fun rainbowSort() {
+    require(cards.all { it.category != null }) {
+      "Can't sort rainbows if not all cards have a category"
+    }
+
+    val yellow = cards.filter { it.category == Category.YELLOW }
+    val green = cards.filter { it.category == Category.GREEN }
+    val blue = cards.filter { it.category == Category.BLUE }
+    val purple = cards.filter { it.category == Category.PURPLE }
+
+    val orderedCategories = if (isCurrentlyInRainbowOrder()) {
+      listOf(purple, blue, green, yellow)
+    } else {
+      listOf(yellow, green, blue, purple)
+    }
+
+    orderedCategories.flatten().forEachIndexed { index, card ->
+      cards[index] = card.copy(currentPosition = index)
+    }
+
+    publishModelUpdate()
+  }
+
   private fun assignCards(selectedCategory: Category) {
     val selectedCards = cards.filter { it.selected }
     val categoryHasAssignedCards = cards.any { it.category == selectedCategory }
@@ -213,11 +236,7 @@ class Game(cards: List<Card>) {
   private fun generateModel(): GameModel {
     val categoryStatuses = Category.entries.associateWith { determineCategoryStatus(it) }
     val rainbowStatus = when {
-      cards.slice(0..3).all { it.category == Category.YELLOW } &&
-        cards.slice(4..7).all { it.category == Category.GREEN } &&
-        cards.slice(8..11).all { it.category == Category.BLUE } &&
-        cards.slice(12..15).all { it.category == Category.PURPLE } -> RainbowStatus.REVERSIBLE
-
+      isCurrentlyInRainbowOrder() -> RainbowStatus.REVERSIBLE
       cards.all { it.category != null } -> RainbowStatus.SETTABLE
       else -> RainbowStatus.DISABLED
     }
@@ -270,5 +289,12 @@ class Game(cards: List<Card>) {
       cards.any { it.category == category } -> CategoryStatus.CLEARABLE
       else -> CategoryStatus.DISABLED
     }
+  }
+
+  private fun isCurrentlyInRainbowOrder(): Boolean {
+    return cards.slice(0..3).all { it.category == Category.YELLOW } &&
+      cards.slice(4..7).all { it.category == Category.GREEN } &&
+      cards.slice(8..11).all { it.category == Category.BLUE } &&
+      cards.slice(12..15).all { it.category == Category.PURPLE }
   }
 }

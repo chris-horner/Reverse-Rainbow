@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -26,9 +24,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.data.CategoryStatus
+import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
-import codes.chrishorner.planner.ui.Shuffle
 import codes.chrishorner.planner.ui.theme.plannerColors
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -77,13 +75,13 @@ fun CategoryActions(
 
           if (status == CategoryStatus.CLEARABLE) {
             Icon(
-              imageVector = Icons.Rounded.Clear,
+              imageVector = Icons.Clear,
               contentDescription = null,
               tint = colors.icon,
             )
           } else if (status == CategoryStatus.SWAPPABLE) {
             Icon(
-              imageVector = Icons.Rounded.Shuffle,
+              imageVector = Icons.Shuffle,
               contentDescription = null,
               tint = colors.icon,
             )

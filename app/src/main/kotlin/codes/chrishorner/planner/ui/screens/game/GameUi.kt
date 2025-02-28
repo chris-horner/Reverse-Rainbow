@@ -17,12 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.Game
 import codes.chrishorner.planner.R
 import codes.chrishorner.planner.data.RainbowStatus
+import codes.chrishorner.planner.ui.BetterDropdownMenu
+import codes.chrishorner.planner.ui.Icons
 
 @Composable
 fun GameUi(game: Game, onOpenNyt: () -> Unit) {
@@ -63,7 +60,7 @@ fun GameUi(game: Game, onOpenNyt: () -> Unit) {
       modifier = Modifier
         .padding(paddingValues)
     ) {
-      Spacer(modifier = Modifier.weight(4f))
+      Spacer(modifier = Modifier.weight(1f))
 
       Grid(model.cards, game::select)
 
@@ -74,7 +71,7 @@ fun GameUi(game: Game, onOpenNyt: () -> Unit) {
         onCategoryClick = { category -> game.select(category) }
       )
 
-      Spacer(modifier = Modifier.weight(1f))
+      Spacer(modifier = Modifier.weight(3f))
     }
   }
 }
@@ -114,29 +111,25 @@ private fun BottomBar(
 }
 
 @Composable
-private fun Menu() {
+fun Menu() {
   var expanded by remember { mutableStateOf(false) }
 
   Box {
-    IconButton(
-      onClick = { expanded = true },
-      modifier = Modifier
-        .sizeIn(minWidth = 52.dp, minHeight = 52.dp)
-    ) {
+    IconButton(onClick = { expanded = true }) {
       Icon(
-        imageVector = Icons.Rounded.MoreVert,
+        imageVector = Icons.MoreVert,
         contentDescription = stringResource(R.string.menu_description),
       )
     }
 
-    DropdownMenu(
+    BetterDropdownMenu(
       expanded = expanded,
       onDismissRequest = { expanded = false },
     ) {
       DropdownMenuItem(
         leadingIcon = {
           Icon(
-            Icons.Rounded.Info,
+            Icons.Info,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurface
           )

@@ -40,6 +40,8 @@ class GameLoader private constructor(
   val state: State<LoaderState> = _state
 
   fun refresh() = scope.launch {
+    _state.value = LoaderState.Loading
+
     val result = fetchCards()
 
     _state.value = when (result) {

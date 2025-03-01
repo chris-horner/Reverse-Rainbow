@@ -30,8 +30,8 @@ jobs:
 
       - name: Publish bundle to internal test track
         env:
-          socket_weather_alias: ${{ secrets.socket_weather_alias }}
-          socket_weather_password: ${{ secrets.socket_weather_password }}
+          connections_planner_alias: ${{ secrets.connections_planner_alias }}
+          connections_planner_password: ${{ secrets.connections_planner_password }}
         run: bash ./gradlew publishReleaseBundle
 
       - name: Update store listing
@@ -39,8 +39,8 @@ jobs:
 
       - name: Build APKs
         env:
-          socket_weather_alias: ${{ secrets.socket_weather_alias }}
-          socket_weather_password: ${{ secrets.socket_weather_password }}
+          connections_planner_alias: ${{ secrets.connections_planner_alias }}
+          connections_planner_password: ${{ secrets.connections_planner_password }}
         run: bash ./gradlew assembleDebug assembleRelease
 
       - name: Create GitHub release

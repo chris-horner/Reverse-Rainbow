@@ -1,1 +1,3 @@
-Initial testing release.
+- 📺 Made UI slightly nicer on large displays
+- 🌄 Added support for small devices in landscape orientation
+- 💥 Fixed a crash where uncategorised cards could be accidentally swapped

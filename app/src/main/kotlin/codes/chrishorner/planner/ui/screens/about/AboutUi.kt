@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.BuildConfig
 import codes.chrishorner.planner.R
 import codes.chrishorner.planner.data.Category
+import codes.chrishorner.planner.ui.CappedWidthContainer
 import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
@@ -43,33 +44,35 @@ import codes.chrishorner.planner.ui.theme.plannerColors
 @Composable
 fun AboutUi(onBack: () -> Unit) {
   Scaffold(topBar = { TopBar(onBack) }) { paddingValues ->
-    Column(
-      modifier = Modifier
-        .verticalScroll(rememberScrollState())
-        .padding(paddingValues),
-    ) {
-      Spacer(modifier = Modifier.size(32.dp))
+    CappedWidthContainer {
+      Column(
+        modifier = Modifier
+          .verticalScroll(rememberScrollState())
+          .padding(paddingValues),
+      ) {
+        Spacer(modifier = Modifier.size(32.dp))
 
-      Text(
-        text = stringResource(R.string.about_app_name),
-        color = MaterialTheme.colorScheme.onBackground,
-        style = MaterialTheme.typography.headlineMedium,
-        modifier = Modifier.padding(horizontal = 16.dp)
-      )
+        Text(
+          text = stringResource(R.string.about_app_name),
+          color = MaterialTheme.colorScheme.onBackground,
+          style = MaterialTheme.typography.headlineMedium,
+          modifier = Modifier.padding(horizontal = 16.dp)
+        )
 
-      Text(
-        text = BuildConfig.VERSION_NAME,
-        color = MaterialTheme.colorScheme.onBackground,
-        style = MaterialTheme.typography.titleSmall,
-        modifier = Modifier.padding(horizontal = 16.dp)
-      )
+        Text(
+          text = BuildConfig.VERSION_NAME,
+          color = MaterialTheme.colorScheme.onBackground,
+          style = MaterialTheme.typography.titleSmall,
+          modifier = Modifier.padding(horizontal = 16.dp)
+        )
 
-      Spacer(modifier = Modifier.size(32.dp))
+        Spacer(modifier = Modifier.size(32.dp))
 
-      Entry(Category.YELLOW, Icons.Person, stringResource(R.string.about_point1))
-      Entry(Category.GREEN, Icons.Warning, stringResource(R.string.about_point2))
-      Entry(Category.BLUE, Icons.Block, stringResource(R.string.about_point3))
-      Entry(Category.PURPLE, Icons.GitHub, stringResource(R.string.about_point4))
+        Entry(Category.YELLOW, Icons.Person, stringResource(R.string.about_point1))
+        Entry(Category.GREEN, Icons.Warning, stringResource(R.string.about_point2))
+        Entry(Category.BLUE, Icons.Block, stringResource(R.string.about_point3))
+        Entry(Category.PURPLE, Icons.GitHub, stringResource(R.string.about_point4))
+      }
     }
   }
 }

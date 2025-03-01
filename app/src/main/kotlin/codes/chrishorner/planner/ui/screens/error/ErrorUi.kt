@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.GameLoader.FailureType
 import codes.chrishorner.planner.R
 import codes.chrishorner.planner.data.Category
+import codes.chrishorner.planner.ui.CappedWidthContainer
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.plannerColors
@@ -41,86 +42,88 @@ import codes.chrishorner.planner.ui.theme.plannerColors
 @Composable
 fun ErrorUi(failureType: FailureType, onRetry: () -> Unit) {
 
-  Column(
-    horizontalAlignment = Alignment.CenterHorizontally,
-    modifier = Modifier
-      .fillMaxSize()
-      .verticalScroll(rememberScrollState())
-      .systemBarsPadding()
-      .padding(vertical = 16.dp)
-  ) {
-    Spacer(modifier = Modifier.weight(3f))
-
-    Text(
-      text = when (failureType) {
-        FailureType.NETWORK -> stringResource(R.string.error_title_network)
-        FailureType.HTTP -> stringResource(R.string.error_title_http)
-        FailureType.PARSING -> stringResource(R.string.error_title_parsing)
-      },
-      style = MaterialTheme.typography.headlineLarge,
-      color = MaterialTheme.colorScheme.onBackground,
-    )
-
-    Spacer(modifier = Modifier.size(24.dp))
-
-    Row(
-      horizontalArrangement = Arrangement.SpaceEvenly,
+  CappedWidthContainer {
+    Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier
-        .padding(horizontal = 16.dp)
-        .fillMaxWidth()
-        .widthIn(max = 320.dp)
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState())
+        .systemBarsPadding()
+        .padding(vertical = 16.dp)
     ) {
-      CategoryBlock(
-        category = Category.YELLOW,
-        backgroundColor = MaterialTheme.plannerColors.yellowSurface,
-        foregroundColor = MaterialTheme.plannerColors.onYellowSurface,
-        image = painterResource(R.drawable.sad_face1),
+      Spacer(modifier = Modifier.weight(3f))
+
+      Text(
+        text = when (failureType) {
+          FailureType.NETWORK -> stringResource(R.string.error_title_network)
+          FailureType.HTTP -> stringResource(R.string.error_title_http)
+          FailureType.PARSING -> stringResource(R.string.error_title_parsing)
+        },
+        style = MaterialTheme.typography.headlineLarge,
+        color = MaterialTheme.colorScheme.onBackground,
       )
-      CategoryBlock(
-        category = Category.GREEN,
-        backgroundColor = MaterialTheme.plannerColors.greenSurface,
-        foregroundColor = MaterialTheme.plannerColors.onYellowSurface,
-        image = painterResource(R.drawable.sad_face2),
+
+      Spacer(modifier = Modifier.size(24.dp))
+
+      Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier
+          .padding(horizontal = 16.dp)
+          .fillMaxWidth()
+          .widthIn(max = 320.dp)
+      ) {
+        CategoryBlock(
+          category = Category.YELLOW,
+          backgroundColor = MaterialTheme.plannerColors.yellowSurface,
+          foregroundColor = MaterialTheme.plannerColors.onYellowSurface,
+          image = painterResource(R.drawable.sad_face1),
+        )
+        CategoryBlock(
+          category = Category.GREEN,
+          backgroundColor = MaterialTheme.plannerColors.greenSurface,
+          foregroundColor = MaterialTheme.plannerColors.onYellowSurface,
+          image = painterResource(R.drawable.sad_face2),
+        )
+        CategoryBlock(
+          category = Category.BLUE,
+          backgroundColor = MaterialTheme.plannerColors.blueSurface,
+          foregroundColor = MaterialTheme.plannerColors.onBlueSurface,
+          image = painterResource(R.drawable.sad_face3),
+        )
+        CategoryBlock(
+          category = Category.PURPLE,
+          backgroundColor = MaterialTheme.plannerColors.purpleSurface,
+          foregroundColor = MaterialTheme.plannerColors.onPurpleSurface,
+          image = painterResource(R.drawable.sad_face4),
+        )
+      }
+
+      Spacer(modifier = Modifier.size(24.dp))
+
+      Text(
+        text = when (failureType) {
+          FailureType.NETWORK -> stringResource(R.string.error_message_network)
+          FailureType.HTTP -> stringResource(R.string.error_message_http)
+          FailureType.PARSING -> stringResource(R.string.error_message_parsing)
+        },
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onBackground,
+        modifier = Modifier
+          .padding(horizontal = 16.dp)
+          .widthIn(max = 300.dp)
       )
-      CategoryBlock(
-        category = Category.BLUE,
-        backgroundColor = MaterialTheme.plannerColors.blueSurface,
-        foregroundColor = MaterialTheme.plannerColors.onBlueSurface,
-        image = painterResource(R.drawable.sad_face3),
-      )
-      CategoryBlock(
-        category = Category.PURPLE,
-        backgroundColor = MaterialTheme.plannerColors.purpleSurface,
-        foregroundColor = MaterialTheme.plannerColors.onPurpleSurface,
-        image = painterResource(R.drawable.sad_face4),
-      )
+
+      Spacer(modifier = Modifier.size(32.dp))
+
+      OutlinedButton(
+        onClick = onRetry,
+        modifier = Modifier.widthIn(min = 248.dp)
+      ) {
+        Text(text = stringResource(R.string.error_retry_button))
+      }
+
+      Spacer(modifier = Modifier.weight(5f))
     }
-
-    Spacer(modifier = Modifier.size(24.dp))
-
-    Text(
-      text = when (failureType) {
-        FailureType.NETWORK -> stringResource(R.string.error_message_network)
-        FailureType.HTTP -> stringResource(R.string.error_message_http)
-        FailureType.PARSING -> stringResource(R.string.error_message_parsing)
-      },
-      style = MaterialTheme.typography.bodyLarge,
-      color = MaterialTheme.colorScheme.onBackground,
-      modifier = Modifier
-        .padding(horizontal = 16.dp)
-        .widthIn(max = 300.dp)
-    )
-
-    Spacer(modifier = Modifier.size(32.dp))
-
-    OutlinedButton(
-      onClick = onRetry,
-      modifier = Modifier.widthIn(min = 248.dp)
-    ) {
-      Text(text = stringResource(R.string.error_retry_button))
-    }
-
-    Spacer(modifier = Modifier.weight(5f))
   }
 }
 

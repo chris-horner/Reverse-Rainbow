@@ -5,13 +5,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 
 enum class LayoutOrientation {
   Portrait,
   Landscape,
 }
 
+enum class UiMode {
+  Small,
+  Large,
+}
+
 val LocalLayoutOrientation = staticCompositionLocalOf { LayoutOrientation.Portrait }
+val LocalUiMode = staticCompositionLocalOf { UiMode.Small }
 
 @Composable
 fun UiLayoutManager(content: @Composable () -> Unit) {
@@ -21,7 +28,15 @@ fun UiLayoutManager(content: @Composable () -> Unit) {
       else -> LayoutOrientation.Portrait
     }
 
-    CompositionLocalProvider(LocalLayoutOrientation.provides(layout)) {
+    val uiMode = when {
+      min(maxWidth, maxHeight) > 700.dp -> UiMode.Large
+      else -> UiMode.Small
+    }
+
+    CompositionLocalProvider(
+      LocalLayoutOrientation.provides(layout),
+      LocalUiMode.provides(uiMode)
+    ) {
       content()
     }
   }

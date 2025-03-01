@@ -43,9 +43,12 @@ import codes.chrishorner.planner.Game
 import codes.chrishorner.planner.R
 import codes.chrishorner.planner.data.RainbowStatus
 import codes.chrishorner.planner.ui.BetterDropdownMenu
+import codes.chrishorner.planner.ui.CappedWidthContainer
 import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.LayoutOrientation
 import codes.chrishorner.planner.ui.LocalLayoutOrientation
+import codes.chrishorner.planner.ui.LocalUiMode
+import codes.chrishorner.planner.ui.UiMode
 
 @Composable
 fun GameUi(
@@ -56,7 +59,7 @@ fun GameUi(
   val orientation = LocalLayoutOrientation.current
 
   when (orientation) {
-    LayoutOrientation.Portrait -> PortraitGameUi(game, onOpenNyt, onOpenNyt)
+    LayoutOrientation.Portrait -> PortraitGameUi(game, onOpenNyt, onClickAbout)
     LayoutOrientation.Landscape -> LandscapeGameUi(game, onOpenNyt, onClickAbout)
   }
 }
@@ -76,23 +79,28 @@ private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -
       )
     },
   ) { paddingValues ->
-    Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = Modifier
-        .padding(paddingValues)
-    ) {
-      Spacer(modifier = Modifier.weight(1f))
+    CappedWidthContainer {
+      Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+          .padding(paddingValues)
+      ) {
+        when (LocalUiMode.current) {
+          UiMode.Small -> Spacer(modifier = Modifier.weight(1f))
+          UiMode.Large -> Spacer(modifier = Modifier.weight(3f))
+        }
 
-      Grid(model.cards, game::select)
+        Grid(model.cards, game::select)
 
-      Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-      CategoryActions(
-        categoryStatuses = model.categoryStatuses,
-        onCategoryClick = { category -> game.select(category) }
-      )
+        CategoryActions(
+          categoryStatuses = model.categoryStatuses,
+          onCategoryClick = { category -> game.select(category) }
+        )
 
-      Spacer(modifier = Modifier.weight(3f))
+        Spacer(modifier = Modifier.weight(3f))
+      }
     }
   }
 }
@@ -142,13 +150,21 @@ private fun LandscapeSideBar(
 
     Spacer(modifier = Modifier.size(32.dp))
 
-    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+    Box(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 8.dp)
+    ) {
       OpenNytButton(showNytButton, onOpenNytClick, Modifier.fillMaxWidth())
     }
 
     Spacer(modifier = Modifier.size(8.dp))
 
-    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+    Box(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 8.dp)
+    ) {
       RainbowButton(rainbowStatus, onRainbowClick, Modifier.fillMaxWidth())
     }
   }

@@ -42,7 +42,11 @@ import codes.chrishorner.planner.ui.BetterDropdownMenu
 import codes.chrishorner.planner.ui.Icons
 
 @Composable
-fun GameUi(game: Game, onOpenNyt: () -> Unit) {
+fun GameUi(
+  game: Game,
+  onOpenNyt: () -> Unit,
+  onClickAbout: () -> Unit,
+) {
   val model = game.model.value
 
   Scaffold(
@@ -50,6 +54,7 @@ fun GameUi(game: Game, onOpenNyt: () -> Unit) {
       BottomBar(
         showNytButton = model.mostlyComplete,
         rainbowStatus = model.rainbowStatus,
+        onAboutClick = onClickAbout,
         onRainbowClick = { game.rainbowSort() },
         onOpenNytClick = onOpenNyt,
       )
@@ -80,6 +85,7 @@ fun GameUi(game: Game, onOpenNyt: () -> Unit) {
 private fun BottomBar(
   showNytButton: Boolean,
   rainbowStatus: RainbowStatus,
+  onAboutClick: () -> Unit,
   onRainbowClick: () -> Unit,
   onOpenNytClick: () -> Unit,
 ) {
@@ -105,13 +111,13 @@ private fun BottomBar(
 
       Spacer(modifier = Modifier.weight(1f))
 
-      Menu()
+      Menu(onAboutClick)
     },
   )
 }
 
 @Composable
-fun Menu() {
+private fun Menu(onAboutClick: () -> Unit) {
   var expanded by remember { mutableStateOf(false) }
 
   Box {
@@ -135,7 +141,10 @@ fun Menu() {
           )
         },
         text = { Text(stringResource(R.string.about)) },
-        onClick = {},
+        onClick = {
+          expanded = false
+          onAboutClick()
+        },
       )
     }
   }

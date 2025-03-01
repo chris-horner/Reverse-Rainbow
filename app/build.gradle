@@ -6,6 +6,10 @@ plugins {
   alias(libs.plugins.kotlin.serialization)
 }
 
+def versionMajor = 0
+def versionMinor = 5
+def versionPatch = 0
+
 android {
   namespace 'codes.chrishorner.planner'
   compileSdk 35
@@ -14,8 +18,8 @@ android {
     applicationId "codes.chrishorner.planner"
     minSdk 31
     targetSdk 35
-    versionCode 1
-    versionName "1.0"
+    versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch
+    versionName "${versionMajor}.${versionMinor}.${versionPatch}"
 
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -37,6 +41,7 @@ android {
   }
   buildFeatures {
     compose true
+    buildConfig true
   }
 }
 

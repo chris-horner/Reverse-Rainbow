@@ -1,5 +1,6 @@
 package codes.chrishorner.planner.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -15,9 +16,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
+import codes.chrishorner.planner.Game
+import codes.chrishorner.planner.GameLoader
 import codes.chrishorner.planner.GameLoader.LoaderState
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
+import codes.chrishorner.planner.ui.screens.about.AboutUi
 import codes.chrishorner.planner.ui.screens.error.ErrorUi
 import codes.chrishorner.planner.ui.screens.game.GameUi
 import codes.chrishorner.planner.ui.screens.loading.LoadingUi
@@ -31,6 +35,11 @@ fun MainUi(
   onOpenNyt: () -> Unit,
 ) {
   var loadingAnimationDone by remember { mutableStateOf(loaderState !is LoaderState.Loading) }
+  var navDestination by remember { mutableStateOf(NavDestination.Game) }
+
+  BackHandler(enabled = navDestination == NavDestination.About) {
+    navDestination = NavDestination.Game
+  }
 
   Box(
     modifier = Modifier
@@ -40,21 +49,50 @@ fun MainUi(
     SharedTransitionLayout {
       val state = if (!loadingAnimationDone) LoaderState.Loading else loaderState
 
-      AnimatedContent(targetState = state, label = "MainUi") { targetState ->
+      val screen = when {
+        !loadingAnimationDone -> Screen.Loading
+        navDestination == NavDestination.About -> Screen.About
+        else -> when (state) {
+          is LoaderState.Failure -> Screen.Error(state.type)
+          LoaderState.Loading -> Screen.Loading
+          is LoaderState.Success -> Screen.Loaded(state.game)
+        }
+      }
+
+      AnimatedContent(targetState = screen, label = "MainUi") { targetScreen ->
         CompositionLocalProvider(
           LocalSharedTransitionScope provides this@SharedTransitionLayout,
           LocalAnimatedContentScope provides this
         ) {
-          when (targetState) {
-            LoaderState.Loading -> LoadingUi(
-              splashIconSize, onAnimationDone = { loadingAnimationDone = true },
+          when (targetScreen) {
+            is Screen.Loading -> LoadingUi(
+              splashIconSize = splashIconSize,
+              onAnimationDone = { loadingAnimationDone = true },
             )
 
-            is LoaderState.Failure -> ErrorUi(targetState.type, onRetry = onRefresh)
-            is LoaderState.Success -> GameUi(targetState.game, onOpenNyt)
+            is Screen.Loaded -> GameUi(
+              targetScreen.game, onOpenNyt,
+              onClickAbout = { navDestination = NavDestination.About }
+            )
+
+            is Screen.Error -> ErrorUi(targetScreen.type, onRetry = onRefresh)
+
+            is Screen.About -> AboutUi(onBack = { navDestination = NavDestination.Game })
           }
         }
       }
     }
   }
+}
+
+private enum class NavDestination {
+  Game,
+  About,
+}
+
+private sealed interface Screen {
+  data object Loading : Screen
+  data class Error(val type: GameLoader.FailureType) : Screen
+  data class Loaded(val game: Game) : Screen
+  data object About : Screen
 }

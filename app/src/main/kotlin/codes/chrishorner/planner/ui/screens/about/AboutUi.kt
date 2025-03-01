@@ -3,6 +3,8 @@
 package codes.chrishorner.planner.ui.screens.about
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -140,6 +142,12 @@ private fun Block(
       .sharedBounds(
         sharedContentState = rememberSharedContentState(category),
         animatedVisibilityScope = LocalAnimatedContentScope.current,
+        boundsTransform = { _, _ ->
+          spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+          )
+        }
       )
       .size(48.dp)
       .background(

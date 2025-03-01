@@ -2,8 +2,16 @@ package codes.chrishorner.planner.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.EaseOutBack
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -59,7 +67,11 @@ fun MainUi(
         }
       }
 
-      AnimatedContent(targetState = screen, label = "MainUi") { targetScreen ->
+      AnimatedContent(
+        targetState = screen,
+        label = "MainUi",
+        transitionSpec = transitionSpec(),
+      ) { targetScreen ->
         CompositionLocalProvider(
           LocalSharedTransitionScope provides this@SharedTransitionLayout,
           LocalAnimatedContentScope provides this
@@ -95,4 +107,17 @@ private sealed interface Screen {
   data class Error(val type: GameLoader.FailureType) : Screen
   data class Loaded(val game: Game) : Screen
   data object About : Screen
+}
+
+private fun <S> transitionSpec(): AnimatedContentTransitionScope<S>.() -> ContentTransform = {
+  val inSpec = fadeIn(
+    animationSpec = tween(220, delayMillis = 90)
+  ) + scaleIn(
+    initialScale = 0.92f,
+    animationSpec = tween(220, delayMillis = 90, easing = EaseOutBack)
+  )
+
+  val outSpec = fadeOut(animationSpec = tween(90))
+
+  inSpec.togetherWith(outSpec)
 }

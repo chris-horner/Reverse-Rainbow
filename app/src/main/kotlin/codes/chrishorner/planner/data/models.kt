@@ -14,7 +14,7 @@ data class Card(
   @Parcelize
   sealed interface Content : Parcelable {
     @Parcelize
-    data class Text(val content: String) : Content
+    data class Text(val body: String) : Content
 
     @Parcelize
     data class Image(val url: String, val description: String?) : Content

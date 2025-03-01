@@ -17,7 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,13 +28,20 @@ import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.ui.AutoSizeText
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.plannerColors
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Tile(card: Card, onClick: () -> Unit, modifier: Modifier) {
   val tileColors = getColors(card)
-  val backgroundColor by animateColorAsState(tileColors.background, animationSpec = spring(stiffness = Spring.StiffnessHigh))
-  val textColor by animateColorAsState(tileColors.text, animationSpec = spring(stiffness = Spring.StiffnessHigh))
+  val backgroundColor by animateColorAsState(
+    tileColors.background, animationSpec = spring(stiffness = Spring.StiffnessHigh)
+  )
+  val foregroundColor by animateColorAsState(
+    tileColors.text, animationSpec = spring(stiffness = Spring.StiffnessHigh)
+  )
 
   with(LocalSharedTransitionScope.current) {
     Box(
@@ -51,15 +59,31 @@ fun Tile(card: Card, onClick: () -> Unit, modifier: Modifier) {
           4f - card.currentPosition
         ) // Makes sure cards animating to the top render over others.
     ) {
-      AutoSizeText(
-        // TODO: Render different types of content.
-        text = (card.content as Card.Content.Text).content,
-        maxLines = 2,
-        style = MaterialTheme.typography.titleMedium.copy(
-          fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
-        ),
-        color = textColor,
-      )
+
+      when (card.content) {
+        is Card.Content.Image -> {
+          AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+              .data(card.content.url)
+              .crossfade(true)
+              .build(),
+            contentDescription = card.content.description,
+            colorFilter = ColorFilter.tint(foregroundColor),
+          )
+        }
+
+        is Card.Content.Text -> {
+          AutoSizeText(
+            text = card.content.body,
+            maxLines = 2,
+            style = MaterialTheme.typography.titleMedium.copy(
+              fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
+            ),
+            color = foregroundColor,
+          )
+        }
+      }
+
     }
   }
 }
@@ -79,18 +103,22 @@ private fun getColors(card: Card): TileColors {
       primaryColor = MaterialTheme.plannerColors.yellowSurface
       secondaryColor = MaterialTheme.plannerColors.onYellowSurface
     }
+
     Category.GREEN -> {
       primaryColor = MaterialTheme.plannerColors.greenSurface
       secondaryColor = MaterialTheme.plannerColors.onGreenSurface
     }
+
     Category.BLUE -> {
       primaryColor = MaterialTheme.plannerColors.blueSurface
       secondaryColor = MaterialTheme.plannerColors.onBlueSurface
     }
+
     Category.PURPLE -> {
       primaryColor = MaterialTheme.plannerColors.purpleSurface
       secondaryColor = MaterialTheme.plannerColors.onPurpleSurface
     }
+
     null -> {
       primaryColor = MaterialTheme.colorScheme.surfaceContainer
       secondaryColor = MaterialTheme.colorScheme.onSurface

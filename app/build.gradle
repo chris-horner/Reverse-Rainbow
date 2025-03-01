@@ -4,6 +4,7 @@ plugins {
   alias(libs.plugins.kotlin.compose)
   alias(libs.plugins.kotlin.parcelize)
   alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.playpublisher)
 }
 
 def versionMajor = 0
@@ -20,29 +21,70 @@ android {
     targetSdk 35
     versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch
     versionName "${versionMajor}.${versionMinor}.${versionPatch}"
-
-    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
 
-  buildTypes {
+  signingConfigs {
+    debug {
+      storeFile file('keys/debug.keystore')
+      storePassword 'android'
+      keyAlias 'androiddebugkey'
+    }
+
     release {
-      minifyEnabled true
-      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'shrinker_rules.pro'
-      signingConfig signingConfigs.debug // TODO: Replace with real config.
+      def uploadKey = file('keys/upload.keystore')
+      storeFile uploadKey.exists() ? uploadKey : file('keys/debug.keystore')
+      storePassword System.getenv("planner_password") ?: 'android'
+      keyAlias System.getenv("planner_alias") ?: 'androiddebugkey'
+      keyPassword System.getenv("planner_password") ?: 'android'
     }
   }
+
+
+  buildTypes {
+    debug {
+      signingConfig signingConfigs.debug
+    }
+
+    release {
+      minifyEnabled true
+      shrinkResources true
+      signingConfig signingConfigs.release
+      proguardFiles file('shrinker_rules.pro')
+    }
+  }
+
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_11
     targetCompatibility JavaVersion.VERSION_11
   }
+
   kotlinOptions {
     jvmTarget = '11'
     freeCompilerArgs += ['-Xcontext-receivers']
   }
+
   buildFeatures {
     compose true
     buildConfig true
   }
+
+  packagingOptions {
+    resources {
+      excludes += ['**/*.kotlin_metadata', 'META-INF/*.kotlin_module', 'META-INF/*.properties', '/*.properties']
+    }
+  }
+
+  bundle {
+    language {
+      enableSplit = false // We currently only have one language.
+    }
+  }
+}
+
+play {
+  serviceAccountCredentials = file('keys/play_access.json')
+  defaultToAppBundles = true
+  resolutionStrategy = com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE
 }
 
 dependencies {

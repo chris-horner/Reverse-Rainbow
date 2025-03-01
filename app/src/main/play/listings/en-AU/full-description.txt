@@ -1,0 +1,1 @@
+This app let's you plan your answers for today's New York Times Connections game. It does not let you play the game - you'll still need the official website or app for that.

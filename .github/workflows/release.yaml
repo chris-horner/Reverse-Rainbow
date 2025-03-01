@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy:
+    name: Publish release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Retrieve access json
+        env:
+          play_access_json: ${{ secrets.play_access_json }}
+        run: echo $play_access_json > app/keys/play_access.json
+
+      - name: Retrieve upload keystore
+        env:
+          upload_keystore: ${{ secrets.upload_keystore }}
+        run: echo $upload_keystore | base64 -di > app/keys/upload.keystore
+
+      - name: Publish bundle to internal test track
+        env:
+          socket_weather_alias: ${{ secrets.socket_weather_alias }}
+          socket_weather_password: ${{ secrets.socket_weather_password }}
+        run: bash ./gradlew publishReleaseBundle
+
+      - name: Update store listing
+        run: bash ./gradlew publishReleaseListing
+
+      - name: Build APKs
+        env:
+          socket_weather_alias: ${{ secrets.socket_weather_alias }}
+          socket_weather_password: ${{ secrets.socket_weather_password }}
+        run: bash ./gradlew assembleDebug assembleRelease
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          body_path: app/src/main/play/release-notes/en-AU/default.txt
+          files: |
+            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -33,9 +33,9 @@ android {
     release {
       def uploadKey = file('keys/upload.keystore')
       storeFile uploadKey.exists() ? uploadKey : file('keys/debug.keystore')
-      storePassword System.getenv("planner_password") ?: 'android'
-      keyAlias System.getenv("planner_alias") ?: 'androiddebugkey'
-      keyPassword System.getenv("planner_password") ?: 'android'
+      storePassword System.getenv("connections_planner_password") ?: 'android'
+      keyAlias System.getenv("connections_planner_alias") ?: 'androiddebugkey'
+      keyPassword System.getenv("connections_planner_password") ?: 'android'
     }
   }
 

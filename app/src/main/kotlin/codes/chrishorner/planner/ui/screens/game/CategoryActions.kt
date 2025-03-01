@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalSharedTransitionApi::class)
+
 package codes.chrishorner.planner.ui.screens.game
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -8,7 +10,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,69 +29,92 @@ import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.data.CategoryStatus
 import codes.chrishorner.planner.ui.Icons
+import codes.chrishorner.planner.ui.LayoutOrientation
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
+import codes.chrishorner.planner.ui.LocalLayoutOrientation
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.plannerColors
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun CategoryActions(
   categoryStatuses: Map<Category, CategoryStatus>,
   onCategoryClick: (Category) -> Unit,
 ) {
-  with(LocalSharedTransitionScope.current) {
-    Row(
-      horizontalArrangement = Arrangement.SpaceEvenly,
-      modifier = Modifier.fillMaxWidth(),
-    ) {
-      for ((category, status) in categoryStatuses) {
-        val colors = getColors(category)
-        val alpha by animateFloatAsState(
-          targetValue = if (status == CategoryStatus.DISABLED) 0.5f else 1f,
-          label = "category action alpha",
-        )
-
-        Box(
-          contentAlignment = Alignment.Center,
-          modifier = Modifier
-            .sharedBounds(
-              sharedContentState = rememberSharedContentState(category),
-              animatedVisibilityScope = LocalAnimatedContentScope.current,
-              boundsTransform = { _, _ ->
-                spring(
-                  dampingRatio = Spring.DampingRatioLowBouncy,
-                  stiffness = Spring.StiffnessMediumLow,
-                )
-              }
-            )
-            .alpha(alpha)
-            .size(64.dp)
-            .background(
-              shape = RoundedCornerShape(8.dp),
-              color = colors.background,
-            )
-            .clip(RoundedCornerShape(8.dp))
-            .clickable(
-              enabled = status != CategoryStatus.DISABLED,
-              onClick = { onCategoryClick(category) },
-            )
-        ) {
-
-          if (status == CategoryStatus.CLEARABLE) {
-            Icon(
-              imageVector = Icons.Clear,
-              contentDescription = null,
-              tint = colors.icon,
-            )
-          } else if (status == CategoryStatus.SWAPPABLE) {
-            Icon(
-              imageVector = Icons.Shuffle,
-              contentDescription = null,
-              tint = colors.icon,
-            )
-          }
+  when (LocalLayoutOrientation.current) {
+    LayoutOrientation.Portrait -> {
+      Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.fillMaxWidth(),
+      ) {
+        for ((category, status) in categoryStatuses) {
+          CategoryAction(category, status, onCategoryClick)
         }
       }
+    }
+
+    LayoutOrientation.Landscape -> {
+      Column(
+        verticalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.fillMaxHeight(),
+      ) {
+        for ((category, status) in categoryStatuses) {
+          CategoryAction(category, status, onCategoryClick)
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun CategoryAction(
+  category: Category,
+  status: CategoryStatus,
+  onClick: (Category) -> Unit,
+) = with(LocalSharedTransitionScope.current) {
+  val colors = getColors(category)
+  val alpha by animateFloatAsState(
+    targetValue = if (status == CategoryStatus.DISABLED) 0.5f else 1f,
+    label = "category action alpha",
+  )
+
+  Box(
+    contentAlignment = Alignment.Center,
+    modifier = Modifier
+      .sharedBounds(
+        sharedContentState = rememberSharedContentState(category),
+        animatedVisibilityScope = LocalAnimatedContentScope.current,
+        boundsTransform = { _, _ ->
+          spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+          )
+        }
+      )
+      .alpha(alpha)
+      .size(64.dp)
+      .background(
+        shape = RoundedCornerShape(8.dp),
+        color = colors.background,
+      )
+      .clip(RoundedCornerShape(8.dp))
+      .clickable(
+        enabled = status != CategoryStatus.DISABLED,
+        onClick = { onClick(category) },
+      )
+  ) {
+
+    if (status == CategoryStatus.CLEARABLE) {
+      Icon(
+        imageVector = Icons.Clear,
+        contentDescription = null,
+        tint = colors.icon,
+      )
+    } else if (status == CategoryStatus.SWAPPABLE) {
+      Icon(
+        imageVector = Icons.Shuffle,
+        contentDescription = null,
+        tint = colors.icon,
+      )
     }
   }
 }

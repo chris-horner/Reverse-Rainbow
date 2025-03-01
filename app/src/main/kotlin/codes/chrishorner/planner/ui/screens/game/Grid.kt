@@ -24,6 +24,7 @@ import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import codes.chrishorner.planner.data.Card
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 @Composable
 fun Grid(
@@ -55,7 +56,6 @@ fun Grid(
 
   ConnectionsLayout(
     modifier = Modifier
-      .fillMaxWidth()
       .widthIn(max = 400.dp)
       .padding(8.dp)
       .alpha(alphaAnimation.value)
@@ -88,14 +88,13 @@ private fun ConnectionsLayout(
       "ConnectionsLayout layout requires 16 children exactly."
     }
 
-    val width = constraints.maxWidth
-    val height = width // Square up.
+    val widthAndHeight = min(constraints.maxWidth, constraints.maxHeight)
     val itemSpacingPx = itemSpacing.roundToPx()
-    val itemSize = (width - (itemSpacingPx * 3)) / 4
+    val itemSize = (widthAndHeight - (itemSpacingPx * 3)) / 4
     val itemConstraints = Constraints.fixed(width = itemSize, height = itemSize)
     val placeables = measurables.fastMap { it.measure(itemConstraints) }
 
-    layout(width, height) {
+    layout(widthAndHeight, widthAndHeight) {
       placeables.fastForEachIndexed { index, placeable ->
         val horizontalIndex = index % 4
         val horizontalOffset = (itemSize + itemSpacingPx) * horizontalIndex

@@ -13,11 +13,15 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +44,8 @@ import codes.chrishorner.planner.R
 import codes.chrishorner.planner.data.RainbowStatus
 import codes.chrishorner.planner.ui.BetterDropdownMenu
 import codes.chrishorner.planner.ui.Icons
+import codes.chrishorner.planner.ui.LayoutOrientation
+import codes.chrishorner.planner.ui.LocalLayoutOrientation
 
 @Composable
 fun GameUi(
@@ -47,6 +53,16 @@ fun GameUi(
   onOpenNyt: () -> Unit,
   onClickAbout: () -> Unit,
 ) {
+  val orientation = LocalLayoutOrientation.current
+
+  when (orientation) {
+    LayoutOrientation.Portrait -> PortraitGameUi(game, onOpenNyt, onOpenNyt)
+    LayoutOrientation.Landscape -> LandscapeGameUi(game, onOpenNyt, onClickAbout)
+  }
+}
+
+@Composable
+private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -> Unit) {
   val model = game.model.value
 
   Scaffold(
@@ -82,6 +98,63 @@ fun GameUi(
 }
 
 @Composable
+private fun LandscapeGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -> Unit) {
+  val model = game.model.value
+
+  Scaffold { paddingValues ->
+    Row(modifier = Modifier.padding(paddingValues)) {
+      LandscapeSideBar(
+        showNytButton = model.mostlyComplete,
+        rainbowStatus = model.rainbowStatus,
+        onAboutClick = onClickAbout,
+        onRainbowClick = { game.rainbowSort() },
+        onOpenNytClick = onOpenNyt,
+        modifier = Modifier
+          .weight(1f)
+          .fillMaxHeight(),
+      )
+
+      Grid(model.cards, game::select)
+
+      Spacer(modifier = Modifier.size(16.dp))
+
+      CategoryActions(
+        categoryStatuses = model.categoryStatuses,
+        onCategoryClick = { category -> game.select(category) }
+      )
+
+      Spacer(modifier = Modifier.size(16.dp))
+    }
+  }
+}
+
+@Composable
+private fun LandscapeSideBar(
+  showNytButton: Boolean,
+  rainbowStatus: RainbowStatus,
+  onAboutClick: () -> Unit,
+  onRainbowClick: () -> Unit,
+  onOpenNytClick: () -> Unit,
+  modifier: Modifier,
+) {
+  Column(modifier = modifier) {
+    Menu(onAboutClick)
+
+    Spacer(modifier = Modifier.size(32.dp))
+
+    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+      OpenNytButton(showNytButton, onOpenNytClick, Modifier.fillMaxWidth())
+    }
+
+    Spacer(modifier = Modifier.size(8.dp))
+
+    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+      RainbowButton(rainbowStatus, onRainbowClick, Modifier.fillMaxWidth())
+    }
+  }
+}
+
+@Composable
 private fun BottomBar(
   showNytButton: Boolean,
   rainbowStatus: RainbowStatus,
@@ -95,15 +168,7 @@ private fun BottomBar(
     actions = {
       Spacer(modifier = Modifier.size(16.dp))
 
-      AnimatedVisibility(
-        visible = showNytButton,
-        enter = ButtonEnterSpec,
-        exit = ButtonExitSpec,
-      ) {
-        OutlinedButton(onClick = onOpenNytClick) {
-          Text(stringResource(R.string.open_nyt))
-        }
-      }
+      OpenNytButton(showNytButton, onOpenNytClick)
 
       Spacer(modifier = Modifier.size(16.dp))
 
@@ -117,10 +182,13 @@ private fun BottomBar(
 }
 
 @Composable
-private fun Menu(onAboutClick: () -> Unit) {
+private fun Menu(
+  onAboutClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
   var expanded by remember { mutableStateOf(false) }
 
-  Box {
+  Box(modifier) {
     IconButton(onClick = { expanded = true }) {
       Icon(
         imageVector = Icons.MoreVert,
@@ -151,7 +219,33 @@ private fun Menu(onAboutClick: () -> Unit) {
 }
 
 @Composable
-private fun RainbowButton(status: RainbowStatus, onClick: () -> Unit) {
+private fun OpenNytButton(
+  show: Boolean, onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  AnimatedVisibility(
+    visible = show,
+    enter = ButtonEnterSpec,
+    exit = ButtonExitSpec,
+  ) {
+    OutlinedButton(
+      onClick = onClick,
+      colors = ButtonDefaults.outlinedButtonColors(
+        contentColor = MaterialTheme.colorScheme.primary
+      ),
+      modifier = modifier,
+    ) {
+      Text(stringResource(R.string.open_nyt))
+    }
+  }
+}
+
+@Composable
+private fun RainbowButton(
+  status: RainbowStatus,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
   val rainbowRotation by animateFloatAsState(
     targetValue = if (status == RainbowStatus.REVERSIBLE) 180f else 0f
   )
@@ -169,7 +263,10 @@ private fun RainbowButton(status: RainbowStatus, onClick: () -> Unit) {
   ) {
     OutlinedButton(
       onClick = onClick,
-      modifier = Modifier.animateContentSize(),
+      modifier = modifier.animateContentSize(),
+      colors = ButtonDefaults.outlinedButtonColors(
+        contentColor = MaterialTheme.colorScheme.primary
+      ),
     ) {
       Text("🌈", modifier = Modifier.rotate(rainbowRotation))
       Spacer(modifier = Modifier.size(6.dp))

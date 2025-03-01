@@ -48,6 +48,7 @@ fun BetterDropdownMenu(
   modifier: Modifier = Modifier,
   content: @Composable ColumnScope.() -> Unit
 ) {
+  val orientation = LocalLayoutOrientation.current
   val expandedState = remember { MutableTransitionState(false) }
   expandedState.targetState = expanded
 
@@ -63,10 +64,18 @@ fun BetterDropdownMenu(
             layoutDirection: LayoutDirection,
             popupContentSize: IntSize
           ): IntOffset {
-            val anchorOffset = IntOffset(
-              x = popupContentSize.width - anchorBounds.width,
-              y = popupContentSize.height,
-            )
+            val anchorOffset = when (orientation) {
+              LayoutOrientation.Portrait -> IntOffset(
+                x = popupContentSize.width - anchorBounds.width,
+                y = popupContentSize.height,
+              )
+
+              LayoutOrientation.Landscape -> IntOffset(
+                x = popupContentSize.width - anchorBounds.width,
+                y = -anchorBounds.height,
+              )
+            }
+
             return anchorBounds.topLeft - anchorOffset
           }
         }

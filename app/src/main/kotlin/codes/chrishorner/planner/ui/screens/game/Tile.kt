@@ -4,6 +4,7 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.animateBounds
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
@@ -25,9 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.Category
-import codes.chrishorner.planner.ui.util.AutoSizeText
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.plannerColors
+import codes.chrishorner.planner.ui.util.AutoSizeText
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -47,7 +49,16 @@ fun Tile(card: Card, onClick: () -> Unit, modifier: Modifier) {
     Box(
       contentAlignment = Alignment.Center,
       modifier = modifier
-        .animateBounds(this)
+        .animateBounds(
+          lookaheadScope = this,
+          boundsTransform = { _, _ ->
+            spring(
+              dampingRatio = Spring.DampingRatioLowBouncy,
+              stiffness = Spring.StiffnessMediumLow,
+              visibilityThreshold = Rect.VisibilityThreshold,
+            )
+          }
+        )
         .background(
           color = backgroundColor,
           shape = RoundedCornerShape(6.dp)

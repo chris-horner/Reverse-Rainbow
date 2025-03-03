@@ -34,7 +34,7 @@ fun Grid(
   val offsetAnimations = remember {
     with(density) {
       List(cards.size) { index ->
-        Animatable(IntOffset(0, ((-8).dp * index).roundToPx()), IntOffset.VectorConverter)
+        Animatable(IntOffset(0, ((-8).dp * (index + 1)).roundToPx()), IntOffset.VectorConverter)
       }
     }
   }
@@ -45,7 +45,7 @@ fun Grid(
       launch {
         offsetAnimation.animateTo(
           IntOffset.Zero, animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow,
+            dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow,
           )
         )
       }

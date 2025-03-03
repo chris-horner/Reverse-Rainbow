@@ -1,7 +1,6 @@
 package codes.chrishorner.planner.ui.screens.loading
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.VectorConverter
@@ -9,7 +8,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -46,30 +44,26 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun LoadingUi(splashIconSize: DpSize, onAnimationDone: () -> Unit) {
-  with(LocalSharedTransitionScope.current) {
+  Box(
+    contentAlignment = Alignment.Center,
+    modifier = Modifier.fillMaxSize(),
+  ) {
     Box(
       contentAlignment = Alignment.Center,
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.size(splashIconSize),
     ) {
-      Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.size(splashIconSize),
-      ) {
-        LoadingTiles(onAnimationDone)
-      }
+      LoadingTiles(onAnimationDone)
     }
   }
 }
 
-context(SharedTransitionScope)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun BoxScope.LoadingTiles(
+private fun LoadingTiles(
   onAnimationDone: () -> Unit,
-) {
+) = with(LocalSharedTransitionScope.current) {
   val scope = rememberCoroutineScope()
   val state = remember { LoadingAnimationState(scope) }
   LaunchedEffect(state.completedIntro) {
@@ -78,7 +72,7 @@ private fun BoxScope.LoadingTiles(
 
   Box(
     modifier = Modifier
-      .offset { state.yellowOffset.toIntOffset() }
+      .offset { intOffsetFrom(state.yellowOffset) }
       .sharedBounds(
         sharedContentState = rememberSharedContentState(Category.YELLOW),
         animatedVisibilityScope = LocalAnimatedContentScope.current,
@@ -89,7 +83,7 @@ private fun BoxScope.LoadingTiles(
 
   Box(
     modifier = Modifier
-      .offset { state.greenOffset.toIntOffset() }
+      .offset { intOffsetFrom(state.greenOffset) }
       .sharedBounds(
         sharedContentState = rememberSharedContentState(Category.GREEN),
         animatedVisibilityScope = LocalAnimatedContentScope.current,
@@ -100,7 +94,7 @@ private fun BoxScope.LoadingTiles(
 
   Box(
     modifier = Modifier
-      .offset { state.blueOffset.toIntOffset() }
+      .offset { intOffsetFrom(state.blueOffset) }
       .sharedBounds(
         sharedContentState = rememberSharedContentState(Category.BLUE),
         animatedVisibilityScope = LocalAnimatedContentScope.current,
@@ -111,7 +105,7 @@ private fun BoxScope.LoadingTiles(
 
   Box(
     modifier = Modifier
-      .offset { state.purpleOffset.toIntOffset() }
+      .offset { intOffsetFrom(state.purpleOffset) }
       .sharedBounds(
         sharedContentState = rememberSharedContentState(Category.PURPLE),
         animatedVisibilityScope = LocalAnimatedContentScope.current,
@@ -185,8 +179,9 @@ private class LoadingAnimationState(scope: CoroutineScope) {
   }
 }
 
-context (Density)
-private fun DpOffset.toIntOffset() = IntOffset(x.roundToPx(), y.roundToPx())
+private fun Density.intOffsetFrom(dpOffset: DpOffset): IntOffset {
+  return IntOffset(dpOffset.x.roundToPx(), dpOffset.y.roundToPx())
+}
 
 // Starting angles for each of the colors.
 private val YellowAngle = Math.toRadians(225.0).toFloat()

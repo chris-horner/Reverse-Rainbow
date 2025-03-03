@@ -1,6 +1,5 @@
 package codes.chrishorner.planner
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -66,10 +65,9 @@ class MainActivity : ComponentActivity() {
         }
     }
   }
-}
 
-context(Context)
-private fun Int.pxToDp(): Dp {
-  val value = this / (resources.displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT)
-  return value.dp
+  private fun Int.pxToDp(): Dp {
+    val value = this / (resources.displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT)
+    return value.dp
+  }
 }

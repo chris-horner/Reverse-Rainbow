@@ -6,7 +6,6 @@ import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
@@ -22,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import codes.chrishorner.planner.data.Card
-import codes.chrishorner.planner.ui.CappedWidth
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
@@ -47,8 +45,8 @@ fun Grid(
       launch {
         offsetAnimation.animateTo(
           IntOffset.Zero, animationSpec = spring(
-          dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow
-        )
+            dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMediumLow,
+          )
         )
       }
     }
@@ -56,7 +54,6 @@ fun Grid(
 
   ConnectionsLayout(
     modifier = Modifier
-      .widthIn(max = CappedWidth)
       .padding(8.dp)
       .alpha(alphaAnimation.value)
   ) {

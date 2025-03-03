@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.Category
-import codes.chrishorner.planner.ui.AutoSizeText
+import codes.chrishorner.planner.ui.util.AutoSizeText
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.plannerColors
 import coil3.compose.AsyncImage

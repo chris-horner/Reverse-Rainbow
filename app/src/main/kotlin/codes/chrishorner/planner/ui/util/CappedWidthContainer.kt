@@ -1,4 +1,4 @@
-package codes.chrishorner.planner.ui
+package codes.chrishorner.planner.ui.util
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,13 +17,10 @@ fun CappedWidthContainer(content: @Composable () -> Unit) {
   Box(contentAlignment = Alignment.TopCenter, modifier = Modifier.fillMaxSize()) {
     Box(
       modifier = Modifier
-        .widthIn(max = CappedWidth)
+        .widthIn(max = 500.dp)
         .fillMaxHeight()
     ) {
       content()
     }
   }
 }
-
-val CappedWidth = 500.dp
-

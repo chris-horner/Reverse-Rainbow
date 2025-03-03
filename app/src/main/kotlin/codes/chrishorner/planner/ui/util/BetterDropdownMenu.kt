@@ -1,4 +1,4 @@
-package codes.chrishorner.planner.ui
+package codes.chrishorner.planner.ui.util
 
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateDp
@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
+import codes.chrishorner.planner.ui.LayoutOrientation
+import codes.chrishorner.planner.ui.LocalLayoutOrientation
 
 /**
  * A copy of Material3's `DropdownMenu`, but with simpler position calculation that doesn't have

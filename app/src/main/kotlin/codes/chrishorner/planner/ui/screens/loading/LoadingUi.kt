@@ -1,6 +1,5 @@
 package codes.chrishorner.planner.ui.screens.loading
 
-import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable

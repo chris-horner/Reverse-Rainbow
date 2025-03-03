@@ -20,6 +20,10 @@ enum class UiMode {
 val LocalLayoutOrientation = staticCompositionLocalOf { LayoutOrientation.Portrait }
 val LocalUiMode = staticCompositionLocalOf { UiMode.Small }
 
+/**
+ * Sits at the root, looks at the available width and height, and decides the current
+ * [LocalLayoutOrientation] and [LocalUiMode].
+ */
 @Composable
 fun UiLayoutManager(content: @Composable () -> Unit) {
   BoxWithConstraints {

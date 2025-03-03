@@ -1,4 +1,4 @@
-package codes.chrishorner.planner.ui
+package codes.chrishorner.planner.ui.util
 
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text

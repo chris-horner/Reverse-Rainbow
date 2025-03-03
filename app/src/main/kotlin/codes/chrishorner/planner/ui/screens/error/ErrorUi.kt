@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.GameLoader.FailureType
 import codes.chrishorner.planner.R
 import codes.chrishorner.planner.data.Category
-import codes.chrishorner.planner.ui.CappedWidthContainer
+import codes.chrishorner.planner.ui.util.CappedWidthContainer
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.plannerColors

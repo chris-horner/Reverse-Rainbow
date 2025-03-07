@@ -273,7 +273,7 @@ class Game(cards: List<Card>) {
 
     val allOfOneOtherCategorySelected = otherCategorySelectionCount == 1 &&
       selectedCards.all { it.category != null } &&
-      selectedCards.count { it.category != category } == cardsInCategoryCount
+      selectedCards.all { it.category != category }
 
     val equalNumberFromOtherCategorySelected = otherCategorySelectionCount == 1 &&
       selectedCards.all { it.category != null } &&

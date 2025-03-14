@@ -42,32 +42,15 @@ class Game(cards: List<Card>) {
     // Prevent selecting more than 4 cards.
     if (!card.selected && selectionCount >= 4) return
 
-    when {
-      card.category != null -> when {
-        // If the first card selected already has a category, select all cards in that category.
-        selectionCount == 0 -> {
-          cards.replaceAll { it.copy(selected = it.category == card.category) }
-        }
-
-        // If there are several cards selected of the same category, deselect them all except the
-        // current card.
-        cards.filter { it.category == card.category }.all { it.selected } && selectionCount > 1 -> {
-          cards.replaceAll { if (it != card) it.copy(selected = false) else card }
-        }
-
-        // Otherwise just select the card like normal.
-        else -> {
-          cards[card.currentPosition] = card.copy(selected = !card.selected)
-        }
-      }
-
-      // Otherwise just select the card like normal.
-      else -> {
-        cards[card.currentPosition] = card.copy(selected = !card.selected)
-      }
-    }
-
+    cards[card.currentPosition] = card.copy(selected = !card.selected)
     publishModelUpdate()
+  }
+
+  fun longSelect(card: Card) {
+    if (card.category != null) {
+      cards.replaceAll { it.copy(selected = it.category == card.category) }
+      publishModelUpdate()
+    }
   }
 
   fun select(category: Category) {

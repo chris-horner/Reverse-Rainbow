@@ -7,7 +7,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,7 +36,7 @@ import coil3.request.crossfade
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun Tile(card: Card, onClick: () -> Unit, modifier: Modifier) {
+fun Tile(card: Card, onClick: () -> Unit, onLongClick: () -> Unit, modifier: Modifier) {
   val tileColors = getColors(card)
   val backgroundColor by animateColorAsState(
     tileColors.background, animationSpec = spring(stiffness = Spring.StiffnessHigh)
@@ -64,7 +64,10 @@ fun Tile(card: Card, onClick: () -> Unit, modifier: Modifier) {
           shape = RoundedCornerShape(6.dp)
         )
         .clip(RoundedCornerShape(6.dp))
-        .clickable(onClick = onClick)
+        .combinedClickable(
+          onClick = onClick,
+          onLongClick = onLongClick,
+        )
         .padding(8.dp)
         .zIndex(
           4f - card.currentPosition

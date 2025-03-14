@@ -28,6 +28,7 @@ import kotlin.math.min
 fun Grid(
   cards: List<Card>,
   onSelect: (Card) -> Unit,
+  onLongSelect: (Card) -> Unit,
 ) {
   val density = LocalDensity.current
   val alphaAnimation = remember { Animatable(0f) }
@@ -62,6 +63,7 @@ fun Grid(
         Tile(
           card = card,
           onClick = { onSelect(card) },
+          onLongClick = { onLongSelect(card) },
           modifier = Modifier.offset { offsetAnimations[index].value }
         )
       }

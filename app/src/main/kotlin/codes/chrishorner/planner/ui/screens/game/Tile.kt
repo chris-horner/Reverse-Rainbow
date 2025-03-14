@@ -21,15 +21,12 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.plannerColors
-import codes.chrishorner.planner.ui.util.AutoSizeText
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -87,17 +84,9 @@ fun Tile(card: Card, onClick: () -> Unit, onLongClick: () -> Unit, modifier: Mod
         }
 
         is Card.Content.Text -> {
-          AutoSizeText(
-            text = card.content.body,
-            maxLines = 2,
-            style = MaterialTheme.typography.titleMedium.copy(
-              fontWeight = FontWeight.Bold, textAlign = TextAlign.Center,
-            ),
-            color = foregroundColor,
-          )
+          TileText(text = card.content.body, color = foregroundColor)
         }
       }
-
     }
   }
 }

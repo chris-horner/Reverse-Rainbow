@@ -44,7 +44,10 @@ class TileDragState(private var cards: List<Card>) {
     if (card.category == null) return
 
     cards.fastForEach { otherCard ->
-      if (otherCard != card && otherCard.category == card.category) {
+      val isOtherCard = otherCard.initialPosition != card.initialPosition
+      val isSameCategory = otherCard.category == card.category
+
+      if (isOtherCard && isSameCategory) {
         var otherCardOffset by offsetStates[otherCard.initialPosition]
         otherCardOffset += IntOffset(dragAmount.x.roundToInt(), dragAmount.y.roundToInt())
         draggingStates[otherCard.initialPosition].value = true

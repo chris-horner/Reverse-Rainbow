@@ -4,7 +4,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.EaseOutBack
 import androidx.compose.animation.core.tween
@@ -36,7 +35,6 @@ import codes.chrishorner.planner.ui.screens.error.ErrorUi
 import codes.chrishorner.planner.ui.screens.game.GameUi
 import codes.chrishorner.planner.ui.screens.loading.LoadingUi
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun MainUi(
   loaderState: LoaderState,

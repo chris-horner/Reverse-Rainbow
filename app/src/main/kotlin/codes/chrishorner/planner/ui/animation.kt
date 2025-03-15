@@ -1,10 +1,7 @@
-@file:OptIn(ExperimentalSharedTransitionApi::class)
-
 package codes.chrishorner.planner.ui
 
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Easing
 import androidx.compose.runtime.compositionLocalOf

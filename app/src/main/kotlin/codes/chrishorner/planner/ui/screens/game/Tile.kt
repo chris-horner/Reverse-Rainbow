@@ -1,6 +1,5 @@
 package codes.chrishorner.planner.ui.screens.game
 
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.animateBounds
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -31,7 +30,6 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Tile(card: Card, onClick: () -> Unit, onLongClick: () -> Unit, modifier: Modifier) {
   val tileColors = getColors(card)

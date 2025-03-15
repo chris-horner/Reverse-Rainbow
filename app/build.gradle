@@ -60,6 +60,11 @@ android {
 
   kotlinOptions {
     jvmTarget = '11'
+    freeCompilerArgs += [
+            '-opt-in=androidx.compose.animation.ExperimentalSharedTransitionApi',
+            '-opt-in=androidx.compose.material3.ExperimentalMaterial3Api',
+            '-opt-in=kotlinx.serialization.ExperimentalSerializationApi',
+    ]
   }
 
   buildFeatures {

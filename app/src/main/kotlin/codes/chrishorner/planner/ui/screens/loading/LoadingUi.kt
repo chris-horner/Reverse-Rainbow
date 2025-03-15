@@ -1,6 +1,5 @@
 package codes.chrishorner.planner.ui.screens.loading
 
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.VectorConverter
@@ -59,7 +58,6 @@ fun LoadingUi(splashIconSize: DpSize, onAnimationDone: () -> Unit) {
   }
 }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun LoadingTiles(
   onAnimationDone: () -> Unit,

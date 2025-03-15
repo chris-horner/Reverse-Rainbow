@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.data.CardFetchResult
 import codes.chrishorner.planner.data.fetchCards
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.Clock
@@ -77,7 +78,7 @@ class GameLoader private constructor(
       val previousCards = previousBundle?.getParcelableArrayList<Card>("cards")
       val previousDate = previousBundle?.getString("date")?.let { LocalDate.parse(it) }
       val initialLoaderState = if (previousCards != null && previousDate != null) {
-        LoaderState.Success(previousDate, Game(previousCards))
+        LoaderState.Success(previousDate, Game(previousCards.toImmutableList()))
       } else {
         LoaderState.Loading
       }

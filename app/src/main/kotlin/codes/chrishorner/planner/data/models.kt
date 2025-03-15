@@ -1,6 +1,9 @@
 package codes.chrishorner.planner.data
 
 import android.os.Parcelable
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -30,9 +33,9 @@ enum class Category {
 
 @Parcelize
 data class GameState(
-  val cards: List<Card>,
+  val cards: ImmutableList<Card>,
   val selectionCount: Int = 0,
-  val categoryStatuses: Map<Category, CategoryState> = mapOf(
+  val categoryStatuses: ImmutableMap<Category, CategoryState> = persistentMapOf(
     Category.YELLOW to CategoryState(),
     Category.GREEN to CategoryState(),
     Category.BLUE to CategoryState(),
@@ -60,8 +63,8 @@ enum class RainbowStatus {
 }
 
 class GameModel(
-  val cards: List<Card>,
-  val categoryStatuses: Map<Category, CategoryStatus>,
+  val cards: ImmutableList<Card>,
+  val categoryStatuses: ImmutableMap<Category, CategoryStatus>,
   val rainbowStatus: RainbowStatus,
 
   /**

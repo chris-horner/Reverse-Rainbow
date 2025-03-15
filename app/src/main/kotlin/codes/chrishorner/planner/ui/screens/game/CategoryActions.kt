@@ -31,10 +31,11 @@ import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalLayoutOrientation
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.plannerColors
+import kotlinx.collections.immutable.ImmutableMap
 
 @Composable
 fun CategoryActions(
-  categoryStatuses: Map<Category, CategoryStatus>,
+  categoryStatuses: ImmutableMap<Category, CategoryStatus>,
   onCategoryClick: (Category) -> Unit,
 ) {
   when (LocalLayoutOrientation.current) {

@@ -8,8 +8,11 @@ import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.data.CategoryStatus
 import codes.chrishorner.planner.data.GameModel
 import codes.chrishorner.planner.data.RainbowStatus
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 
-class Game(cards: List<Card>) {
+class Game(cards: ImmutableList<Card>) {
   private val cards = cards.toMutableList()
 
   private val _model: MutableState<GameModel>
@@ -232,8 +235,8 @@ class Game(cards: List<Card>) {
       listOf(completedYellow, completedGreen, completedBlue, completedPurple).count { it }
 
     return GameModel(
-      cards = cards.toList(),
-      categoryStatuses = categoryStatuses,
+      cards = cards.toImmutableList(),
+      categoryStatuses = categoryStatuses.toImmutableMap(),
       rainbowStatus = rainbowStatus,
       mostlyComplete = completedCategoryCount >= 3,
     )

@@ -21,22 +21,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import codes.chrishorner.planner.data.Card
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
 @Composable
 fun Grid(
-  cards: List<Card>,
+  cards: ImmutableList<Card>,
   onSelect: (Card) -> Unit,
   onLongSelect: (Card) -> Unit,
 ) {
   val density = LocalDensity.current
   val alphaAnimation = remember { Animatable(0f) }
-  val offsetAnimations = remember {
+  val offsetAnimations = remember(density) {
     with(density) {
       List(cards.size) { index ->
         Animatable(IntOffset(0, ((-8).dp * (index + 1)).roundToPx()), IntOffset.VectorConverter)
-      }
+      }.toImmutableList()
     }
   }
 
@@ -48,9 +50,11 @@ fun Grid(
     for (offsetAnimation in offsetAnimations) {
       launch {
         offsetAnimation.animateTo(
-          IntOffset.Zero, animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow,
-          )
+          targetValue = IntOffset.Zero,
+          animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+          ),
         )
       }
     }

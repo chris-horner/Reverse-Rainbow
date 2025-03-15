@@ -11,19 +11,20 @@ import codes.chrishorner.planner.data.Card
 import codes.chrishorner.planner.ui.util.getValue
 import codes.chrishorner.planner.ui.util.mutableLongStateFrom
 import codes.chrishorner.planner.ui.util.setValue
+import kotlinx.collections.immutable.ImmutableList
 import kotlin.math.roundToInt
 
 @Composable
-fun rememberTileDragState(cards: List<Card>): TileDragState {
+fun rememberTileDragState(cards: ImmutableList<Card>): TileDragState {
   return remember { TileDragState(cards) }
 }
 
 @Stable
-class TileDragState(private var cards: List<Card>) {
+class TileDragState(private var cards: ImmutableList<Card>) {
   private val offsetStates = Array(16) { mutableLongStateFrom(IntOffset.Zero) }
   private val draggingStates = Array(16) { mutableStateOf(false) }
 
-  fun updateCards(cards: List<Card>) {
+  fun updateCards(cards: ImmutableList<Card>) {
     this.cards = cards
   }
 

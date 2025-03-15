@@ -1,6 +1,8 @@
 package codes.chrishorner.planner.data
 
 import android.util.Log
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -34,7 +36,7 @@ suspend fun fetchCards(): CardFetchResult {
 }
 
 sealed interface CardFetchResult {
-  data class Success(val cards: List<Card>) : CardFetchResult
+  data class Success(val cards: ImmutableList<Card>) : CardFetchResult
 
   sealed interface Failure : CardFetchResult
 
@@ -56,6 +58,7 @@ private fun Response.toResult(): CardFetchResult = use {
       .flatMap { it.cards }
       .sortedBy { it.position }
       .map { it.asCard() }
+      .toImmutableList()
   } catch (e: Exception) {
     Log.e("Planner", "Failed to parse cards from server response.", e)
     return CardFetchResult.ParsingFailure

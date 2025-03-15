@@ -8,7 +8,6 @@ import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -19,11 +18,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -43,8 +40,6 @@ fun Tile(
   onLongClick: () -> Unit,
   dragging: Boolean,
   dragOffsetProvider: () -> IntOffset,
-  onDrag: (Offset) -> Unit,
-  onDragEnd: () -> Unit,
   modifier: Modifier,
 ) = with(LocalSharedTransitionScope.current) {
   val tileColors = getColors(card)
@@ -85,13 +80,6 @@ fun Tile(
       .padding(8.dp)
       // Makes sure cards animating to the top render over others.
       .zIndex(4f - card.currentPosition)
-      .pointerInput(card.category) {
-        detectDragGestures(
-          onDrag = { _, dragAmount -> onDrag(dragAmount) },
-          onDragEnd = { onDragEnd() },
-          onDragCancel = { onDragEnd() },
-        )
-      }
   ) {
 
     when (card.content) {

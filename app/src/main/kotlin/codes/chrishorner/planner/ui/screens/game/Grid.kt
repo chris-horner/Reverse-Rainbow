@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -12,7 +13,10 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -42,8 +46,7 @@ fun Grid(
     }
   }
 
-  val tileDragState = rememberTileDragState(cards)
-  tileDragState.updateCards(cards)
+  val tileDragState = rememberTileDragStates(cards)
 
   LaunchedEffect(Unit) {
     launch { alphaAnimation.animateTo(1f) }
@@ -64,6 +67,14 @@ fun Grid(
     modifier = Modifier
       .padding(8.dp)
       .alpha(alphaAnimation.value)
+      .pointerInput(cards) {
+        detectDragGestures(
+          onDragStart = { position -> tileDragState.onDragStart(position) },
+          onDrag = { _, dragAmount -> tileDragState.onDrag(dragAmount) },
+          onDragEnd = { tileDragState.onDragFinish() },
+          onDragCancel = { tileDragState.onDragFinish() },
+        )
+      }
   ) {
     cards.fastForEachIndexed { index, card ->
       key(card.initialPosition) {
@@ -71,11 +82,13 @@ fun Grid(
           card = card,
           onClick = { onSelect(card) },
           onLongClick = { onLongSelect(card) },
-          dragOffsetProvider = { tileDragState.getOffset(card) },
-          dragging = tileDragState.getDragging(card),
-          onDrag = { dragAmount -> tileDragState.onDrag(card, dragAmount) },
-          onDragEnd = { tileDragState.finishDrag() },
-          modifier = Modifier.offset { offsetAnimations[index].value }
+          dragOffsetProvider = { tileDragState[index].offset },
+          dragging = tileDragState[index].dragging,
+          modifier = Modifier
+            .offset { offsetAnimations[index].value }
+            .onPlaced { coordinates ->
+              tileDragState[index].bounds = coordinates.boundsInParent()
+            }
         )
       }
     }

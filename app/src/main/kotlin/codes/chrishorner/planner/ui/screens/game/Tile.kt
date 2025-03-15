@@ -2,12 +2,15 @@ package codes.chrishorner.planner.ui.screens.game
 
 import androidx.compose.animation.animateBounds
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.SnapSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -16,10 +19,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.data.Card
@@ -35,6 +41,10 @@ fun Tile(
   card: Card,
   onClick: () -> Unit,
   onLongClick: () -> Unit,
+  dragging: Boolean,
+  dragOffsetProvider: () -> IntOffset,
+  onDrag: (Offset) -> Unit,
+  onDragEnd: () -> Unit,
   modifier: Modifier,
 ) = with(LocalSharedTransitionScope.current) {
   val tileColors = getColors(card)
@@ -48,14 +58,19 @@ fun Tile(
   Box(
     contentAlignment = Alignment.Center,
     modifier = modifier
+      .offset { dragOffsetProvider() }
       .animateBounds(
         lookaheadScope = this,
         boundsTransform = { _, _ ->
-          spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessMediumLow,
-            visibilityThreshold = Rect.VisibilityThreshold,
-          )
+          if (!dragging) {
+            spring(
+              dampingRatio = Spring.DampingRatioLowBouncy,
+              stiffness = Spring.StiffnessMediumLow,
+              visibilityThreshold = Rect.VisibilityThreshold,
+            )
+          } else {
+            SnapSpec()
+          }
         }
       )
       .background(
@@ -68,9 +83,15 @@ fun Tile(
         onLongClick = onLongClick,
       )
       .padding(8.dp)
-      .zIndex(
-        4f - card.currentPosition
-      ) // Makes sure cards animating to the top render over others.
+      // Makes sure cards animating to the top render over others.
+      .zIndex(4f - card.currentPosition)
+      .pointerInput(card.category) {
+        detectDragGestures(
+          onDrag = { _, dragAmount -> onDrag(dragAmount) },
+          onDragEnd = { onDragEnd() },
+          onDragCancel = { onDragEnd() },
+        )
+      }
   ) {
 
     when (card.content) {

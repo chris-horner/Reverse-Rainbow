@@ -40,6 +40,9 @@ fun Grid(
     }
   }
 
+  val tileDragState = rememberTileDragState(cards)
+  tileDragState.updateCards(cards)
+
   LaunchedEffect(Unit) {
     launch { alphaAnimation.animateTo(1f) }
     for (offsetAnimation in offsetAnimations) {
@@ -64,6 +67,10 @@ fun Grid(
           card = card,
           onClick = { onSelect(card) },
           onLongClick = { onLongSelect(card) },
+          dragOffsetProvider = { tileDragState.getOffset(card) },
+          dragging = tileDragState.getDragging(card),
+          onDrag = { dragAmount -> tileDragState.onDrag(card, dragAmount) },
+          onDragEnd = { tileDragState.finishDrag() },
           modifier = Modifier.offset { offsetAnimations[index].value }
         )
       }

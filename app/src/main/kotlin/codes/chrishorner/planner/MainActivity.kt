@@ -1,7 +1,6 @@
 package codes.chrishorner.planner
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.DisplayMetrics
 import androidx.activity.ComponentActivity
@@ -12,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.core.view.doOnLayout
 import codes.chrishorner.planner.ui.SplashScreenFadeMillis
 import codes.chrishorner.planner.ui.screens.MainUi
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
           onRefresh = { gameLoader.refresh() },
           onOpenNyt = {
             startActivity(
-              Intent(Intent.ACTION_VIEW, Uri.parse("https://www.nytimes.com/games/connections"))
+              Intent(Intent.ACTION_VIEW, "https://www.nytimes.com/games/connections".toUri())
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             )
           }

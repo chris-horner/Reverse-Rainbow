@@ -31,7 +31,12 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 
 @Composable
-fun Tile(card: Card, onClick: () -> Unit, onLongClick: () -> Unit, modifier: Modifier) {
+fun Tile(
+  card: Card,
+  onClick: () -> Unit,
+  onLongClick: () -> Unit,
+  modifier: Modifier,
+) = with(LocalSharedTransitionScope.current) {
   val tileColors = getColors(card)
   val backgroundColor by animateColorAsState(
     tileColors.background, animationSpec = spring(stiffness = Spring.StiffnessHigh)
@@ -40,50 +45,48 @@ fun Tile(card: Card, onClick: () -> Unit, onLongClick: () -> Unit, modifier: Mod
     tileColors.text, animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
 
-  with(LocalSharedTransitionScope.current) {
-    Box(
-      contentAlignment = Alignment.Center,
-      modifier = modifier
-        .animateBounds(
-          lookaheadScope = this,
-          boundsTransform = { _, _ ->
-            spring(
-              dampingRatio = Spring.DampingRatioLowBouncy,
-              stiffness = Spring.StiffnessMediumLow,
-              visibilityThreshold = Rect.VisibilityThreshold,
-            )
-          }
-        )
-        .background(
-          color = backgroundColor,
-          shape = RoundedCornerShape(6.dp)
-        )
-        .clip(RoundedCornerShape(6.dp))
-        .combinedClickable(
-          onClick = onClick,
-          onLongClick = onLongClick,
-        )
-        .padding(8.dp)
-        .zIndex(
-          4f - card.currentPosition
-        ) // Makes sure cards animating to the top render over others.
-    ) {
-
-      when (card.content) {
-        is Card.Content.Image -> {
-          AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-              .data(card.content.url)
-              .crossfade(true)
-              .build(),
-            contentDescription = card.content.description,
-            colorFilter = ColorFilter.tint(foregroundColor),
+  Box(
+    contentAlignment = Alignment.Center,
+    modifier = modifier
+      .animateBounds(
+        lookaheadScope = this,
+        boundsTransform = { _, _ ->
+          spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+            visibilityThreshold = Rect.VisibilityThreshold,
           )
         }
+      )
+      .background(
+        color = backgroundColor,
+        shape = RoundedCornerShape(6.dp)
+      )
+      .clip(RoundedCornerShape(6.dp))
+      .combinedClickable(
+        onClick = onClick,
+        onLongClick = onLongClick,
+      )
+      .padding(8.dp)
+      .zIndex(
+        4f - card.currentPosition
+      ) // Makes sure cards animating to the top render over others.
+  ) {
 
-        is Card.Content.Text -> {
-          TileText(text = card.content.body, color = foregroundColor)
-        }
+    when (card.content) {
+      is Card.Content.Image -> {
+        AsyncImage(
+          model = ImageRequest.Builder(LocalContext.current)
+            .data(card.content.url)
+            .crossfade(true)
+            .build(),
+          contentDescription = card.content.description,
+          colorFilter = ColorFilter.tint(foregroundColor),
+        )
+      }
+
+      is Card.Content.Text -> {
+        TileText(text = card.content.body, color = foregroundColor)
       }
     }
   }

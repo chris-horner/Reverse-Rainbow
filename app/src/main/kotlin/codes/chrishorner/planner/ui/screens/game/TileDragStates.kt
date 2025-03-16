@@ -8,9 +8,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastForEachIndexed
 import codes.chrishorner.planner.data.Card
+import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.ui.util.mutableLongStateFrom
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -23,6 +26,7 @@ fun rememberTileDragStates(cards: ImmutableList<Card>): TileDragStates {
 
 class TileDragStates(private val cards: ImmutableList<Card>) {
   private val states = cards.map { TileDragState() }.toImmutableList()
+  private var dragPosition = Offset.Unspecified
 
   operator fun get(index: Int): TileDragState {
     return states[index]
@@ -31,6 +35,7 @@ class TileDragStates(private val cards: ImmutableList<Card>) {
   fun onDragStart(position: Offset) {
     val card = cards.find { states[it.currentPosition].bounds.contains(position) } ?: return
     states[card.currentPosition].dragging = true
+    dragPosition = position
 
     if (card.category == null) return
 
@@ -45,9 +50,40 @@ class TileDragStates(private val cards: ImmutableList<Card>) {
   }
 
   fun onDrag(dragAmount: Offset) {
-    states.fastForEach { state ->
-      if (state.dragging) {
-        state.offset += IntOffset(dragAmount.x.roundToInt(), dragAmount.y.roundToInt())
+    if (dragPosition.isUnspecified) return
+
+    dragPosition += dragAmount
+    var highlightCategory: Category? = null
+
+    states.fastForEachIndexed { index, dragState ->
+      when {
+        // If the drag state of this entry is dragging, all we need to do is move it.
+        dragState.dragging -> {
+          dragState.offset += IntOffset(dragAmount.x.roundToInt(), dragAmount.y.roundToInt())
+        }
+
+        // If we're not being dragging, then check if the drag position is currently hovering over
+        // this entry. If it is, then highlight it, and all entries in the same category.
+        dragState.bounds.contains(dragPosition) -> {
+          dragState.highlight = true
+          val hoveredCard = cards[index]
+
+          if (hoveredCard.category != null) {
+            highlightCategory = hoveredCard.category
+
+            cards.fastForEachIndexed { highlightIndex, card ->
+              if (card.category == hoveredCard.category) {
+                states[highlightIndex].highlight = true
+              }
+            }
+          }
+        }
+
+        // If the entry isn't being hovered over and its category doesn't match the current
+        // highlightCategory, then unhighlight it.
+        cards[index].category != highlightCategory || cards[index].category == null -> {
+          dragState.highlight = false
+        }
       }
     }
   }
@@ -56,23 +92,23 @@ class TileDragStates(private val cards: ImmutableList<Card>) {
     states.fastForEach { state ->
       state.offset = IntOffset.Zero
       state.dragging = false
+      state.highlight = false
     }
+
+    dragPosition = Offset.Unspecified
   }
 }
 
 @Stable
 class TileDragState {
   private var offsetState = mutableLongStateFrom(IntOffset.Zero)
-  private var draggingState = mutableStateOf(false)
-  private var boundsStates = mutableStateOf(Rect.Zero)
 
+  var dragging: Boolean by mutableStateOf(false)
+  var bounds by mutableStateOf(Rect.Zero)
+  var highlight by mutableStateOf(false)
   var offset: IntOffset
     get() = IntOffset(offsetState.longValue)
     set(value) {
       offsetState.longValue = value.packedValue
     }
-
-  var dragging: Boolean by draggingState
-
-  var bounds by boundsStates
 }

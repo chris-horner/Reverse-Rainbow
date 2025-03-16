@@ -19,7 +19,6 @@ import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
@@ -65,7 +64,7 @@ fun Grid(
 
   ConnectionsLayout(
     modifier = Modifier
-      .padding(8.dp)
+      .padding(4.dp)
       .alpha(alphaAnimation.value)
       .pointerInput(cards) {
         detectDragGestures(
@@ -84,6 +83,7 @@ fun Grid(
           onLongClick = { onLongSelect(card) },
           dragOffsetProvider = { tileDragState[index].offset },
           dragging = tileDragState[index].dragging,
+          highlight = tileDragState[index].highlight,
           modifier = Modifier
             .offset { offsetAnimations[index].value }
             .onPlaced { coordinates ->
@@ -98,7 +98,6 @@ fun Grid(
 @Composable
 private fun ConnectionsLayout(
   modifier: Modifier,
-  itemSpacing: Dp = 8.dp,
   content: @Composable () -> Unit,
 ) {
   // We could use `LazyGrid`, but this gives us more control over the animations as items move. Not
@@ -112,17 +111,16 @@ private fun ConnectionsLayout(
     }
 
     val widthAndHeight = min(constraints.maxWidth, constraints.maxHeight)
-    val itemSpacingPx = itemSpacing.roundToPx()
-    val itemSize = (widthAndHeight - (itemSpacingPx * 3)) / 4
+    val itemSize = widthAndHeight / 4
     val itemConstraints = Constraints.fixed(width = itemSize, height = itemSize)
     val placeables = measurables.fastMap { it.measure(itemConstraints) }
 
     layout(widthAndHeight, widthAndHeight) {
       placeables.fastForEachIndexed { index, placeable ->
         val horizontalIndex = index % 4
-        val horizontalOffset = (itemSize + itemSpacingPx) * horizontalIndex
+        val horizontalOffset = itemSize * horizontalIndex
         val verticalIndex = index / 4
-        val verticalOffset = (itemSize + itemSpacingPx) * verticalIndex
+        val verticalOffset = itemSize * verticalIndex
         placeable.place(x = horizontalOffset, y = verticalOffset)
       }
     }

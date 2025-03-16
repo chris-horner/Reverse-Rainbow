@@ -5,8 +5,10 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.SnapSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
@@ -21,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -39,6 +42,7 @@ fun Tile(
   onClick: () -> Unit,
   onLongClick: () -> Unit,
   dragging: Boolean,
+  highlight: Boolean,
   dragOffsetProvider: () -> IntOffset,
   modifier: Modifier,
 ) = with(LocalSharedTransitionScope.current) {
@@ -49,6 +53,30 @@ fun Tile(
   val foregroundColor by animateColorAsState(
     tileColors.text, animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
+
+  // When a tile is being dragged, make sure it renders over the others with a grace period,
+  // allowing it to continue being on top while it animates back into position.
+  val dragZOffset by animateFloatAsState(
+    targetValue = if (dragging) 100f else 0f,
+    animationSpec = SnapSpec(delay = 100),
+  )
+
+  val scale by animateFloatAsState(
+    targetValue = if (highlight) 0.92f else if (dragging) 0.7f else 1f,
+    animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy),
+  )
+
+  // TODO: Animate these two colors without causing a ridiculous number of recompositions.
+  val highlightBorderColor = if (highlight) {
+    MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+  } else {
+    Color.Transparent
+  }
+  val dragBorderColor = when {
+    dragging && card.category != null -> foregroundColor.copy(alpha = 0.3f)
+    dragging -> foregroundColor.copy(alpha = 0.1f)
+    else -> Color.Transparent
+  }
 
   Box(
     contentAlignment = Alignment.Center,
@@ -68,18 +96,25 @@ fun Tile(
           }
         }
       )
+      .border(width = 3.dp, color = highlightBorderColor, shape = TileShape)
+      .padding(4.dp)
+      .graphicsLayer {
+        scaleX = scale
+        scaleY = scale
+      }
       .background(
         color = backgroundColor,
-        shape = RoundedCornerShape(6.dp)
+        shape = TileShape,
       )
-      .clip(RoundedCornerShape(6.dp))
+      .border(width = 5.dp, color = dragBorderColor, shape = TileShape)
+      .clip(TileShape)
       .combinedClickable(
         onClick = onClick,
         onLongClick = onLongClick,
       )
       .padding(8.dp)
-      // Makes sure cards animating to the top render over others.
-      .zIndex(4f - card.currentPosition)
+      // Makes sure cards animating to the top, or being dragged render over others.
+      .zIndex(4f - card.currentPosition + dragZOffset)
   ) {
 
     when (card.content) {
@@ -100,6 +135,8 @@ fun Tile(
     }
   }
 }
+
+private val TileShape = RoundedCornerShape(6.dp)
 
 private data class TileColors(
   val background: Color,

@@ -71,6 +71,17 @@ class Game(tiles: ImmutableList<Tile>) {
     publishModelUpdate()
   }
 
+  fun onDragOver(source: Tile, destination: Tile) {
+    val sourceCategory = source.category
+    swapTiles(
+      source.copy(category = destination.category),
+      destination.copy(category = sourceCategory),
+    )
+
+    sortGrid()
+    publishModelUpdate()
+  }
+
   fun rainbowSort() {
     require(tiles.all { it.category != null }) {
       "Can't sort rainbows if not all tiles have a category"

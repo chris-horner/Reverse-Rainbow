@@ -33,6 +33,7 @@ fun Grid(
   tiles: ImmutableList<Tile>,
   onSelect: (Tile) -> Unit,
   onLongSelect: (Tile) -> Unit,
+  onDragOver: (source: Tile, destination: Tile) -> Unit,
 ) {
   val density = LocalDensity.current
   val alphaAnimation = remember { Animatable(0f) }
@@ -44,7 +45,7 @@ fun Grid(
     }
   }
 
-  val tileDragStates = rememberTileDragStates(tiles)
+  val tileDragStates = rememberTileDragStates(tiles, onDragOver)
 
   LaunchedEffect(Unit) {
     launch { alphaAnimation.animateTo(1f) }

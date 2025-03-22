@@ -9,11 +9,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastZip
 import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.ui.util.mutableLongStateFrom
 import kotlinx.collections.immutable.ImmutableList
@@ -21,11 +23,17 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.roundToInt
 
 @Composable
-fun rememberTileDragStates(tiles: ImmutableList<Tile>): TileDragStates {
-  return remember(tiles) { TileDragStates(tiles) }
+fun rememberTileDragStates(
+  tiles: ImmutableList<Tile>,
+  onDragOver: (source: Tile, destination: Tile) -> Unit,
+): TileDragStates {
+  return remember(tiles, onDragOver) { TileDragStates(tiles, onDragOver) }
 }
 
-class TileDragStates(private val tiles: ImmutableList<Tile>) {
+class TileDragStates(
+  private val tiles: ImmutableList<Tile>,
+  private val onDragOver: (source: Tile, destination: Tile) -> Unit,
+) {
   private val states = this@TileDragStates.tiles.map { TileDragState() }.toImmutableList()
   private var dragPosition = Offset.Unspecified
 
@@ -37,8 +45,8 @@ class TileDragStates(private val tiles: ImmutableList<Tile>) {
     scope.detectDragGestures(
       onDragStart = { position -> onDragStart(position) },
       onDrag = { _, dragAmount -> onDrag(dragAmount) },
-      onDragEnd = { onDragFinish() },
-      onDragCancel = { onDragFinish() },
+      onDragEnd = { onDragFinish(cancelled = false) },
+      onDragCancel = { onDragFinish(cancelled = true) },
     )
   }
 
@@ -69,7 +77,21 @@ class TileDragStates(private val tiles: ImmutableList<Tile>) {
     }
   }
 
-  private fun onDragFinish() {
+  private fun onDragFinish(cancelled: Boolean) {
+    if (dragPosition.isSpecified && !cancelled) {
+      var source: Tile? = null
+      var destination: Tile? = null
+
+      states.fastZip(tiles) { state, tile ->
+        if (state.dragging) source = tile
+        if (state.highlight) destination = tile
+      }
+
+      if (source != null && destination != null) {
+        onDragOver(source, destination)
+      }
+    }
+
     states.fastForEach { state ->
       state.offset = IntOffset.Zero
       state.dragging = false

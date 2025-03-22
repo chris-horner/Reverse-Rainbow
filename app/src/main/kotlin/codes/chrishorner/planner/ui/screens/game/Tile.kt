@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
@@ -44,6 +45,7 @@ fun Tile(
   dragging: Boolean,
   highlight: Boolean,
   dragOffsetProvider: () -> IntOffset,
+  transformOrigin: TransformOrigin,
   modifier: Modifier,
 ) = with(LocalSharedTransitionScope.current) {
   val tileColors = getColors(card)
@@ -63,7 +65,7 @@ fun Tile(
 
   val scale by animateFloatAsState(
     targetValue = if (highlight) 0.92f else if (dragging) 0.7f else 1f,
-    animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy),
+    animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow),
   )
 
   // TODO: Animate these two colors without causing a ridiculous number of recompositions.
@@ -99,6 +101,7 @@ fun Tile(
       .border(width = 3.dp, color = highlightBorderColor, shape = TileShape)
       .padding(4.dp)
       .graphicsLayer {
+        this.transformOrigin = transformOrigin
         scaleX = scale
         scaleY = scale
       }

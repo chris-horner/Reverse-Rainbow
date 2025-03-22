@@ -77,17 +77,20 @@ fun Grid(
   ) {
     cards.fastForEachIndexed { index, card ->
       key(card.initialPosition) {
+        val dragState = tileDragState[index]
+
         Tile(
           card = card,
           onClick = { onSelect(card) },
           onLongClick = { onLongSelect(card) },
-          dragOffsetProvider = { tileDragState[index].offset },
-          dragging = tileDragState[index].dragging,
-          highlight = tileDragState[index].highlight,
+          dragOffsetProvider = { dragState.offset },
+          dragging = dragState.dragging,
+          transformOrigin = dragState.transformOrigin,
+          highlight = dragState.highlight,
           modifier = Modifier
             .offset { offsetAnimations[index].value }
             .onPlaced { coordinates ->
-              tileDragState[index].bounds = coordinates.boundsInParent()
+              dragState.bounds = coordinates.boundsInParent()
             }
         )
       }

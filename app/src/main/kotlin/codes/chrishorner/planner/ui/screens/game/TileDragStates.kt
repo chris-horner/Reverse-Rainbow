@@ -9,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.isUnspecified
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
@@ -34,7 +35,13 @@ class TileDragStates(private val cards: ImmutableList<Card>) {
 
   fun onDragStart(position: Offset) {
     val card = cards.find { states[it.currentPosition].bounds.contains(position) } ?: return
-    states[card.currentPosition].dragging = true
+    val state = states[card.currentPosition]
+    state.dragging = true
+    states[card.currentPosition].transformOrigin = TransformOrigin(
+      pivotFractionX = (position.x - state.bounds.left) / state.bounds.width,
+      pivotFractionY = (position.y - state.bounds.top) / state.bounds.height,
+    )
+
     dragPosition = position
 
     if (card.category == null) return
@@ -44,7 +51,12 @@ class TileDragStates(private val cards: ImmutableList<Card>) {
       val isSameCategory = otherCard.category == card.category
 
       if (isOtherCard && isSameCategory) {
-        states[otherCard.currentPosition].dragging = true
+        val state = states[otherCard.currentPosition]
+        state.dragging = true
+        state.transformOrigin = TransformOrigin(
+          pivotFractionX = (position.x - state.bounds.left) / state.bounds.width,
+          pivotFractionY = (position.y - state.bounds.top) / state.bounds.height,
+        )
       }
     }
   }
@@ -93,6 +105,7 @@ class TileDragStates(private val cards: ImmutableList<Card>) {
       state.offset = IntOffset.Zero
       state.dragging = false
       state.highlight = false
+      state.transformOrigin = TransformOrigin.Center
     }
 
     dragPosition = Offset.Unspecified
@@ -106,6 +119,7 @@ class TileDragState {
   var dragging: Boolean by mutableStateOf(false)
   var bounds by mutableStateOf(Rect.Zero)
   var highlight by mutableStateOf(false)
+  var transformOrigin by mutableStateOf(TransformOrigin.Center)
   var offset: IntOffset
     get() = IntOffset(offsetState.longValue)
     set(value) {

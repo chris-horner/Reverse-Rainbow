@@ -70,7 +70,7 @@ fun Tile(
 
   // TODO: Animate these two colors without causing a ridiculous number of recompositions.
   val highlightBorderColor = if (highlight) {
-    MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+    MaterialTheme.colorScheme.primary
   } else {
     Color.Transparent
   }
@@ -98,8 +98,9 @@ fun Tile(
           }
         }
       )
+      .padding(1.dp)
       .border(width = 3.dp, color = highlightBorderColor, shape = TileShape)
-      .padding(4.dp)
+      .padding(3.dp)
       .graphicsLayer {
         this.transformOrigin = transformOrigin
         scaleX = scale

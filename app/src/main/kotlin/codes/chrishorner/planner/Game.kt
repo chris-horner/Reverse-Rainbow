@@ -30,8 +30,8 @@ class Game(cards: ImmutableList<Card>) {
 
     for (category in Category.entries) {
       val cardCountInCategory = cards.count { it.category == category }
-      require(cardCountInCategory == 0 || cardCountInCategory == 4) {
-        "Category $category must have 0 or assigned 4 cards, but had $cardCountInCategory"
+      require(cardCountInCategory in 0..4) {
+        "Category $category must have between 0 to 4 cards, but had $cardCountInCategory"
       }
     }
 

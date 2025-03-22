@@ -1,3 +1,4 @@
-- 📺 Made UI slightly nicer on large displays
-- 🌄 Added support for small devices in landscape orientation
-- 💥 Fixed a crash where uncategorised tiles could be accidentally swapped
+- 💥 Fixed a crash that could occur when swapping assigned categories.
+- 👇 Updated category selection to use long press - taps now always select a single tile.
+- 👓 Improved how long, multi-word tiles shrink their text to fit.
+- 🫳 Added ability to drag tiles to rearrange and reassign.

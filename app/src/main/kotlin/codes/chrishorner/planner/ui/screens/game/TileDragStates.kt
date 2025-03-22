@@ -12,19 +12,19 @@ import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.fastForEach
-import codes.chrishorner.planner.data.Card
+import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.ui.util.mutableLongStateFrom
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.roundToInt
 
 @Composable
-fun rememberTileDragStates(cards: ImmutableList<Card>): TileDragStates {
-  return remember(cards) { TileDragStates(cards) }
+fun rememberTileDragStates(tiles: ImmutableList<Tile>): TileDragStates {
+  return remember(tiles) { TileDragStates(tiles) }
 }
 
-class TileDragStates(private val cards: ImmutableList<Card>) {
-  private val states = cards.map { TileDragState() }.toImmutableList()
+class TileDragStates(private val tiles: ImmutableList<Tile>) {
+  private val states = this@TileDragStates.tiles.map { TileDragState() }.toImmutableList()
   private var dragPosition = Offset.Unspecified
 
   operator fun get(index: Int): TileDragState {
@@ -32,8 +32,8 @@ class TileDragStates(private val cards: ImmutableList<Card>) {
   }
 
   fun onDragStart(position: Offset) {
-    val card = cards.find { states[it.currentPosition].bounds.contains(position) } ?: return
-    val state = states[card.currentPosition]
+    val tile = tiles.find { states[it.currentPosition].bounds.contains(position) } ?: return
+    val state = states[tile.currentPosition]
 
     state.dragging = true
     state.transformOrigin = TransformOrigin(

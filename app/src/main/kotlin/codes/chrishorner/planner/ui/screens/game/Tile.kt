@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import codes.chrishorner.planner.data.Card
+import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.plannerColors
@@ -39,7 +39,7 @@ import coil3.request.crossfade
 
 @Composable
 fun Tile(
-  card: Card,
+  tile: Tile,
   onClick: () -> Unit,
   onLongClick: () -> Unit,
   dragging: Boolean,
@@ -48,7 +48,7 @@ fun Tile(
   transformOrigin: TransformOrigin,
   modifier: Modifier,
 ) = with(LocalSharedTransitionScope.current) {
-  val tileColors = getColors(card)
+  val tileColors = getColors(tile)
   val backgroundColor by animateColorAsState(
     tileColors.background, animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
@@ -75,7 +75,7 @@ fun Tile(
     Color.Transparent
   }
   val dragBorderColor = when {
-    dragging && card.category != null -> foregroundColor.copy(alpha = 0.3f)
+    dragging && tile.category != null -> foregroundColor.copy(alpha = 0.3f)
     dragging -> foregroundColor.copy(alpha = 0.1f)
     else -> Color.Transparent
   }
@@ -117,24 +117,24 @@ fun Tile(
         onLongClick = onLongClick,
       )
       .padding(8.dp)
-      // Makes sure cards animating to the top, or being dragged render over others.
-      .zIndex(4f - card.currentPosition + dragZOffset)
+      // Makes sure tiles animating to the top, or being dragged render over others.
+      .zIndex(4f - tile.currentPosition + dragZOffset)
   ) {
 
-    when (card.content) {
-      is Card.Content.Image -> {
+    when (tile.content) {
+      is Tile.Content.Image -> {
         AsyncImage(
           model = ImageRequest.Builder(LocalContext.current)
-            .data(card.content.url)
+            .data(tile.content.url)
             .crossfade(true)
             .build(),
-          contentDescription = card.content.description,
+          contentDescription = tile.content.description,
           colorFilter = ColorFilter.tint(foregroundColor),
         )
       }
 
-      is Card.Content.Text -> {
-        TileText(text = card.content.body, color = foregroundColor)
+      is Tile.Content.Text -> {
+        TileText(text = tile.content.body, color = foregroundColor)
       }
     }
   }
@@ -148,11 +148,11 @@ private data class TileColors(
 )
 
 @Composable
-private fun getColors(card: Card): TileColors {
+private fun getColors(tile: Tile): TileColors {
   val primaryColor: Color
   val secondaryColor: Color
 
-  when (card.category) {
+  when (tile.category) {
     Category.YELLOW -> {
       primaryColor = MaterialTheme.plannerColors.yellowSurface
       secondaryColor = MaterialTheme.plannerColors.onYellowSurface
@@ -179,8 +179,8 @@ private fun getColors(card: Card): TileColors {
     }
   }
 
-  val backgroundColor = if (card.selected) secondaryColor else primaryColor
-  val textColor = if (card.selected) primaryColor else secondaryColor
+  val backgroundColor = if (tile.selected) secondaryColor else primaryColor
+  val textColor = if (tile.selected) primaryColor else secondaryColor
 
   return TileColors(backgroundColor, textColor)
 }

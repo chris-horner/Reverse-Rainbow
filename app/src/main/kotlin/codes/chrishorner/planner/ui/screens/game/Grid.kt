@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
-import codes.chrishorner.planner.data.Card
+import codes.chrishorner.planner.data.Tile
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -31,21 +31,21 @@ import kotlin.math.min
 
 @Composable
 fun Grid(
-  cards: ImmutableList<Card>,
-  onSelect: (Card) -> Unit,
-  onLongSelect: (Card) -> Unit,
+  tiles: ImmutableList<Tile>,
+  onSelect: (Tile) -> Unit,
+  onLongSelect: (Tile) -> Unit,
 ) {
   val density = LocalDensity.current
   val alphaAnimation = remember { Animatable(0f) }
   val offsetAnimations = remember(density) {
     with(density) {
-      List(cards.size) { index ->
+      List(tiles.size) { index ->
         Animatable(IntOffset(0, ((-8).dp * (index + 1)).roundToPx()), IntOffset.VectorConverter)
       }.toImmutableList()
     }
   }
 
-  val tileDragState = rememberTileDragStates(cards)
+  val tileDragState = rememberTileDragStates(tiles)
 
   LaunchedEffect(Unit) {
     launch { alphaAnimation.animateTo(1f) }
@@ -66,7 +66,7 @@ fun Grid(
     modifier = Modifier
       .padding(4.dp)
       .alpha(alphaAnimation.value)
-      .pointerInput(cards) {
+      .pointerInput(tiles) {
         detectDragGestures(
           onDragStart = { position -> tileDragState.onDragStart(position) },
           onDrag = { _, dragAmount -> tileDragState.onDrag(dragAmount) },
@@ -75,14 +75,14 @@ fun Grid(
         )
       }
   ) {
-    cards.fastForEachIndexed { index, card ->
-      key(card.initialPosition) {
+    tiles.fastForEachIndexed { index, tile ->
+      key(tile.initialPosition) {
         val dragState = tileDragState[index]
 
         Tile(
-          card = card,
-          onClick = { onSelect(card) },
-          onLongClick = { onLongSelect(card) },
+          tile = tile,
+          onClick = { onSelect(tile) },
+          onLongClick = { onLongSelect(tile) },
           dragOffsetProvider = { dragState.offset },
           dragging = dragState.dragging,
           transformOrigin = dragState.transformOrigin,

@@ -59,7 +59,7 @@ private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -
           UiMode.Large -> Spacer(modifier = Modifier.weight(3f))
         }
 
-        Grid(model.cards, game::select, game::longSelect)
+        Grid(model.tiles, game::select, game::longSelect)
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -91,7 +91,7 @@ private fun LandscapeGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () 
           .fillMaxHeight(),
       )
 
-      Grid(model.cards, game::select, game::longSelect)
+      Grid(model.tiles, game::select, game::longSelect)
 
       Spacer(modifier = Modifier.size(16.dp))
 

@@ -7,7 +7,7 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Card(
+data class Tile(
   val initialPosition: Int,
   val content: Content,
   val currentPosition: Int = initialPosition,
@@ -33,7 +33,7 @@ enum class Category {
 
 @Parcelize
 data class GameState(
-  val cards: ImmutableList<Card>,
+  val tiles: ImmutableList<Tile>,
   val selectionCount: Int = 0,
   val categoryStatuses: ImmutableMap<Category, CategoryState> = persistentMapOf(
     Category.YELLOW to CategoryState(),
@@ -63,7 +63,7 @@ enum class RainbowStatus {
 }
 
 class GameModel(
-  val cards: ImmutableList<Card>,
+  val tiles: ImmutableList<Tile>,
   val categoryStatuses: ImmutableMap<Category, CategoryStatus>,
   val rainbowStatus: RainbowStatus,
 

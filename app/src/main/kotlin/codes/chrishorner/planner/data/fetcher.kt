@@ -15,7 +15,7 @@ import okhttp3.Request
 import okhttp3.Response
 import java.time.LocalDate
 
-suspend fun fetchCards(): CardFetchResult {
+suspend fun fetchTiles(): TileFetchResult {
   val today = LocalDate.now()
   val year = today.year
   val month = today.monthValue.toString().padStart(2, '0')
@@ -30,41 +30,41 @@ suspend fun fetchCards(): CardFetchResult {
     try {
       client.newCall(request).execute().use { response -> response.toResult() }
     } catch (_: Exception) {
-      CardFetchResult.NetworkFailure
+      TileFetchResult.NetworkFailure
     }
   }
 }
 
-sealed interface CardFetchResult {
-  data class Success(val cards: ImmutableList<Card>) : CardFetchResult
+sealed interface TileFetchResult {
+  data class Success(val tiles: ImmutableList<Tile>) : TileFetchResult
 
-  sealed interface Failure : CardFetchResult
+  sealed interface Failure : TileFetchResult
 
   data object NetworkFailure : Failure
   data object HttpFailure : Failure
   data object ParsingFailure : Failure
 }
 
-private fun Response.toResult(): CardFetchResult = use {
+private fun Response.toResult(): TileFetchResult = use {
   if (!isSuccessful) {
-    Log.e("Planner", "Card fetching failed with code $code")
-    return CardFetchResult.HttpFailure
+    Log.e("Planner", "Tile fetching failed with code $code")
+    return TileFetchResult.HttpFailure
   }
 
-  val cards = try {
+  val tiles = try {
     val stream = body!!.byteStream()
     val apiResponse = Json.decodeFromStream<ApiResponse>(stream)
     apiResponse.categories
       .flatMap { it.cards }
       .sortedBy { it.position }
-      .map { it.asCard() }
+      .map { it.asTile() }
       .toImmutableList()
   } catch (e: Exception) {
-    Log.e("Planner", "Failed to parse cards from server response.", e)
-    return CardFetchResult.ParsingFailure
+    Log.e("Planner", "Failed to parse tiles from server response.", e)
+    return TileFetchResult.ParsingFailure
   }
 
-  CardFetchResult.Success(cards)
+  TileFetchResult.Success(tiles)
 }
 
 @Serializable
@@ -80,6 +80,7 @@ private data class ApiCategory(
   val cards: List<ApiCard>
 )
 
+@Suppress("PropertyName") // Match the network API. https://publicobject.com/2016/01/20/strict-naming-conventions-are-a-liability/
 @Serializable
 @JsonIgnoreUnknownKeys
 private data class ApiCard(
@@ -89,12 +90,12 @@ private data class ApiCard(
   val image_alt_text: String? = null,
 )
 
-private fun ApiCard.asCard(): Card {
-  return Card(
+private fun ApiCard.asTile(): Tile {
+  return Tile(
     initialPosition = position,
     content = when {
-      image_url != null -> Card.Content.Image(image_url, image_alt_text)
-      content != null -> Card.Content.Text(content)
+      image_url != null -> Tile.Content.Image(image_url, image_alt_text)
+      content != null -> Tile.Content.Text(content)
       else -> throw SerializationException("Unknown content type.")
     }
   )

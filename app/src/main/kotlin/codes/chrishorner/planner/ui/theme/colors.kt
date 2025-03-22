@@ -9,8 +9,8 @@ import androidx.compose.ui.graphics.Color
 interface PlannerColors {
   val primary: Color
   val background: Color
-  val card: Color
-  val onCard: Color
+  val tile: Color
+  val onTile: Color
   val yellowSurface: Color
   val onYellowSurface: Color
   val greenSurface: Color
@@ -28,24 +28,24 @@ val MaterialTheme.plannerColors: PlannerColors
 val MaterialLightScheme = lightColorScheme(
   primary = ColorsLight.primary,
   background = ColorsLight.background,
-  surfaceContainer = ColorsLight.card,
-  onSurface = ColorsLight.onCard,
-  onBackground = ColorsLight.onCard,
+  surfaceContainer = ColorsLight.tile,
+  onSurface = ColorsLight.onTile,
+  onBackground = ColorsLight.onTile,
 )
 
 val MaterialDarkScheme = lightColorScheme(
   primary = ColorsDark.primary,
   background = ColorsDark.background,
-  surfaceContainer = ColorsDark.card,
-  onSurface = ColorsDark.onCard,
-  onBackground = ColorsDark.onCard,
+  surfaceContainer = ColorsDark.tile,
+  onSurface = ColorsDark.onTile,
+  onBackground = ColorsDark.onTile,
 )
 
 object ColorsLight : PlannerColors {
   override val primary = Color(0xFFE16031)
   override val background = Color(0xFFFEFAF9)
-  override val card = Color(0xFFF8EFEC)
-  override val onCard = Color(0xFF29242B)
+  override val tile = Color(0xFFF8EFEC)
+  override val onTile = Color(0xFF29242B)
   override val yellowSurface = Color(0xFFFFD979)
   override val onYellowSurface = Color(0xFF513E01)
   override val greenSurface = Color(0xFFB2E083)
@@ -59,8 +59,8 @@ object ColorsLight : PlannerColors {
 object ColorsDark : PlannerColors {
   override val primary = Color(0xFFFC9867)
   override val background = Color(0xFF211F22)
-  override val card = Color(0xFF302E32)
-  override val onCard = Color(0xFFFCFCFA)
+  override val tile = Color(0xFF302E32)
+  override val onTile = Color(0xFFFCFCFA)
   override val yellowSurface = Color(0xFFFFE08B)
   override val onYellowSurface = Color(0xFF513E01)
   override val greenSurface = Color(0xFFB8E38E)

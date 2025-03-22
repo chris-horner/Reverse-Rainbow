@@ -3,7 +3,7 @@ package codes.chrishorner.planner
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import codes.chrishorner.planner.data.Card
+import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.data.CategoryStatus
 import codes.chrishorner.planner.data.GameModel
@@ -12,26 +12,26 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 
-class Game(cards: ImmutableList<Card>) {
-  private val cards = cards.toMutableList()
+class Game(tiles: ImmutableList<Tile>) {
+  private val tiles = tiles.toMutableList()
 
   private val _model: MutableState<GameModel>
   val model: State<GameModel>
 
   init {
-    require(cards.size == 16) {
-      "inputCards must be size 16, but was ${cards.size}"
+    require(tiles.size == 16) {
+      "tiles must be size 16, but was ${tiles.size}"
     }
 
-    val selectionCount = cards.count { it.selected }
+    val selectionCount = tiles.count { it.selected }
     require(selectionCount in 0..4) {
-      "Number of selected cards must be within 0 and 4, but was $selectionCount"
+      "Number of selected tiles must be within 0 and 4, but was $selectionCount"
     }
 
     for (category in Category.entries) {
-      val cardCountInCategory = cards.count { it.category == category }
-      require(cardCountInCategory in 0..4) {
-        "Category $category must have between 0 to 4 cards, but had $cardCountInCategory"
+      val tileCountInCategory = tiles.count { it.category == category }
+      require(tileCountInCategory in 0..4) {
+        "Category $category must have between 0 to 4 tiles, but had $tileCountInCategory"
       }
     }
 
@@ -39,19 +39,19 @@ class Game(cards: ImmutableList<Card>) {
     model = _model
   }
 
-  fun select(card: Card) {
-    val selectionCount = cards.count { it.selected }
+  fun select(tile: Tile) {
+    val selectionCount = tiles.count { it.selected }
 
-    // Prevent selecting more than 4 cards.
-    if (!card.selected && selectionCount >= 4) return
+    // Prevent selecting more than 4 tiles.
+    if (!tile.selected && selectionCount >= 4) return
 
-    cards[card.currentPosition] = card.copy(selected = !card.selected)
+    tiles[tile.currentPosition] = tile.copy(selected = !tile.selected)
     publishModelUpdate()
   }
 
-  fun longSelect(card: Card) {
-    if (card.category != null) {
-      cards.replaceAll { it.copy(selected = it.category == card.category) }
+  fun longSelect(tile: Tile) {
+    if (tile.category != null) {
+      tiles.replaceAll { it.copy(selected = it.category == tile.category) }
       publishModelUpdate()
     }
   }
@@ -61,25 +61,25 @@ class Game(cards: ImmutableList<Card>) {
 
     when (status) {
       CategoryStatus.DISABLED -> return
-      CategoryStatus.ENABLED -> assignCards(category)
-      CategoryStatus.CLEARABLE -> clearCards(category)
+      CategoryStatus.ENABLED -> assignTiles(category)
+      CategoryStatus.CLEARABLE -> clearTiles(category)
       CategoryStatus.SWAPPABLE -> swapSelectedToCategory(category)
     }
 
-    cards.replaceAll { it.copy(selected = false) }
+    tiles.replaceAll { it.copy(selected = false) }
     sortGrid()
     publishModelUpdate()
   }
 
   fun rainbowSort() {
-    require(cards.all { it.category != null }) {
-      "Can't sort rainbows if not all cards have a category"
+    require(tiles.all { it.category != null }) {
+      "Can't sort rainbows if not all tiles have a category"
     }
 
-    val yellow = cards.filter { it.category == Category.YELLOW }
-    val green = cards.filter { it.category == Category.GREEN }
-    val blue = cards.filter { it.category == Category.BLUE }
-    val purple = cards.filter { it.category == Category.PURPLE }
+    val yellow = tiles.filter { it.category == Category.YELLOW }
+    val green = tiles.filter { it.category == Category.GREEN }
+    val blue = tiles.filter { it.category == Category.BLUE }
+    val purple = tiles.filter { it.category == Category.PURPLE }
 
     val orderedCategories = if (isCurrentlyInRainbowOrder()) {
       listOf(purple, blue, green, yellow)
@@ -87,101 +87,101 @@ class Game(cards: ImmutableList<Card>) {
       listOf(yellow, green, blue, purple)
     }
 
-    orderedCategories.flatten().forEachIndexed { index, card ->
-      cards[index] = card.copy(currentPosition = index)
+    orderedCategories.flatten().forEachIndexed { index, tile ->
+      tiles[index] = tile.copy(currentPosition = index)
     }
 
     publishModelUpdate()
   }
 
-  private fun assignCards(selectedCategory: Category) {
-    val selectedCards = cards.filter { it.selected }
-    val categoryHasAssignedCards = cards.any { it.category == selectedCategory }
+  private fun assignTiles(selectedCategory: Category) {
+    val selectedTiles = tiles.filter { it.selected }
+    val categoryHasAssignedTiles = tiles.any { it.category == selectedCategory }
 
-    val row = if (categoryHasAssignedCards) {
-      cards.chunked(4).single { row -> row.any { it.category == selectedCategory } }
+    val row = if (categoryHasAssignedTiles) {
+      tiles.chunked(4).single { row -> row.any { it.category == selectedCategory } }
     } else {
-      cards.chunked(4).first { row -> row.all { it.category == null } }
+      tiles.chunked(4).first { row -> row.all { it.category == null } }
     }
 
-    var swapPosition = if (categoryHasAssignedCards) {
+    var swapPosition = if (categoryHasAssignedTiles) {
       row.first { it.category == null }.currentPosition
     } else {
       row.first().currentPosition
     }
 
-    for (card in selectedCards) {
-      val currentCard = cards.single { it.initialPosition == card.initialPosition }
-      val updatedCard = currentCard.copy(category = selectedCategory)
-      cards[updatedCard.currentPosition] = updatedCard
-      val cardToSwap = cards[swapPosition]
-      swapCards(updatedCard, cardToSwap)
+    for (tile in selectedTiles) {
+      val currentTile = tiles.single { it.initialPosition == tile.initialPosition }
+      val updatedTile = currentTile.copy(category = selectedCategory)
+      tiles[updatedTile.currentPosition] = updatedTile
+      val tileToSwap = tiles[swapPosition]
+      swapTiles(updatedTile, tileToSwap)
       swapPosition++
     }
   }
 
-  private fun clearCards(selectedCategory: Category) {
-    if (cards.any { it.selected }) {
-      // If any cards are selected, only clear those cards.
-      cards.replaceAll { card ->
-        if (card.selected && card.category == selectedCategory) card.copy(category = null) else card
+  private fun clearTiles(selectedCategory: Category) {
+    if (tiles.any { it.selected }) {
+      // If any tiles are selected, only clear those tiles.
+      tiles.replaceAll { tile ->
+        if (tile.selected && tile.category == selectedCategory) tile.copy(category = null) else tile
       }
     } else {
       // Otherwise clear everything in this category.
-      cards.replaceAll { card ->
-        card.copy(category = if (card.category == selectedCategory) null else card.category)
+      tiles.replaceAll { tile ->
+        tile.copy(category = if (tile.category == selectedCategory) null else tile.category)
       }
     }
   }
 
   private fun swapSelectedToCategory(selectedCategory: Category) {
-    val selectedCards = cards.filter { it.selected }
-    val selectedCategories = selectedCards.distinctBy { it.category }.map { it.category }
+    val selectedTiles = tiles.filter { it.selected }
+    val selectedCategories = selectedTiles.distinctBy { it.category }.map { it.category }
 
     if (selectedCategories.size == 1) {
       // Only one category selected, which means we should we swapping to a _different_ category.
-      val selectedCardsCategory = selectedCards.map { it.category }.distinct().single()
-      val cardsInCategory = cards.filter { it.category == selectedCategory }
+      val selectedTilesCategory = selectedTiles.map { it.category }.distinct().single()
+      val tilesInCategory = tiles.filter { it.category == selectedCategory }
 
-      for (card in selectedCards) {
-        cards[card.currentPosition] = card.copy(category = selectedCategory)
+      for (tile in selectedTiles) {
+        tiles[tile.currentPosition] = tile.copy(category = selectedCategory)
       }
 
-      for (card in cardsInCategory) {
-        cards[card.currentPosition] = card.copy(category = selectedCardsCategory)
+      for (tile in tilesInCategory) {
+        tiles[tile.currentPosition] = tile.copy(category = selectedTilesCategory)
       }
     } else {
-      // Selected cards should span across two categories, and there should be an even number
+      // Selected tiles should span across two categories, and there should be an even number
       // between those categories.
       require(selectedCategories.size == 2) {
         "There can be only one or two selected categories when swapping, but had ${selectedCategories.size}"
       }
 
       val (category1, category2) = selectedCategories
-      val category1Cards = selectedCards.filter { it.category == category1 }
-      val category2Cards = selectedCards.filter { it.category == category2 }
+      val category1Tiles = selectedTiles.filter { it.category == category1 }
+      val category2Tiles = selectedTiles.filter { it.category == category2 }
 
-      require(category1Cards.size == category2Cards.size) {
-        "There should be an equal number of cards in each category when swapping, but had ${category1Cards.size} and ${category2Cards.size}"
+      require(category1Tiles.size == category2Tiles.size) {
+        "There should be an equal number of tiles in each category when swapping, but had ${category1Tiles.size} and ${category2Tiles.size}"
       }
 
-      category1Cards.zip(category2Cards) { card1, card2 ->
-        swapCards(card1.copy(category = card2.category), card2.copy(category = card1.category))
+      category1Tiles.zip(category2Tiles) { tile1, tile2 ->
+        swapTiles(tile1.copy(category = tile2.category), tile2.copy(category = tile1.category))
       }
     }
   }
 
-  private fun swapCards(card1: Card, card2: Card) {
-    if (card1 == card2) return
+  private fun swapTiles(tile1: Tile, tile2: Tile) {
+    if (tile1 == tile2) return
 
-    val card1Position = card1.currentPosition
-    val card2Position = card2.currentPosition
-    cards[card1Position] = card2.copy(currentPosition = card1Position)
-    cards[card2Position] = card1.copy(currentPosition = card2Position)
+    val tile1Position = tile1.currentPosition
+    val tile2Position = tile2.currentPosition
+    tiles[tile1Position] = tile2.copy(currentPosition = tile1Position)
+    tiles[tile2Position] = tile1.copy(currentPosition = tile2Position)
   }
 
   /**
-   * For each row, ensure that cards with an assigned category are positioned before cards without
+   * For each row, ensure that tiles with an assigned category are positioned before tiles without
    * a category.
    *
    * For all rows, ensure that those with assigned categories are positioned higher than those
@@ -189,13 +189,13 @@ class Game(cards: ImmutableList<Card>) {
    */
   private fun sortGrid() {
     for (rowStartIndex in 0..12 step 4) {
-      val row = cards.subList(rowStartIndex, rowStartIndex + 4)
+      val row = tiles.subList(rowStartIndex, rowStartIndex + 4)
 
-      // If some cards in a row have a category and some do not, sort them to remove any gaps.
+      // If some tiles in a row have a category and some do not, sort them to remove any gaps.
       if (row.any { it.category != null } && row.any { it.category == null }) {
-        for ((rowIndex, card) in row.sortedByDescending { it.category }.withIndex()) {
-          val cardIndex = rowStartIndex + rowIndex
-          cards[cardIndex] = card.copy(currentPosition = cardIndex)
+        for ((rowIndex, tile) in row.sortedByDescending { it.category }.withIndex()) {
+          val tileIndex = rowStartIndex + rowIndex
+          tiles[tileIndex] = tile.copy(currentPosition = tileIndex)
         }
       }
 
@@ -203,13 +203,13 @@ class Game(cards: ImmutableList<Card>) {
       if (rowStartIndex > 8) continue
 
       // If this entire row has no category, and the next row _does_ have a category, swap all
-      // cards from the next row that do have an assigned category.
-      val nextRow = cards.subList(rowStartIndex + 4, rowStartIndex + 8)
+      // tiles from the next row that do have an assigned category.
+      val nextRow = tiles.subList(rowStartIndex + 4, rowStartIndex + 8)
       if (row.all { it.category == null } && nextRow.any { it.category != null }) {
         row.zip(nextRow)
-          .filter { (_, card2) -> card2.category != null }
-          .forEach { (card1, card2) ->
-            swapCards(card1, card2)
+          .filter { (_, tile2) -> tile2.category != null }
+          .forEach { (tile1, tile2) ->
+            swapTiles(tile1, tile2)
           }
       }
     }
@@ -223,19 +223,19 @@ class Game(cards: ImmutableList<Card>) {
     val categoryStatuses = Category.entries.associateWith { determineCategoryStatus(it) }
     val rainbowStatus = when {
       isCurrentlyInRainbowOrder() -> RainbowStatus.REVERSIBLE
-      cards.all { it.category != null } -> RainbowStatus.SETTABLE
+      tiles.all { it.category != null } -> RainbowStatus.SETTABLE
       else -> RainbowStatus.DISABLED
     }
 
-    val completedYellow = cards.count { it.category == Category.YELLOW } == 4
-    val completedGreen = cards.count { it.category == Category.GREEN } == 4
-    val completedBlue = cards.count { it.category == Category.BLUE } == 4
-    val completedPurple = cards.count { it.category == Category.PURPLE } == 4
+    val completedYellow = tiles.count { it.category == Category.YELLOW } == 4
+    val completedGreen = tiles.count { it.category == Category.GREEN } == 4
+    val completedBlue = tiles.count { it.category == Category.BLUE } == 4
+    val completedPurple = tiles.count { it.category == Category.PURPLE } == 4
     val completedCategoryCount =
       listOf(completedYellow, completedGreen, completedBlue, completedPurple).count { it }
 
     return GameModel(
-      cards = cards.toImmutableList(),
+      tiles = tiles.toImmutableList(),
       categoryStatuses = categoryStatuses.toImmutableMap(),
       rainbowStatus = rainbowStatus,
       mostlyComplete = completedCategoryCount >= 3,
@@ -244,45 +244,45 @@ class Game(cards: ImmutableList<Card>) {
 
   /**
    * Look at the current state of the board - including currently assigned categories and selected
-   * cards. Use this to work out what the current valid action is for a given category.
+   * tiles. Use this to work out what the current valid action is for a given category.
    */
   private fun determineCategoryStatus(category: Category): CategoryStatus {
-    val selectedCards = cards.filter { it.selected }
-    val selectionCount = selectedCards.count()
-    val categorySelected = selectedCards.any { it.category == category }
-    val cardsInCategoryCount = cards.count { it.category == category }
+    val selectedTiles = tiles.filter { it.selected }
+    val selectionCount = selectedTiles.count()
+    val categorySelected = selectedTiles.any { it.category == category }
+    val tilesInCategoryCount = tiles.count { it.category == category }
 
-    val otherCategorySelectionCount = selectedCards
+    val otherCategorySelectionCount = selectedTiles
       .filter { it.category != null && it.category != category }
       .distinctBy { it.category }
       .count()
 
     val allOfOneOtherCategorySelected = otherCategorySelectionCount == 1 &&
-      selectedCards.all { it.category != null } &&
-      selectedCards.all { it.category != category }
+      selectedTiles.all { it.category != null } &&
+      selectedTiles.all { it.category != category }
 
     val equalNumberFromOtherCategorySelected = otherCategorySelectionCount == 1 &&
-      selectedCards.all { it.category != null } &&
-      selectedCards.count { it.category == category } == selectedCards.count { it.category != category }
+      selectedTiles.all { it.category != null } &&
+      selectedTiles.count { it.category == category } == selectedTiles.count { it.category != category }
 
     return when {
       selectionCount > 0 -> when {
-        cardsInCategoryCount + selectionCount <= 4 && !categorySelected -> CategoryStatus.ENABLED
-        cardsInCategoryCount > 0 && allOfOneOtherCategorySelected -> CategoryStatus.SWAPPABLE
+        tilesInCategoryCount + selectionCount <= 4 && !categorySelected -> CategoryStatus.ENABLED
+        tilesInCategoryCount > 0 && allOfOneOtherCategorySelected -> CategoryStatus.SWAPPABLE
         equalNumberFromOtherCategorySelected -> CategoryStatus.SWAPPABLE
-        selectedCards.all { it.category == category } -> CategoryStatus.CLEARABLE
+        selectedTiles.all { it.category == category } -> CategoryStatus.CLEARABLE
         else -> CategoryStatus.DISABLED
       }
 
-      cards.any { it.category == category } -> CategoryStatus.CLEARABLE
+      tiles.any { it.category == category } -> CategoryStatus.CLEARABLE
       else -> CategoryStatus.DISABLED
     }
   }
 
   private fun isCurrentlyInRainbowOrder(): Boolean {
-    return cards.slice(0..3).all { it.category == Category.YELLOW } &&
-      cards.slice(4..7).all { it.category == Category.GREEN } &&
-      cards.slice(8..11).all { it.category == Category.BLUE } &&
-      cards.slice(12..15).all { it.category == Category.PURPLE }
+    return tiles.slice(0..3).all { it.category == Category.YELLOW } &&
+      tiles.slice(4..7).all { it.category == Category.GREEN } &&
+      tiles.slice(8..11).all { it.category == Category.BLUE } &&
+      tiles.slice(12..15).all { it.category == Category.PURPLE }
   }
 }

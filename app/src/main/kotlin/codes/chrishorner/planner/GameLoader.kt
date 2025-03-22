@@ -8,9 +8,9 @@ import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import codes.chrishorner.planner.data.Card
-import codes.chrishorner.planner.data.CardFetchResult
-import codes.chrishorner.planner.data.fetchCards
+import codes.chrishorner.planner.data.Tile
+import codes.chrishorner.planner.data.TileFetchResult
+import codes.chrishorner.planner.data.fetchTiles
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ import java.time.LocalDate
 class GameLoader private constructor(
   private val scope: CoroutineScope,
   private val initialState: LoaderState = LoaderState.Loading,
-  private val fetchCards: suspend () -> CardFetchResult = ::fetchCards,
+  private val fetchTiles: suspend () -> TileFetchResult = ::fetchTiles,
   private val clock: Clock = Clock.systemDefaultZone(),
 ) {
 
@@ -43,15 +43,15 @@ class GameLoader private constructor(
   fun refresh() = scope.launch {
     _state.value = LoaderState.Loading
 
-    val result = fetchCards()
+    val result = fetchTiles()
 
     _state.value = when (result) {
-      is CardFetchResult.Success -> LoaderState.Success(LocalDate.now(clock), Game(result.cards))
-      is CardFetchResult.Failure -> LoaderState.Failure(
+      is TileFetchResult.Success -> LoaderState.Success(LocalDate.now(clock), Game(result.tiles))
+      is TileFetchResult.Failure -> LoaderState.Failure(
         type = when (result) {
-          CardFetchResult.HttpFailure -> FailureType.HTTP
-          CardFetchResult.NetworkFailure -> FailureType.NETWORK
-          CardFetchResult.ParsingFailure -> FailureType.PARSING
+          TileFetchResult.HttpFailure -> FailureType.HTTP
+          TileFetchResult.NetworkFailure -> FailureType.NETWORK
+          TileFetchResult.ParsingFailure -> FailureType.PARSING
         }
       )
     }
@@ -75,10 +75,10 @@ class GameLoader private constructor(
 
     init {
       val previousBundle = savedStateHandle.get<Bundle>("wrapper_state")
-      val previousCards = previousBundle?.getParcelableArrayList<Card>("cards")
+      val previousTiles = previousBundle?.getParcelableArrayList<Tile>("tiles")
       val previousDate = previousBundle?.getString("date")?.let { LocalDate.parse(it) }
-      val initialLoaderState = if (previousCards != null && previousDate != null) {
-        LoaderState.Success(previousDate, Game(previousCards.toImmutableList()))
+      val initialLoaderState = if (previousTiles != null && previousDate != null) {
+        LoaderState.Success(previousDate, Game(previousTiles.toImmutableList()))
       } else {
         LoaderState.Loading
       }
@@ -93,7 +93,7 @@ class GameLoader private constructor(
           val loaderState = gameLoader.state.value
 
           if (loaderState is LoaderState.Success) {
-            putParcelableArrayList("cards", ArrayList(loaderState.game.model.value.cards))
+            putParcelableArrayList("tiles", ArrayList(loaderState.game.model.value.tiles))
             putString("date", loaderState.date.toString())
           }
         }

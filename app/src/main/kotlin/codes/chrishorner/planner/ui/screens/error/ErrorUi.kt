@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -114,6 +115,9 @@ fun ErrorUi(failureType: FailureType, onRetry: () -> Unit) {
 
       OutlinedButton(
         onClick = onRetry,
+        colors = ButtonDefaults.outlinedButtonColors(
+          contentColor = MaterialTheme.colorScheme.primary
+        ),
         modifier = Modifier.widthIn(min = 248.dp)
       ) {
         Text(text = stringResource(R.string.error_retry_button))

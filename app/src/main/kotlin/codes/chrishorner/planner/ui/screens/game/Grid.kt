@@ -4,7 +4,6 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -45,7 +44,7 @@ fun Grid(
     }
   }
 
-  val tileDragState = rememberTileDragStates(tiles)
+  val tileDragStates = rememberTileDragStates(tiles)
 
   LaunchedEffect(Unit) {
     launch { alphaAnimation.animateTo(1f) }
@@ -66,18 +65,11 @@ fun Grid(
     modifier = Modifier
       .padding(4.dp)
       .alpha(alphaAnimation.value)
-      .pointerInput(tiles) {
-        detectDragGestures(
-          onDragStart = { position -> tileDragState.onDragStart(position) },
-          onDrag = { _, dragAmount -> tileDragState.onDrag(dragAmount) },
-          onDragEnd = { tileDragState.onDragFinish() },
-          onDragCancel = { tileDragState.onDragFinish() },
-        )
-      }
+      .pointerInput(tiles) { tileDragStates.detectDragGestures(this) }
   ) {
     tiles.fastForEachIndexed { index, tile ->
       key(tile.initialPosition) {
-        val dragState = tileDragState[index]
+        val dragState = tileDragStates[index]
 
         Tile(
           tile = tile,
@@ -89,9 +81,7 @@ fun Grid(
           highlight = dragState.highlight,
           modifier = Modifier
             .offset { offsetAnimations[index].value }
-            .onPlaced { coordinates ->
-              dragState.bounds = coordinates.boundsInParent()
-            }
+            .onPlaced { coordinates -> dragState.bounds = coordinates.boundsInParent() }
         )
       }
     }

@@ -1,5 +1,6 @@
 package codes.chrishorner.planner.ui.screens.game
 
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -10,6 +11,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.fastForEach
 import codes.chrishorner.planner.data.Tile
@@ -31,7 +33,16 @@ class TileDragStates(private val tiles: ImmutableList<Tile>) {
     return states[index]
   }
 
-  fun onDragStart(position: Offset) {
+  suspend fun detectDragGestures(scope: PointerInputScope) {
+    scope.detectDragGestures(
+      onDragStart = { position -> onDragStart(position) },
+      onDrag = { _, dragAmount -> onDrag(dragAmount) },
+      onDragEnd = { onDragFinish() },
+      onDragCancel = { onDragFinish() },
+    )
+  }
+
+  private fun onDragStart(position: Offset) {
     val tile = tiles.find { states[it.currentPosition].bounds.contains(position) } ?: return
     val state = states[tile.currentPosition]
 
@@ -44,7 +55,7 @@ class TileDragStates(private val tiles: ImmutableList<Tile>) {
     dragPosition = position
   }
 
-  fun onDrag(dragAmount: Offset) {
+  private fun onDrag(dragAmount: Offset) {
     if (dragPosition.isUnspecified) return
 
     dragPosition += dragAmount
@@ -58,7 +69,7 @@ class TileDragStates(private val tiles: ImmutableList<Tile>) {
     }
   }
 
-  fun onDragFinish() {
+  private fun onDragFinish() {
     states.fastForEach { state ->
       state.offset = IntOffset.Zero
       state.dragging = false

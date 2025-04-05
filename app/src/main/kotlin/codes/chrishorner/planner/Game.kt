@@ -260,26 +260,26 @@ class Game(tiles: ImmutableList<Tile>) {
   private fun determineCategoryStatus(category: Category): CategoryStatus {
     val selectedTiles = tiles.filter { it.selected }
     val selectionCount = selectedTiles.count()
-    val categorySelected = selectedTiles.any { it.category == category }
-    val tilesInCategoryCount = tiles.count { it.category == category }
+    val thisCategorySelected = selectedTiles.any { it.category == category }
+    val tilesInThisCategoryCount = tiles.count { it.category == category }
 
     val otherCategorySelectionCount = selectedTiles
-      .filter { it.category != null && it.category != category }
+      .filter { it.category != category }
       .distinctBy { it.category }
       .count()
 
-    val allOfOneOtherCategorySelected = otherCategorySelectionCount == 1 &&
+    val allOfOneOtherCategorySelectedWithMatchingCount = otherCategorySelectionCount == 1 &&
       selectedTiles.all { it.category != null } &&
-      selectedTiles.all { it.category != category }
+      selectedTiles.all { it.category != category } &&
+      selectedTiles.count() == tilesInThisCategoryCount
 
     val equalNumberFromOtherCategorySelected = otherCategorySelectionCount == 1 &&
-      selectedTiles.all { it.category != null } &&
       selectedTiles.count { it.category == category } == selectedTiles.count { it.category != category }
 
     return when {
       selectionCount > 0 -> when {
-        tilesInCategoryCount + selectionCount <= 4 && !categorySelected -> CategoryStatus.ENABLED
-        tilesInCategoryCount > 0 && allOfOneOtherCategorySelected -> CategoryStatus.SWAPPABLE
+        tilesInThisCategoryCount + selectionCount <= 4 && !thisCategorySelected -> CategoryStatus.ENABLED
+        allOfOneOtherCategorySelectedWithMatchingCount -> CategoryStatus.SWAPPABLE
         equalNumberFromOtherCategorySelected -> CategoryStatus.SWAPPABLE
         selectedTiles.all { it.category == category } -> CategoryStatus.CLEARABLE
         else -> CategoryStatus.DISABLED

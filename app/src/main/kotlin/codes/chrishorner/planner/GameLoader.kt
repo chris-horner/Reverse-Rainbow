@@ -74,7 +74,9 @@ class GameLoader private constructor(
     val gameLoader: GameLoader
 
     init {
-      val previousBundle = savedStateHandle.get<Bundle>("wrapper_state")
+      val previousBundle = savedStateHandle.get<Bundle>("wrapper_state")?.apply {
+        classLoader = Tile::class.java.classLoader
+      }
       val previousTiles = previousBundle?.getParcelableArrayList<Tile>("tiles")
       val previousDate = previousBundle?.getString("date")?.let { LocalDate.parse(it) }
       val initialLoaderState = if (previousTiles != null && previousDate != null) {

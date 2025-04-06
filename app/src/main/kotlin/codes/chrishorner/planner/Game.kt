@@ -51,7 +51,8 @@ class Game(tiles: ImmutableList<Tile>) {
 
   fun longSelect(tile: Tile) {
     if (tile.category != null) {
-      tiles.replaceAll { it.copy(selected = it.category == tile.category) }
+      // Select (or deselect) all tiles in the long-selected tile's category.
+      tiles.replaceAll { it.copy(selected = !tile.selected && it.category == tile.category) }
       publishModelUpdate()
     }
   }

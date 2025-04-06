@@ -79,6 +79,7 @@ class Game(tiles: ImmutableList<Tile>) {
       destination.copy(category = sourceCategory),
     )
 
+    tiles.replaceAll { it.copy(selected = false) }
     sortGrid()
     publishModelUpdate()
   }

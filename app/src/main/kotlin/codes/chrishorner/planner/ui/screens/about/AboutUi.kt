@@ -64,9 +64,9 @@ fun AboutUi(onBack: () -> Unit) {
 
         Spacer(modifier = Modifier.size(32.dp))
 
-        Entry(Category.YELLOW, Icons.Person, stringResource(R.string.about_point1))
+        Entry(Category.YELLOW, Icons.Construction, stringResource(R.string.about_point1))
         Entry(Category.GREEN, Icons.Warning, stringResource(R.string.about_point2))
-        Entry(Category.BLUE, Icons.Block, stringResource(R.string.about_point3))
+        Entry(Category.BLUE, Icons.EditNote, stringResource(R.string.about_point3))
         Entry(Category.PURPLE, Icons.GitHub, stringResource(R.string.about_point4))
       }
     }

@@ -20,17 +20,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorProducer
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.drawOutline
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.data.Category
+import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.plannerColors
 import coil3.compose.AsyncImage
@@ -50,10 +57,12 @@ fun Tile(
 ) = with(LocalSharedTransitionScope.current) {
   val tileColors = getColors(tile)
   val backgroundColor by animateColorAsState(
-    tileColors.background, animationSpec = spring(stiffness = Spring.StiffnessHigh)
+    targetValue = tileColors.background,
+    animationSpec = spring(stiffness = Spring.StiffnessHigh),
   )
   val foregroundColor by animateColorAsState(
-    tileColors.text, animationSpec = spring(stiffness = Spring.StiffnessHigh)
+    targetValue = tileColors.text,
+    animationSpec = spring(stiffness = Spring.StiffnessHigh),
   )
 
   // When a tile is being dragged, make sure it renders over the others with a grace period,
@@ -65,24 +74,32 @@ fun Tile(
 
   val scale by animateFloatAsState(
     targetValue = if (highlight) 0.92f else if (dragging) 0.7f else 1f,
-    animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow),
+    animationSpec = spring(
+      dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow
+    ),
   )
 
-  // TODO: Animate these two colors without causing a ridiculous number of recompositions.
-  val highlightBorderColor = if (highlight) {
-    MaterialTheme.colorScheme.primary
-  } else {
-    Color.Transparent
-  }
+  val highlightBorderColor by animateColorAsState(
+    targetValue = if (highlight) MaterialTheme.colorScheme.primary else Color.Transparent,
+    animationSpec = spring(stiffness = Spring.StiffnessHigh)
+  )
+
   val dragBorderColor = when {
     dragging && tile.category != null -> foregroundColor.copy(alpha = 0.3f)
     dragging -> foregroundColor.copy(alpha = 0.1f)
     else -> Color.Transparent
   }
 
+  val swapBorderColor by animateColorAsState(
+    targetValue = if (dragging) MaterialTheme.colorScheme.secondary else Color.Transparent,
+    animationSpec = spring(stiffness = Spring.StiffnessHigh)
+  )
+
   Box(
     contentAlignment = Alignment.Center,
     modifier = modifier
+      .padding(1.dp)
+      .dashedBorder(color = { swapBorderColor })
       .offset { dragOffsetProvider() }
       .animateBounds(
         lookaheadScope = this,
@@ -98,8 +115,7 @@ fun Tile(
           }
         }
       )
-      .padding(1.dp)
-      .border(width = 3.dp, color = highlightBorderColor, shape = TileShape)
+      .dashedBorder(color = { highlightBorderColor })
       .padding(3.dp)
       .graphicsLayer {
         this.transformOrigin = transformOrigin
@@ -183,4 +199,30 @@ private fun getColors(tile: Tile): TileColors {
   val textColor = if (tile.selected) primaryColor else secondaryColor
 
   return TileColors(backgroundColor, textColor)
+}
+
+private fun Modifier.dashedBorder(
+  color: ColorProducer,
+) = drawBehind {
+  val inset = 3.dp.toPx()
+  val outline = TileShape.createOutline(
+    size = size.copy(size.width - inset, size.height - inset),
+    layoutDirection = layoutDirection,
+    density = this
+  )
+  val dashedStroke = Stroke(
+    cap = StrokeCap.Round,
+    width = 3.dp.toPx(),
+    pathEffect = PathEffect.dashPathEffect(
+      intervals = floatArrayOf(4.dp.toPx(), 8.dp.toPx())
+    )
+  )
+
+  inset(inset / 2f) {
+    drawOutline(
+      outline = outline,
+      style = dashedStroke,
+      color = color(),
+    )
+  }
 }

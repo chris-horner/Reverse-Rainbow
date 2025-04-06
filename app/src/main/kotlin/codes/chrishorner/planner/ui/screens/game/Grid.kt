@@ -94,7 +94,8 @@ private fun ConnectionsLayout(
 }
 
 private fun getEnterTransitionFor(index: Int): EnterTransition {
-  val duration = 250
+  val duration = 200
+  // Animate tiles lower down in the grid earlier than those higher up to create a nice effect.
   val delay = 200 - ((index / 4) * 50)
 
   return slideInVertically(

@@ -16,9 +16,9 @@ val LocalAnimatedContentScope = compositionLocalOf<AnimatedContentScope> {
 
 const val SplashScreenFadeMillis = 150L
 
-object OvershootEasing : Easing {
+class OvershootEasing(tension: Float) : Easing {
 
-  private val interpolator = OvershootInterpolator(6f)
+  private val interpolator = OvershootInterpolator(tension)
 
   override fun transform(fraction: Float): Float {
     return interpolator.getInterpolation(fraction)

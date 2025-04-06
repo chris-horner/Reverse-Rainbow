@@ -157,7 +157,7 @@ private class LoadingAnimationState(scope: CoroutineScope) {
         targetValue = 80.dp,
         animationSpec = tween(
           durationMillis = 500,
-          easing = OvershootEasing,
+          easing = OvershootEasing(6f),
         )
       )
 

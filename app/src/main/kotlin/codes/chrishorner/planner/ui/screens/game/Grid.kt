@@ -1,31 +1,26 @@
 package codes.chrishorner.planner.ui.screens.game
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.layout.offset
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onPlaced
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import codes.chrishorner.planner.data.Tile
+import codes.chrishorner.planner.ui.LocalAnimatedContentScope
+import codes.chrishorner.planner.ui.OvershootEasing
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.launch
 import kotlin.math.min
 
 @Composable
@@ -34,38 +29,12 @@ fun Grid(
   onSelect: (Tile) -> Unit,
   onLongSelect: (Tile) -> Unit,
   onDragOver: (source: Tile, destination: Tile) -> Unit,
-) {
-  val density = LocalDensity.current
-  val alphaAnimation = remember { Animatable(0f) }
-  val offsetAnimations = remember(density) {
-    with(density) {
-      List(tiles.size) { index ->
-        Animatable(IntOffset(0, ((-8).dp * (index + 1)).roundToPx()), IntOffset.VectorConverter)
-      }.toImmutableList()
-    }
-  }
-
+) = with(LocalAnimatedContentScope.current) {
   val tileDragStates = rememberTileDragStates(tiles, onDragOver)
-
-  LaunchedEffect(Unit) {
-    launch { alphaAnimation.animateTo(1f) }
-    for (offsetAnimation in offsetAnimations) {
-      launch {
-        offsetAnimation.animateTo(
-          targetValue = IntOffset.Zero,
-          animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessMediumLow,
-          ),
-        )
-      }
-    }
-  }
 
   ConnectionsLayout(
     modifier = Modifier
       .padding(4.dp)
-      .alpha(alphaAnimation.value)
       .pointerInput(tiles) { tileDragStates.detectDragGestures(this) }
   ) {
     tiles.fastForEachIndexed { index, tile ->
@@ -81,7 +50,10 @@ fun Grid(
           transformOrigin = dragState.transformOrigin,
           highlight = dragState.highlight,
           modifier = Modifier
-            .offset { offsetAnimations[index].value }
+            .animateEnterExit(
+              enter = getEnterTransitionFor(index),
+              exit = fadeOut(),
+            )
             .onPlaced { coordinates -> dragState.bounds = coordinates.boundsInParent() }
         )
       }
@@ -119,4 +91,22 @@ private fun ConnectionsLayout(
       }
     }
   }
+}
+
+private fun getEnterTransitionFor(index: Int): EnterTransition {
+  val duration = 250
+  val delay = 200 - ((index / 4) * 50)
+
+  return slideInVertically(
+    animationSpec = tween(
+      durationMillis = duration,
+      delayMillis = delay,
+      easing = OvershootEasing(1f),
+    ),
+  ) + fadeIn(
+    animationSpec = tween(
+      durationMillis = duration,
+      delayMillis = delay,
+    )
+  )
 }

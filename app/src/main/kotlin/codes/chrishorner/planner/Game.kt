@@ -146,21 +146,19 @@ class Game(tiles: ImmutableList<Tile>) {
     }
   }
 
-  private fun swapSelectedToCategory(selectedCategory: Category) {
+  private fun swapSelectedToCategory(category: Category) {
     val selectedTiles = tiles.filter { it.selected }
     val selectedCategories = selectedTiles.distinctBy { it.category }.map { it.category }
 
     if (selectedCategories.size == 1) {
-      // Only one category selected, which means we should we swapping to a _different_ category.
-      val selectedTilesCategory = selectedTiles.map { it.category }.distinct().single()
-      val tilesInCategory = tiles.filter { it.category == selectedCategory }
+      val tilesInCategory = tiles.filter { it.category == category }
 
-      for (tile in selectedTiles) {
-        tiles[tile.currentPosition] = tile.copy(category = selectedCategory)
+      require(selectedTiles.count() == tilesInCategory.count()) {
+        "The number of selected tiles should equal the number of tiles in a category being swapped to, but had ${selectedTiles.count()} selected ad ${tilesInCategory.count()} in category"
       }
 
-      for (tile in tilesInCategory) {
-        tiles[tile.currentPosition] = tile.copy(category = selectedTilesCategory)
+      selectedTiles.zip(tilesInCategory) { tile1, tile2 ->
+        swapTiles(tile1.copy(category = tile2.category), tile2.copy(category = tile1.category))
       }
     } else {
       // Selected tiles should span across two categories, and there should be an even number

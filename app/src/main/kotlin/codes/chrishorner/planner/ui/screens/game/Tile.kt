@@ -10,10 +10,14 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.data.Tile
+import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.plannerColors
 import coil3.compose.AsyncImage
@@ -47,6 +52,7 @@ import coil3.request.crossfade
 @Composable
 fun Tile(
   tile: Tile,
+  proposedSwapTile: Tile? = null,
   onClick: () -> Unit,
   onLongClick: () -> Unit,
   dragging: Boolean,
@@ -98,59 +104,93 @@ fun Tile(
   Box(
     contentAlignment = Alignment.Center,
     modifier = modifier
-      .padding(1.dp)
-      .dashedBorder(color = { swapBorderColor })
-      .offset { dragOffsetProvider() }
-      .animateBounds(
-        lookaheadScope = this,
-        boundsTransform = { _, _ ->
-          if (!dragging) {
-            spring(
-              dampingRatio = Spring.DampingRatioLowBouncy,
-              stiffness = Spring.StiffnessMediumLow,
-              visibilityThreshold = Rect.VisibilityThreshold,
-            )
-          } else {
-            SnapSpec()
-          }
-        }
-      )
-      .dashedBorder(color = { highlightBorderColor })
-      .padding(3.dp)
-      .graphicsLayer {
-        this.transformOrigin = transformOrigin
-        scaleX = scale
-        scaleY = scale
-      }
-      .background(
-        color = backgroundColor,
-        shape = TileShape,
-      )
-      .border(width = 5.dp, color = dragBorderColor, shape = TileShape)
-      .clip(TileShape)
-      .combinedClickable(
-        onClick = onClick,
-        onLongClick = onLongClick,
-      )
-      .padding(8.dp)
-      // Makes sure tiles animating to the top, or being dragged render over others.
+      // Make sure tiles animating to the top, or being dragged render over others.
       .zIndex(4f - tile.currentPosition + dragZOffset)
   ) {
+    if (proposedSwapTile != null) {
+      Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.padding(4.dp)
+      ) {
+        // TODO: Deal with image tiles.
+        TileText(
+          text = (tile.content as Tile.Content.Text).body,
+          color = MaterialTheme.colorScheme.onBackground,
+          textStyle = MaterialTheme.typography.labelSmall,
+        )
 
-    when (tile.content) {
-      is Tile.Content.Image -> {
-        AsyncImage(
-          model = ImageRequest.Builder(LocalContext.current)
-            .data(tile.content.url)
-            .crossfade(true)
-            .build(),
-          contentDescription = tile.content.description,
-          colorFilter = ColorFilter.tint(foregroundColor),
+        Icon(
+          imageVector = Icons.Shuffle,
+          contentDescription = null,
+          tint = MaterialTheme.colorScheme.onBackground,
+          modifier = Modifier.size(20.dp),
+        )
+
+        TileText(
+          text = (proposedSwapTile.content as Tile.Content.Text).body,
+          color = MaterialTheme.colorScheme.onBackground,
+          textStyle = MaterialTheme.typography.labelSmall,
         )
       }
+    }
 
-      is Tile.Content.Text -> {
-        TileText(text = tile.content.body, color = foregroundColor)
+    Box(
+      contentAlignment = Alignment.Center,
+      modifier = Modifier
+        .matchParentSize()
+        .padding(1.dp)
+        .dashedBorder(color = { swapBorderColor })
+        .offset { dragOffsetProvider() }
+        .animateBounds(
+          lookaheadScope = this@with,
+          boundsTransform = { _, _ ->
+            if (!dragging) {
+              spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessMediumLow,
+                visibilityThreshold = Rect.VisibilityThreshold,
+              )
+            } else {
+              SnapSpec()
+            }
+          }
+        )
+        .dashedBorder(color = { highlightBorderColor })
+        .padding(3.dp)
+        .graphicsLayer {
+          this.transformOrigin = transformOrigin
+          scaleX = scale
+          scaleY = scale
+        }
+        .background(
+          color = backgroundColor,
+          shape = TileShape,
+        )
+        .border(width = 5.dp, color = dragBorderColor, shape = TileShape)
+        .clip(TileShape)
+        .combinedClickable(
+          onClick = onClick,
+          onLongClick = onLongClick,
+        )
+        .padding(8.dp)
+    ) {
+
+      when (tile.content) {
+        is Tile.Content.Image -> {
+          AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+              .data(tile.content.url)
+              .crossfade(true)
+              .build(),
+            contentDescription = tile.content.description,
+            colorFilter = ColorFilter.tint(foregroundColor),
+          )
+        }
+
+        is Tile.Content.Text -> {
+          TileText(text = tile.content.body, color = foregroundColor)
+        }
       }
     }
   }

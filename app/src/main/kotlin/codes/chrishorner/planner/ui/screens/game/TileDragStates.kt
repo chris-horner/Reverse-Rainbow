@@ -14,7 +14,9 @@ import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.util.fastFirst
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastZip
 import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.ui.util.mutableLongStateFrom
@@ -68,13 +70,20 @@ class TileDragStates(
 
     dragPosition += dragAmount
 
-    states.fastForEach { dragState ->
-      if (dragState.dragging) {
-        dragState.offset += IntOffset(dragAmount.x.roundToInt(), dragAmount.y.roundToInt())
-      } else {
-        dragState.highlight = dragState.bounds.contains(dragPosition)
+    val currentDraggedState = states.fastFirst { it.dragging }
+    currentDraggedState.offset += IntOffset(dragAmount.x.roundToInt(), dragAmount.y.roundToInt())
+
+    var hoveredTile: Tile? = null
+
+    states.fastForEachIndexed { index, dragState ->
+      dragState.highlight = dragState.bounds.contains(dragPosition) && !dragState.dragging
+
+      if (dragState.highlight) {
+        hoveredTile = tiles[index]
       }
     }
+
+    currentDraggedState.hoveredTile = hoveredTile
   }
 
   private fun onDragFinish(cancelled: Boolean) {
@@ -107,6 +116,7 @@ class TileDragStates(
 class TileDragState {
   private var offsetState = mutableLongStateFrom(IntOffset.Zero)
 
+  var hoveredTile by mutableStateOf<Tile?>(null)
   var dragging: Boolean by mutableStateOf(false)
   var bounds by mutableStateOf(Rect.Zero)
   var highlight by mutableStateOf(false)

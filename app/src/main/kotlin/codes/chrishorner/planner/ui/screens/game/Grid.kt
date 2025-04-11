@@ -49,6 +49,7 @@ fun Grid(
           dragging = dragState.dragging,
           transformOrigin = dragState.transformOrigin,
           highlight = dragState.highlight,
+          proposedSwapTile = dragState.hoveredTile,
           modifier = Modifier
             .animateEnterExit(
               enter = getEnterTransitionFor(index),

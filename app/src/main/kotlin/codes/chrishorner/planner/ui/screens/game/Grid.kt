@@ -43,13 +43,9 @@ fun Grid(
 
         Tile(
           tile = tile,
+          dragState = dragState,
           onClick = { onSelect(tile) },
           onLongClick = { onLongSelect(tile) },
-          dragOffsetProvider = { dragState.offset },
-          dragging = dragState.dragging,
-          transformOrigin = dragState.transformOrigin,
-          highlight = dragState.highlight,
-          proposedSwapTile = dragState.hoveredTile,
           modifier = Modifier
             .animateEnterExit(
               enter = getEnterTransitionFor(index),

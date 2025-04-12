@@ -31,13 +31,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.data.Category
@@ -52,13 +50,9 @@ import coil3.request.crossfade
 @Composable
 fun Tile(
   tile: Tile,
-  proposedSwapTile: Tile? = null,
+  dragState: TileDragState,
   onClick: () -> Unit,
   onLongClick: () -> Unit,
-  dragging: Boolean,
-  highlight: Boolean,
-  dragOffsetProvider: () -> IntOffset,
-  transformOrigin: TransformOrigin,
   modifier: Modifier,
 ) = with(LocalSharedTransitionScope.current) {
   val tileColors = getColors(tile)
@@ -74,30 +68,30 @@ fun Tile(
   // When a tile is being dragged, make sure it renders over the others with a grace period,
   // allowing it to continue being on top while it animates back into position.
   val dragZOffset by animateFloatAsState(
-    targetValue = if (dragging) 100f else 0f,
+    targetValue = if (dragState.dragging) 100f else 0f,
     animationSpec = SnapSpec(delay = 100),
   )
 
   val scale by animateFloatAsState(
-    targetValue = if (highlight) 0.92f else if (dragging) 0.7f else 1f,
+    targetValue = if (dragState.highlight) 0.92f else if (dragState.dragging) 0.7f else 1f,
     animationSpec = spring(
       dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow
     ),
   )
 
   val highlightBorderColor by animateColorAsState(
-    targetValue = if (highlight) MaterialTheme.colorScheme.primary else Color.Transparent,
+    targetValue = if (dragState.highlight) MaterialTheme.colorScheme.primary else Color.Transparent,
     animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
 
   val dragBorderColor = when {
-    dragging && tile.category != null -> foregroundColor.copy(alpha = 0.3f)
-    dragging -> foregroundColor.copy(alpha = 0.1f)
+    dragState.dragging && tile.category != null -> foregroundColor.copy(alpha = 0.3f)
+    dragState.dragging -> foregroundColor.copy(alpha = 0.1f)
     else -> Color.Transparent
   }
 
   val swapBorderColor by animateColorAsState(
-    targetValue = if (dragging) MaterialTheme.colorScheme.secondary else Color.Transparent,
+    targetValue = if (dragState.dragging) MaterialTheme.colorScheme.secondary else Color.Transparent,
     animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
 
@@ -107,6 +101,8 @@ fun Tile(
       // Make sure tiles animating to the top, or being dragged render over others.
       .zIndex(4f - tile.currentPosition + dragZOffset)
   ) {
+    val proposedSwapTile = dragState.hoveredTile
+
     if (proposedSwapTile != null) {
       Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -141,11 +137,11 @@ fun Tile(
         .matchParentSize()
         .padding(1.dp)
         .dashedBorder(color = { swapBorderColor })
-        .offset { dragOffsetProvider() }
+        .offset { dragState.offset }
         .animateBounds(
           lookaheadScope = this@with,
           boundsTransform = { _, _ ->
-            if (!dragging) {
+            if (!dragState.dragging) {
               spring(
                 dampingRatio = Spring.DampingRatioLowBouncy,
                 stiffness = Spring.StiffnessMediumLow,

@@ -82,7 +82,7 @@ class TileDragStates(
       when (dragState.status) {
         is DragStatus.Dragged -> Unit
         is DragStatus.Hovered -> if (!hovered) dragState.status = DragStatus.None
-        DragStatus.None -> if (hovered) dragState.status = DragStatus.Hovered(currentDragState.tile)
+        DragStatus.None -> if (hovered) dragState.status = DragStatus.Hovered
       }
 
       if (hovered) {
@@ -147,7 +147,7 @@ sealed interface DragStatus {
     var hoveredTile by mutableStateOf<Tile?>(null)
   }
 
-  class Hovered(val proposedTile: Tile) : DragStatus
+  data object Hovered : DragStatus
 
   data object None : DragStatus
 }

@@ -70,7 +70,7 @@ fun getColorsFor(tile: Tile, dragState: TileDragState): TileColors {
     Color.Transparent
   }
 
-  val hoverBorder = if (dragStatus is DragStatus.Hovered) {
+  val hoverBorder = if (dragStatus == DragStatus.Hovered) {
     getHoverBorderColorFor(tile.category)
   } else {
     Color.Transparent

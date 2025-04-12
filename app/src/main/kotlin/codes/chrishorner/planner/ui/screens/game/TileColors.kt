@@ -1,0 +1,72 @@
+package codes.chrishorner.planner.ui.screens.game
+
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import codes.chrishorner.planner.data.Category
+import codes.chrishorner.planner.data.Tile
+import codes.chrishorner.planner.ui.theme.plannerColors
+
+class TileColors(
+  val background: Color,
+  val foreground: Color,
+  val dragBorder: Color,
+  val swapBorder: Color,
+  val hoverBorder: Color,
+)
+
+@Composable
+fun getColorsFor(tile: Tile, dragState: TileDragState): TileColors {
+  val primaryColor: Color
+  val secondaryColor: Color
+
+  when (tile.category) {
+    Category.YELLOW -> {
+      primaryColor = MaterialTheme.plannerColors.yellowSurface
+      secondaryColor = MaterialTheme.plannerColors.onYellowSurface
+    }
+
+    Category.GREEN -> {
+      primaryColor = MaterialTheme.plannerColors.greenSurface
+      secondaryColor = MaterialTheme.plannerColors.onGreenSurface
+    }
+
+    Category.BLUE -> {
+      primaryColor = MaterialTheme.plannerColors.blueSurface
+      secondaryColor = MaterialTheme.plannerColors.onBlueSurface
+    }
+
+    Category.PURPLE -> {
+      primaryColor = MaterialTheme.plannerColors.purpleSurface
+      secondaryColor = MaterialTheme.plannerColors.onPurpleSurface
+    }
+
+    null -> {
+      primaryColor = MaterialTheme.colorScheme.surfaceContainer
+      secondaryColor = MaterialTheme.colorScheme.onSurface
+    }
+  }
+
+  val background = if (tile.selected) secondaryColor else primaryColor
+  val foreground = if (tile.selected) primaryColor else secondaryColor
+
+  val dragBorder = when {
+    dragState.status is DragStatus.Dragged && tile.category != null -> foreground.copy(alpha = 0.3f)
+    dragState.status is DragStatus.Dragged -> foreground.copy(alpha = 0.1f)
+    else -> Color.Transparent
+  }
+
+  val swapBorder = if (dragState.status is DragStatus.Dragged) {
+    MaterialTheme.colorScheme.secondary
+  } else {
+    Color.Transparent
+  }
+
+  val hoverBorder = if (dragState.status is DragStatus.Hovered) {
+    MaterialTheme.colorScheme.primary
+  } else {
+    Color.Transparent
+  }
+
+  return TileColors(background, foreground, dragBorder, swapBorder, hoverBorder)
+}

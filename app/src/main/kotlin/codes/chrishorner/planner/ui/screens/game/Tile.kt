@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.graphics.PathEffect
@@ -38,11 +37,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
-import codes.chrishorner.planner.ui.theme.plannerColors
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -55,14 +52,27 @@ fun Tile(
   onLongClick: () -> Unit,
   modifier: Modifier,
 ) = with(LocalSharedTransitionScope.current) {
-  val tileColors = getColors(tile)
+  val tileColors = getColorsFor(tile, dragState)
+
   val backgroundColor by animateColorAsState(
     targetValue = tileColors.background,
     animationSpec = spring(stiffness = Spring.StiffnessHigh),
   )
   val foregroundColor by animateColorAsState(
-    targetValue = tileColors.text,
+    targetValue = tileColors.foreground,
     animationSpec = spring(stiffness = Spring.StiffnessHigh),
+  )
+  val hoverBorderColor by animateColorAsState(
+    targetValue = tileColors.hoverBorder,
+    animationSpec = spring(stiffness = Spring.StiffnessHigh)
+  )
+  val dragBorderColor by animateColorAsState(
+    targetValue = tileColors.dragBorder,
+    animationSpec = spring(stiffness = Spring.StiffnessHigh)
+  )
+  val swapBorderColor by animateColorAsState(
+    targetValue = tileColors.swapBorder,
+    animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
 
   // When a tile is being dragged, make sure it renders over the others with a grace period,
@@ -81,22 +91,6 @@ fun Tile(
     animationSpec = spring(
       dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow
     ),
-  )
-
-  val hoverBorderColor by animateColorAsState(
-    targetValue = if (dragState.status is DragStatus.Hovered) MaterialTheme.colorScheme.primary else Color.Transparent,
-    animationSpec = spring(stiffness = Spring.StiffnessHigh)
-  )
-
-  val dragBorderColor = when {
-    dragState.status is DragStatus.Dragged && tile.category != null -> foregroundColor.copy(alpha = 0.3f)
-    dragState.status is DragStatus.Dragged -> foregroundColor.copy(alpha = 0.1f)
-    else -> Color.Transparent
-  }
-
-  val swapBorderColor by animateColorAsState(
-    targetValue = if (dragState.status is DragStatus.Dragged) MaterialTheme.colorScheme.secondary else Color.Transparent,
-    animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
 
   Box(
@@ -197,49 +191,6 @@ fun Tile(
 }
 
 private val TileShape = RoundedCornerShape(6.dp)
-
-private data class TileColors(
-  val background: Color,
-  val text: Color,
-)
-
-@Composable
-private fun getColors(tile: Tile): TileColors {
-  val primaryColor: Color
-  val secondaryColor: Color
-
-  when (tile.category) {
-    Category.YELLOW -> {
-      primaryColor = MaterialTheme.plannerColors.yellowSurface
-      secondaryColor = MaterialTheme.plannerColors.onYellowSurface
-    }
-
-    Category.GREEN -> {
-      primaryColor = MaterialTheme.plannerColors.greenSurface
-      secondaryColor = MaterialTheme.plannerColors.onGreenSurface
-    }
-
-    Category.BLUE -> {
-      primaryColor = MaterialTheme.plannerColors.blueSurface
-      secondaryColor = MaterialTheme.plannerColors.onBlueSurface
-    }
-
-    Category.PURPLE -> {
-      primaryColor = MaterialTheme.plannerColors.purpleSurface
-      secondaryColor = MaterialTheme.plannerColors.onPurpleSurface
-    }
-
-    null -> {
-      primaryColor = MaterialTheme.colorScheme.surfaceContainer
-      secondaryColor = MaterialTheme.colorScheme.onSurface
-    }
-  }
-
-  val backgroundColor = if (tile.selected) secondaryColor else primaryColor
-  val textColor = if (tile.selected) primaryColor else secondaryColor
-
-  return TileColors(backgroundColor, textColor)
-}
 
 private fun Modifier.dashedBorder(
   color: ColorProducer,

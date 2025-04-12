@@ -17,6 +17,7 @@ class TileColors(
 
 @Composable
 fun getColorsFor(tile: Tile, dragState: TileDragState): TileColors {
+  val dragStatus = dragState.status
   val primaryColor: Color
   val secondaryColor: Color
 
@@ -51,22 +52,31 @@ fun getColorsFor(tile: Tile, dragState: TileDragState): TileColors {
   val foreground = if (tile.selected) primaryColor else secondaryColor
 
   val dragBorder = when {
-    dragState.status is DragStatus.Dragged && tile.category != null -> foreground.copy(alpha = 0.3f)
-    dragState.status is DragStatus.Dragged -> foreground.copy(alpha = 0.1f)
+    dragStatus is DragStatus.Dragged && tile.category != null -> foreground.copy(alpha = 0.3f)
+    dragStatus is DragStatus.Dragged -> foreground.copy(alpha = 0.1f)
     else -> Color.Transparent
   }
 
-  val swapBorder = if (dragState.status is DragStatus.Dragged) {
-    MaterialTheme.colorScheme.secondary
+  val swapBorder = if (dragStatus is DragStatus.Dragged) {
+    getHoverBorderColorFor(dragStatus.hoveredTile?.category)
   } else {
     Color.Transparent
   }
 
-  val hoverBorder = if (dragState.status is DragStatus.Hovered) {
-    MaterialTheme.colorScheme.primary
+  val hoverBorder = if (dragStatus is DragStatus.Hovered) {
+    getHoverBorderColorFor(dragStatus.proposedTile.category)
   } else {
     Color.Transparent
   }
 
   return TileColors(background, foreground, dragBorder, swapBorder, hoverBorder)
+}
+
+@Composable
+private fun getHoverBorderColorFor(category: Category?): Color = when(category) {
+  Category.YELLOW -> MaterialTheme.plannerColors.yellowSurface
+  Category.GREEN -> MaterialTheme.plannerColors.greenSurface
+  Category.BLUE -> MaterialTheme.plannerColors.blueSurface
+  Category.PURPLE -> MaterialTheme.plannerColors.purpleSurface
+  null -> MaterialTheme.colorScheme.secondary
 }

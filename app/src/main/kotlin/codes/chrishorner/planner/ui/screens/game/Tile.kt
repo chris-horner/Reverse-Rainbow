@@ -68,30 +68,34 @@ fun Tile(
   // When a tile is being dragged, make sure it renders over the others with a grace period,
   // allowing it to continue being on top while it animates back into position.
   val dragZOffset by animateFloatAsState(
-    targetValue = if (dragState.dragging) 100f else 0f,
+    targetValue = if (dragState.status is DragStatus.Dragged) 100f else 0f,
     animationSpec = SnapSpec(delay = 100),
   )
 
   val scale by animateFloatAsState(
-    targetValue = if (dragState.highlight) 0.92f else if (dragState.dragging) 0.7f else 1f,
+    targetValue = when (dragState.status) {
+      is DragStatus.Dragged -> 0.7f
+      is DragStatus.Hovered -> 0.92f
+      DragStatus.None -> 1f
+    },
     animationSpec = spring(
       dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow
     ),
   )
 
-  val highlightBorderColor by animateColorAsState(
-    targetValue = if (dragState.highlight) MaterialTheme.colorScheme.primary else Color.Transparent,
+  val hoverBorderColor by animateColorAsState(
+    targetValue = if (dragState.status is DragStatus.Hovered) MaterialTheme.colorScheme.primary else Color.Transparent,
     animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
 
   val dragBorderColor = when {
-    dragState.dragging && tile.category != null -> foregroundColor.copy(alpha = 0.3f)
-    dragState.dragging -> foregroundColor.copy(alpha = 0.1f)
+    dragState.status is DragStatus.Dragged && tile.category != null -> foregroundColor.copy(alpha = 0.3f)
+    dragState.status is DragStatus.Dragged -> foregroundColor.copy(alpha = 0.1f)
     else -> Color.Transparent
   }
 
   val swapBorderColor by animateColorAsState(
-    targetValue = if (dragState.dragging) MaterialTheme.colorScheme.secondary else Color.Transparent,
+    targetValue = if (dragState.status is DragStatus.Dragged) MaterialTheme.colorScheme.secondary else Color.Transparent,
     animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
 
@@ -101,7 +105,7 @@ fun Tile(
       // Make sure tiles animating to the top, or being dragged render over others.
       .zIndex(4f - tile.currentPosition + dragZOffset)
   ) {
-    val proposedSwapTile = dragState.hoveredTile
+    val proposedSwapTile = (dragState.status as? DragStatus.Dragged)?.hoveredTile
 
     if (proposedSwapTile != null) {
       Column(
@@ -137,11 +141,11 @@ fun Tile(
         .matchParentSize()
         .padding(1.dp)
         .dashedBorder(color = { swapBorderColor })
-        .offset { dragState.offset }
+        .offset { dragState.status.offset }
         .animateBounds(
           lookaheadScope = this@with,
           boundsTransform = { _, _ ->
-            if (!dragState.dragging) {
+            if (dragState.status !is DragStatus.Dragged) {
               spring(
                 dampingRatio = Spring.DampingRatioLowBouncy,
                 stiffness = Spring.StiffnessMediumLow,
@@ -152,10 +156,10 @@ fun Tile(
             }
           }
         )
-        .dashedBorder(color = { highlightBorderColor })
+        .dashedBorder(color = { hoverBorderColor })
         .padding(3.dp)
         .graphicsLayer {
-          this.transformOrigin = transformOrigin
+          transformOrigin = dragState.status.transformOrigin
           scaleX = scale
           scaleY = scale
         }

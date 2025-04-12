@@ -16,8 +16,6 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.fastFirst
 import androidx.compose.ui.util.fastForEach
-import androidx.compose.ui.util.fastForEachIndexed
-import androidx.compose.ui.util.fastZip
 import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.ui.util.mutableLongStateFrom
 import kotlinx.collections.immutable.ImmutableList
@@ -36,7 +34,7 @@ class TileDragStates(
   private val tiles: ImmutableList<Tile>,
   private val onDragOver: (source: Tile, destination: Tile) -> Unit,
 ) {
-  private val states = this@TileDragStates.tiles.map { TileDragState() }.toImmutableList()
+  private val states = this@TileDragStates.tiles.map { TileDragState(it) }.toImmutableList()
   private var dragPosition = Offset.Unspecified
 
   operator fun get(index: Int): TileDragState {
@@ -53,13 +51,12 @@ class TileDragStates(
   }
 
   private fun onDragStart(position: Offset) {
-    val tile = tiles.find { states[it.currentPosition].bounds.contains(position) } ?: return
-    val state = states[tile.currentPosition]
-
-    state.dragging = true
-    state.transformOrigin = TransformOrigin(
-      pivotFractionX = (position.x - state.bounds.left) / state.bounds.width,
-      pivotFractionY = (position.y - state.bounds.top) / state.bounds.height,
+    val state = states.find { it.bounds.contains(position) } ?: return
+    state.status = DragStatus.Dragged(
+      transformOrigin = TransformOrigin(
+        pivotFractionX = (position.x - state.bounds.left) / state.bounds.width,
+        pivotFractionY = (position.y - state.bounds.top) / state.bounds.height,
+      )
     )
 
     dragPosition = position
@@ -70,20 +67,30 @@ class TileDragStates(
 
     dragPosition += dragAmount
 
-    val currentDraggedState = states.fastFirst { it.dragging }
-    currentDraggedState.offset += IntOffset(dragAmount.x.roundToInt(), dragAmount.y.roundToInt())
+    // Avoid filtering and mapping the list since we don't want to create garbage collections every
+    // frame the tile is dragged.
+    val currentDragState = states.fastFirst { it.status is DragStatus.Dragged }
+    val currentDragStatus = currentDragState.status as DragStatus.Dragged
+
+    currentDragStatus.offset += IntOffset(dragAmount.x.roundToInt(), dragAmount.y.roundToInt())
 
     var hoveredTile: Tile? = null
 
-    states.fastForEachIndexed { index, dragState ->
-      dragState.highlight = dragState.bounds.contains(dragPosition) && !dragState.dragging
+    states.fastForEach { dragState ->
+      val hovered = dragState.bounds.contains(dragPosition)
 
-      if (dragState.highlight) {
-        hoveredTile = tiles[index]
+      when (dragState.status) {
+        is DragStatus.Dragged -> Unit
+        is DragStatus.Hovered -> if (!hovered) dragState.status = DragStatus.None
+        DragStatus.None -> if (hovered) dragState.status = DragStatus.Hovered(currentDragState.tile)
+      }
+
+      if (hovered) {
+        hoveredTile = dragState.tile
       }
     }
 
-    currentDraggedState.hoveredTile = hoveredTile
+    currentDragStatus.hoveredTile = hoveredTile
   }
 
   private fun onDragFinish(cancelled: Boolean) {
@@ -91,21 +98,21 @@ class TileDragStates(
       var source: Tile? = null
       var destination: Tile? = null
 
-      states.fastZip(tiles) { state, tile ->
-        if (state.dragging) source = tile
-        if (state.highlight) destination = tile
+      states.fastForEach { state ->
+        when (state.status) {
+          is DragStatus.Dragged -> source = state.tile
+          is DragStatus.Hovered -> destination = state.tile
+          DragStatus.None -> Unit
+        }
       }
 
       if (source != null && destination != null) {
-        onDragOver(source, destination)
+        onDragOver(source!!, destination!!)
       }
     }
 
     states.fastForEach { state ->
-      state.offset = IntOffset.Zero
-      state.dragging = false
-      state.highlight = false
-      state.transformOrigin = TransformOrigin.Center
+      state.status = DragStatus.None
     }
 
     dragPosition = Offset.Unspecified
@@ -113,17 +120,34 @@ class TileDragStates(
 }
 
 @Stable
-class TileDragState {
-  private var offsetState = mutableLongStateFrom(IntOffset.Zero)
-
-  var hoveredTile by mutableStateOf<Tile?>(null)
-  var dragging: Boolean by mutableStateOf(false)
+class TileDragState(
+  val tile: Tile,
+) {
   var bounds by mutableStateOf(Rect.Zero)
-  var highlight by mutableStateOf(false)
-  var transformOrigin by mutableStateOf(TransformOrigin.Center)
-  var offset: IntOffset
-    get() = IntOffset(offsetState.longValue)
-    set(value) {
-      offsetState.longValue = value.packedValue
-    }
+  var status by mutableStateOf<DragStatus>(DragStatus.None)
+}
+
+@Stable
+sealed interface DragStatus {
+  val offset: IntOffset
+    get() = IntOffset.Zero
+
+  val transformOrigin: TransformOrigin
+    get() = TransformOrigin.Center
+
+  @Stable
+  class Dragged(override val transformOrigin: TransformOrigin) : DragStatus {
+    private var offsetState = mutableLongStateFrom(IntOffset.Zero)
+    override var offset: IntOffset
+      get() = IntOffset(offsetState.longValue)
+      set(value) {
+        offsetState.longValue = value.packedValue
+      }
+
+    var hoveredTile by mutableStateOf<Tile?>(null)
+  }
+
+  class Hovered(val proposedTile: Tile) : DragStatus
+
+  data object None : DragStatus
 }

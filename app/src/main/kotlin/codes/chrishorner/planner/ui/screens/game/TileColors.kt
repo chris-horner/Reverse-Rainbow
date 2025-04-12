@@ -12,6 +12,7 @@ class TileColors(
   val foreground: Color,
   val dragBorder: Color,
   val swapBorder: Color,
+  val swapForeground: Color,
   val hoverBorder: Color,
 )
 
@@ -58,18 +59,24 @@ fun getColorsFor(tile: Tile, dragState: TileDragState): TileColors {
   }
 
   val swapBorder = if (dragStatus is DragStatus.Dragged) {
-    getHoverBorderColorFor(dragStatus.hoveredTile?.category)
+    getHoverBorderColorFor(tile.category)
+  } else {
+    Color.Transparent
+  }
+
+  val swapForeground = if (dragStatus is DragStatus.Dragged) {
+    if (tile.category != null) getHoverBorderColorFor(tile.category) else foreground
   } else {
     Color.Transparent
   }
 
   val hoverBorder = if (dragStatus is DragStatus.Hovered) {
-    getHoverBorderColorFor(dragStatus.proposedTile.category)
+    getHoverBorderColorFor(tile.category)
   } else {
     Color.Transparent
   }
 
-  return TileColors(background, foreground, dragBorder, swapBorder, hoverBorder)
+  return TileColors(background, foreground, dragBorder, swapBorder, swapForeground, hoverBorder)
 }
 
 @Composable

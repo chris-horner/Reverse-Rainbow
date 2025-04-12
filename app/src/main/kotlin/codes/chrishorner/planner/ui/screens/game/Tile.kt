@@ -10,14 +10,10 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorProducer
 import androidx.compose.ui.graphics.PathEffect
@@ -35,10 +32,10 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.data.Tile
-import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -62,16 +59,20 @@ fun Tile(
     targetValue = tileColors.foreground,
     animationSpec = spring(stiffness = Spring.StiffnessHigh),
   )
-  val hoverBorderColor by animateColorAsState(
-    targetValue = tileColors.hoverBorder,
-    animationSpec = spring(stiffness = Spring.StiffnessHigh)
-  )
   val dragBorderColor by animateColorAsState(
     targetValue = tileColors.dragBorder,
     animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
-  val swapBorderColor by animateColorAsState(
+  val hoverBorder by animateColorAsState(
+    targetValue = tileColors.hoverBorder,
+    animationSpec = spring(stiffness = Spring.StiffnessHigh)
+  )
+  val swapBorder by animateColorAsState(
     targetValue = tileColors.swapBorder,
+    animationSpec = spring(stiffness = Spring.StiffnessHigh)
+  )
+  val swapForegroundColor by animateColorAsState(
+    targetValue = tileColors.swapForeground,
     animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
 
@@ -102,29 +103,10 @@ fun Tile(
     val proposedSwapTile = (dragState.status as? DragStatus.Dragged)?.hoveredTile
 
     if (proposedSwapTile != null) {
-      Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.padding(4.dp)
-      ) {
-        // TODO: Deal with image tiles.
-        TileText(
-          text = (tile.content as Tile.Content.Text).body,
-          color = MaterialTheme.colorScheme.onBackground,
-          textStyle = MaterialTheme.typography.labelSmall,
-        )
-
-        Icon(
-          imageVector = Icons.Shuffle,
-          contentDescription = null,
-          tint = MaterialTheme.colorScheme.onBackground,
-          modifier = Modifier.size(20.dp),
-        )
-
-        TileText(
-          text = (proposedSwapTile.content as Tile.Content.Text).body,
-          color = MaterialTheme.colorScheme.onBackground,
-          textStyle = MaterialTheme.typography.labelSmall,
+      Box(modifier = Modifier.padding(12.dp)) {
+        TileContent(
+          content = proposedSwapTile.content,
+          color = swapForegroundColor,
         )
       }
     }
@@ -134,7 +116,7 @@ fun Tile(
       modifier = Modifier
         .matchParentSize()
         .padding(1.dp)
-        .dashedBorder(color = { swapBorderColor })
+        .dashedBorder(color = { swapBorder })
         .offset { dragState.status.offset }
         .animateBounds(
           lookaheadScope = this@with,
@@ -150,7 +132,7 @@ fun Tile(
             }
           }
         )
-        .dashedBorder(color = { hoverBorderColor })
+        .dashedBorder(color = { hoverBorder })
         .padding(3.dp)
         .graphicsLayer {
           transformOrigin = dragState.status.transformOrigin
@@ -169,23 +151,31 @@ fun Tile(
         )
         .padding(8.dp)
     ) {
+      TileContent(tile.content, color = foregroundColor)
+    }
+  }
+}
 
-      when (tile.content) {
-        is Tile.Content.Image -> {
-          AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-              .data(tile.content.url)
-              .crossfade(true)
-              .build(),
-            contentDescription = tile.content.description,
-            colorFilter = ColorFilter.tint(foregroundColor),
-          )
-        }
+@Composable
+private fun TileContent(
+  content: Tile.Content,
+  color: Color,
+  textStyle: TextStyle = MaterialTheme.typography.titleMedium
+) {
+  when (content) {
+    is Tile.Content.Image -> {
+      AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+          .data(content.url)
+          .crossfade(true)
+          .build(),
+        contentDescription = content.description,
+        colorFilter = ColorFilter.tint(color),
+      )
+    }
 
-        is Tile.Content.Text -> {
-          TileText(text = tile.content.body, color = foregroundColor)
-        }
-      }
+    is Tile.Content.Text -> {
+      TileText(text = content.body, color = color, textStyle = textStyle)
     }
   }
 }

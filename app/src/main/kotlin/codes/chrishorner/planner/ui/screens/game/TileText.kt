@@ -1,7 +1,6 @@
 package codes.chrishorner.planner.ui.screens.game
 
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -17,7 +16,7 @@ import androidx.compose.ui.unit.dp
 fun TileText(
   text: String,
   color: Color,
-  textStyle: TextStyle = MaterialTheme.typography.titleMedium,
+  textStyle: TextStyle,
 ) = with(LocalDensity.current) {
   BoxWithConstraints {
     val textMeasurer = rememberTextMeasurer()

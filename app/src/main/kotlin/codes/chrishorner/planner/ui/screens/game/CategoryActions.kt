@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.data.Category
+import codes.chrishorner.planner.data.CategoryAction
 import codes.chrishorner.planner.data.CategoryStatus
 import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.LayoutOrientation
@@ -69,9 +70,10 @@ private fun CategoryAction(
   status: CategoryStatus,
   onClick: (Category) -> Unit,
 ) = with(LocalSharedTransitionScope.current) {
+  val action = status.action
   val colors = getColors(category)
   val alpha by animateFloatAsState(
-    targetValue = if (status == CategoryStatus.DISABLED) 0.5f else 1f,
+    targetValue = if (action == CategoryAction.DISABLED) 0.5f else 1f,
     label = "category action alpha",
   )
 
@@ -96,18 +98,18 @@ private fun CategoryAction(
       )
       .clip(RoundedCornerShape(8.dp))
       .clickable(
-        enabled = status != CategoryStatus.DISABLED,
+        enabled = action != CategoryAction.DISABLED,
         onClick = { onClick(category) },
       )
   ) {
 
-    if (status == CategoryStatus.CLEARABLE) {
+    if (action == CategoryAction.CLEAR) {
       Icon(
         imageVector = Icons.Clear,
         contentDescription = null,
         tint = colors.icon,
       )
-    } else if (status == CategoryStatus.SWAPPABLE) {
+    } else if (action == CategoryAction.SWAP) {
       Icon(
         imageVector = Icons.Shuffle,
         contentDescription = null,

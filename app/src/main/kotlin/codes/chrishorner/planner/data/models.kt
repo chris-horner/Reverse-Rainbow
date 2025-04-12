@@ -46,15 +46,20 @@ data class GameState(
 @Parcelize
 data class CategoryState(
   val assigned: Boolean = false,
-  val status: CategoryStatus = CategoryStatus.DISABLED,
+  val status: CategoryAction = CategoryAction.DISABLED,
 ) : Parcelable
 
-enum class CategoryStatus {
+enum class CategoryAction {
   DISABLED,
-  ENABLED,
-  CLEARABLE,
-  SWAPPABLE,
+  ASSIGN,
+  CLEAR,
+  SWAP,
 }
+
+data class CategoryStatus(
+  val complete: Boolean,
+  val action: CategoryAction,
+)
 
 enum class RainbowStatus {
   DISABLED,

@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.data.Category
+import codes.chrishorner.planner.data.CategoryAction
 import codes.chrishorner.planner.data.CategoryStatus
 import codes.chrishorner.planner.data.GameModel
 import codes.chrishorner.planner.data.RainbowStatus
@@ -58,13 +59,13 @@ class Game(tiles: ImmutableList<Tile>) {
   }
 
   fun select(category: Category) {
-    val status = determineCategoryStatus(category)
+    val action = determineCategoryStatus(category).action
 
-    when (status) {
-      CategoryStatus.DISABLED -> return
-      CategoryStatus.ENABLED -> assignTiles(category)
-      CategoryStatus.CLEARABLE -> clearTiles(category)
-      CategoryStatus.SWAPPABLE -> swapSelectedToCategory(category)
+    when (action) {
+      CategoryAction.DISABLED -> return
+      CategoryAction.ASSIGN -> assignTiles(category)
+      CategoryAction.CLEAR -> clearTiles(category)
+      CategoryAction.SWAP -> swapSelectedToCategory(category)
     }
 
     tiles.replaceAll { it.copy(selected = false) }
@@ -237,13 +238,7 @@ class Game(tiles: ImmutableList<Tile>) {
       tiles.all { it.category != null } -> RainbowStatus.SETTABLE
       else -> RainbowStatus.DISABLED
     }
-
-    val completedYellow = tiles.count { it.category == Category.YELLOW } == 4
-    val completedGreen = tiles.count { it.category == Category.GREEN } == 4
-    val completedBlue = tiles.count { it.category == Category.BLUE } == 4
-    val completedPurple = tiles.count { it.category == Category.PURPLE } == 4
-    val completedCategoryCount =
-      listOf(completedYellow, completedGreen, completedBlue, completedPurple).count { it }
+    val completedCategoryCount = categoryStatuses.count { it.value.complete }
 
     return GameModel(
       tiles = tiles.toImmutableList(),
@@ -255,7 +250,7 @@ class Game(tiles: ImmutableList<Tile>) {
 
   /**
    * Look at the current state of the board - including currently assigned categories and selected
-   * tiles. Use this to work out what the current valid action is for a given category.
+   * tiles. Use this to work out the current status of a given category
    */
   private fun determineCategoryStatus(category: Category): CategoryStatus {
     val selectedTiles = tiles.filter { it.selected }
@@ -276,18 +271,23 @@ class Game(tiles: ImmutableList<Tile>) {
     val equalNumberFromOtherCategorySelected = otherCategorySelectionCount == 1 &&
       selectedTiles.count { it.category == category } == selectedTiles.count { it.category != category }
 
-    return when {
+    val action = when {
       selectionCount > 0 -> when {
-        tilesInThisCategoryCount + selectionCount <= 4 && !thisCategorySelected -> CategoryStatus.ENABLED
-        allOfOneOtherCategorySelectedWithMatchingCount -> CategoryStatus.SWAPPABLE
-        equalNumberFromOtherCategorySelected -> CategoryStatus.SWAPPABLE
-        selectedTiles.all { it.category == category } -> CategoryStatus.CLEARABLE
-        else -> CategoryStatus.DISABLED
+        tilesInThisCategoryCount + selectionCount <= 4 && !thisCategorySelected -> CategoryAction.ASSIGN
+        allOfOneOtherCategorySelectedWithMatchingCount -> CategoryAction.SWAP
+        equalNumberFromOtherCategorySelected -> CategoryAction.SWAP
+        selectedTiles.all { it.category == category } -> CategoryAction.CLEAR
+        else -> CategoryAction.DISABLED
       }
 
-      tiles.any { it.category == category } -> CategoryStatus.CLEARABLE
-      else -> CategoryStatus.DISABLED
+      tiles.any { it.category == category } -> CategoryAction.CLEAR
+      else -> CategoryAction.DISABLED
     }
+
+    return CategoryStatus(
+      complete = tilesInThisCategoryCount == 4,
+      action = action,
+    )
   }
 
   private fun isCurrentlyInRainbowOrder(): Boolean {

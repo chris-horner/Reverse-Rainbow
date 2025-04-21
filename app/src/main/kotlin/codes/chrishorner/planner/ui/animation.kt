@@ -3,6 +3,7 @@ package codes.chrishorner.planner.ui
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing
 import androidx.compose.runtime.compositionLocalOf
 
@@ -15,6 +16,9 @@ val LocalAnimatedContentScope = compositionLocalOf<AnimatedContentScope> {
 }
 
 const val SplashScreenFadeMillis = 150L
+
+val JumpStartEasing = CubicBezierEasing(.36f,-0.65f,.3f,1f)
+val JumpEndEasing = CubicBezierEasing(.68f,0f,.75f,1.63f)
 
 class OvershootEasing(tension: Float) : Easing {
 

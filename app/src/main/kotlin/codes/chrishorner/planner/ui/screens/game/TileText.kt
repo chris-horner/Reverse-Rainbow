@@ -1,11 +1,11 @@
 package codes.chrishorner.planner.ui.screens.game
 
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
@@ -16,14 +16,13 @@ import androidx.compose.ui.unit.dp
 fun TileText(
   text: String,
   color: Color,
-  textStyle: TextStyle,
 ) = with(LocalDensity.current) {
   BoxWithConstraints {
     val textMeasurer = rememberTextMeasurer()
-    var style = textStyle.copy(
+    var style = MaterialTheme.typography.titleMedium.copy(
       fontWeight = FontWeight.Bold,
       textAlign = TextAlign.Center,
-      lineHeight = (textStyle.lineHeight.toPx() - 4.dp.toPx()).toSp(),
+      lineHeight = (MaterialTheme.typography.titleMedium.lineHeight.toPx() - 4.dp.toPx()).toSp(),
       color = color,
     )
 

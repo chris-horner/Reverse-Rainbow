@@ -10,10 +10,11 @@ import codes.chrishorner.planner.ui.theme.plannerColors
 class TileColors(
   val background: Color,
   val foreground: Color,
-  val dragBorder: Color,
-  val swapBorder: Color,
-  val swapForeground: Color,
-  val hoverBorder: Color,
+  val dragTileBorder: Color,
+  val dragSlotBorder: Color,
+  val swapCurrentForeground: Color,
+  val swapProposedForeground: Color,
+  val hoverSlotBorder: Color,
 )
 
 @Composable
@@ -49,41 +50,58 @@ fun getColorsFor(tile: Tile, dragState: TileDragState): TileColors {
     }
   }
 
-  val background = if (tile.selected) secondaryColor else primaryColor
-  val foreground = if (tile.selected) primaryColor else secondaryColor
-
-  val dragBorder = when {
-    dragStatus is DragStatus.Dragged && tile.category != null -> foreground.copy(alpha = 0.3f)
-    dragStatus is DragStatus.Dragged -> foreground.copy(alpha = 0.1f)
-    else -> Color.Transparent
-  }
-
-  val swapBorder = if (dragStatus is DragStatus.Dragged) {
-    getHoverBorderColorFor(tile.category)
+  val hoveredTile = (dragStatus as? DragStatus.Dragged)?.hoveredTile
+  val foreground = if (tile.selected && dragStatus !is DragStatus.Dragged) {
+    primaryColor
   } else {
-    Color.Transparent
+    secondaryColor
   }
 
-  val swapForeground = if (dragStatus is DragStatus.Dragged) {
-    if (tile.category != null) getHoverBorderColorFor(tile.category) else foreground
-  } else {
-    Color.Transparent
-  }
-
-  val hoverBorder = if (dragStatus == DragStatus.Hovered) {
-    getHoverBorderColorFor(tile.category)
-  } else {
-    Color.Transparent
-  }
-
-  return TileColors(background, foreground, dragBorder, swapBorder, swapForeground, hoverBorder)
+  return TileColors(
+    background = if (tile.selected && dragStatus !is DragStatus.Dragged) {
+      secondaryColor
+    } else {
+      primaryColor
+    },
+    foreground = foreground,
+    dragTileBorder = when {
+      dragStatus is DragStatus.Dragged && tile.category != null -> foreground.copy(alpha = 0.3f)
+      dragStatus is DragStatus.Dragged -> foreground.copy(alpha = 0.1f)
+      else -> Color.Transparent
+    },
+    dragSlotBorder = if (dragStatus is DragStatus.Dragged) {
+      getSlotBorderColorFor(tile.category)
+    } else {
+      Color.Transparent
+    },
+    swapCurrentForeground = getSwapTextColorFor(tile.category),
+    swapProposedForeground = if (hoveredTile != null) {
+      getSwapTextColorFor(hoveredTile.category)
+    } else {
+      Color.Transparent
+    },
+    hoverSlotBorder = if (dragStatus == DragStatus.Hovered) {
+      getSlotBorderColorFor(tile.category)
+    } else {
+      Color.Transparent
+    },
+  )
 }
 
 @Composable
-private fun getHoverBorderColorFor(category: Category?): Color = when(category) {
+private fun getSlotBorderColorFor(category: Category?): Color = when (category) {
   Category.YELLOW -> MaterialTheme.plannerColors.yellowSurface
   Category.GREEN -> MaterialTheme.plannerColors.greenSurface
   Category.BLUE -> MaterialTheme.plannerColors.blueSurface
   Category.PURPLE -> MaterialTheme.plannerColors.purpleSurface
   null -> MaterialTheme.colorScheme.secondary
+}
+
+@Composable
+private fun getSwapTextColorFor(category: Category?): Color = when (category) {
+  Category.YELLOW -> MaterialTheme.plannerColors.yellowSurface
+  Category.GREEN -> MaterialTheme.plannerColors.greenSurface
+  Category.BLUE -> MaterialTheme.plannerColors.blueSurface
+  Category.PURPLE -> MaterialTheme.plannerColors.purpleSurface
+  null -> MaterialTheme.colorScheme.onBackground
 }

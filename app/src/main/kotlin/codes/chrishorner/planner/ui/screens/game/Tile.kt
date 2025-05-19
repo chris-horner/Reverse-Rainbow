@@ -40,7 +40,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.zIndex
@@ -70,19 +69,23 @@ fun Tile(
     animationSpec = spring(stiffness = Spring.StiffnessHigh),
   )
   val dragBorderColor by animateColorAsState(
-    targetValue = tileColors.dragBorder,
+    targetValue = tileColors.dragTileBorder,
     animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
-  val hoverBorder by animateColorAsState(
-    targetValue = tileColors.hoverBorder,
+  val hoverSlotBorderColor by animateColorAsState(
+    targetValue = tileColors.hoverSlotBorder,
     animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
-  val swapBorder by animateColorAsState(
-    targetValue = tileColors.swapBorder,
+  val dragSlotBorderColor by animateColorAsState(
+    targetValue = tileColors.dragSlotBorder,
     animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
-  val swapForegroundColor by animateColorAsState(
-    targetValue = tileColors.swapForeground,
+  val swapCurrentForegroundColor by animateColorAsState(
+    targetValue = tileColors.swapCurrentForeground,
+    animationSpec = spring(stiffness = Spring.StiffnessHigh)
+  )
+  val swapProposedForegroundColor by animateColorAsState(
+    targetValue = tileColors.swapProposedForeground,
     animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
 
@@ -112,11 +115,12 @@ fun Tile(
   ) {
     val proposedSwapTile = (dragState.status as? DragStatus.Dragged)?.hoveredTile
 
-    if (proposedSwapTile != null) {
+    if (proposedSwapTile != null && proposedSwapTile.currentPosition != tile.currentPosition) {
       SwapContent(
         current = tile.content,
         proposed = proposedSwapTile.content,
-        foregroundColor = swapForegroundColor,
+        currentColor = swapCurrentForegroundColor,
+        proposedColor = swapProposedForegroundColor,
       )
     }
 
@@ -125,7 +129,7 @@ fun Tile(
       modifier = Modifier
         .matchParentSize()
         .padding(1.dp)
-        .dashedBorder(color = { swapBorder })
+        .dashedBorder(color = { dragSlotBorderColor })
         .offset { dragState.status.offset }
         .animateBounds(
           lookaheadScope = this@with,
@@ -141,7 +145,7 @@ fun Tile(
             }
           }
         )
-        .dashedBorder(color = { hoverBorder })
+        .dashedBorder(color = { hoverSlotBorderColor })
         .padding(3.dp)
         .graphicsLayer {
           transformOrigin = dragState.status.transformOrigin
@@ -152,7 +156,7 @@ fun Tile(
           color = backgroundColor,
           shape = TileShape,
         )
-        .border(width = 5.dp, color = dragBorderColor, shape = TileShape)
+        .border(width = 6.dp, color = dragBorderColor, shape = TileShape)
         .clip(TileShape)
         .combinedClickable(
           onClick = onClick,
@@ -201,16 +205,17 @@ private fun SwapEntry(content: Tile.Content, color: Color) {
 private fun SwapContent(
   current: Tile.Content,
   proposed: Tile.Content,
-  foregroundColor: Color,
+  currentColor: Color,
+  proposedColor: Color,
 ) {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(4.dp),
     modifier = Modifier.padding(12.dp),
   ) {
-    SwapEntry(current, foregroundColor)
+    SwapEntry(current, currentColor)
     Icon(Icons.Shuffle, contentDescription = null, modifier = Modifier.size(16.dp))
-    SwapEntry(proposed, foregroundColor)
+    SwapEntry(proposed, proposedColor)
   }
 }
 

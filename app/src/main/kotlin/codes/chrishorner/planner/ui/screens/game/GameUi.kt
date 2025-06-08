@@ -4,9 +4,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,8 +19,6 @@ import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.Game
 import codes.chrishorner.planner.ui.LayoutOrientation
 import codes.chrishorner.planner.ui.LocalLayoutOrientation
-import codes.chrishorner.planner.ui.LocalUiMode
-import codes.chrishorner.planner.ui.UiMode
 import codes.chrishorner.planner.ui.util.CappedWidthContainer
 
 @Composable
@@ -61,17 +62,16 @@ private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -
         modifier = Modifier
           .padding(paddingValues)
       ) {
-        when (LocalUiMode.current) {
-          UiMode.Small -> Spacer(modifier = Modifier.weight(1f))
-          UiMode.Large -> Spacer(modifier = Modifier.weight(3f))
-        }
+        Spacer(modifier = Modifier.weight(1f))
 
         Grid(
           tiles = model.tiles,
           onSelect = game::select,
           onLongSelect = game::longSelect,
           onDragOver = game::onDragOver,
-          modifier = Modifier.zIndex(2f),
+          modifier = Modifier
+            .fillMaxWidth()
+            .zIndex(2f),
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -83,7 +83,7 @@ private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -
           modifier = Modifier.zIndex(1f),
         )
 
-        Spacer(modifier = Modifier.weight(3f))
+        Spacer(modifier = Modifier.weight(1f))
       }
     }
   }
@@ -94,7 +94,7 @@ private fun LandscapeGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () 
   val model = game.model.value
 
   Scaffold { paddingValues ->
-    Row(modifier = Modifier.padding(paddingValues)) {
+    Row(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
       SideBar(
         showNytButton = model.mostlyComplete,
         rainbowStatus = model.rainbowStatus,
@@ -112,13 +112,19 @@ private fun LandscapeGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () 
           .fillMaxHeight(),
       )
 
+      Spacer(modifier = Modifier.size(16.dp))
+
       Grid(
         tiles = model.tiles,
         onSelect = game::select,
         onLongSelect = game::longSelect,
         onDragOver = game::onDragOver,
-        modifier = Modifier.zIndex(2f),
+        modifier = Modifier
+          .fillMaxHeight()
+          .wrapContentWidth()
+          .zIndex(2f),
       )
+
 
       Spacer(modifier = Modifier.size(16.dp))
 
@@ -130,6 +136,8 @@ private fun LandscapeGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () 
       )
 
       Spacer(modifier = Modifier.size(16.dp))
+
+      Spacer(modifier = Modifier.weight(1f))
     }
   }
 }

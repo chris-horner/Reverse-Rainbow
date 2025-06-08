@@ -21,6 +21,7 @@ fun BottomBar(
   showNytButton: Boolean,
   rainbowStatus: RainbowStatus,
   onAboutClick: () -> Unit,
+  onResetClick: () -> Unit,
   onRainbowClick: () -> Unit,
   onOpenNytClick: () -> Unit,
 ) {
@@ -38,7 +39,7 @@ fun BottomBar(
 
       Spacer(modifier = Modifier.weight(1f))
 
-      Menu(onAboutClick)
+      Menu(onAboutClick, onResetClick)
     },
   )
 }
@@ -48,12 +49,13 @@ fun SideBar(
   showNytButton: Boolean,
   rainbowStatus: RainbowStatus,
   onAboutClick: () -> Unit,
+  onResetClick: () -> Unit,
   onRainbowClick: () -> Unit,
   onOpenNytClick: () -> Unit,
   modifier: Modifier,
 ) {
   Column(modifier = modifier) {
-    Menu(onAboutClick)
+    Menu(onAboutClick, onResetClick)
 
     Spacer(modifier = Modifier.size(32.dp))
 

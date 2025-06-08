@@ -108,6 +108,19 @@ class Game(tiles: ImmutableList<Tile>) {
     publishModelUpdate()
   }
 
+  fun reset() {
+    tiles.replaceAll { tile ->
+      tile.copy(
+        currentPosition = tile.initialPosition,
+        selected = false,
+        category = null,
+      )
+    }
+
+    tiles.sortBy { it.currentPosition }
+    publishModelUpdate()
+  }
+
   private fun assignTiles(selectedCategory: Category) {
     val selectedTiles = tiles.filter { it.selected }
     val categoryHasAssignedTiles = tiles.any { it.category == selectedCategory }

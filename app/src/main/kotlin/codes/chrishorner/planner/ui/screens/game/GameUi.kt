@@ -44,6 +44,7 @@ private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -
         showNytButton = model.mostlyComplete,
         rainbowStatus = model.rainbowStatus,
         onAboutClick = onClickAbout,
+        onResetClick = { game.reset() },
         onRainbowClick = { game.rainbowSort() },
         onOpenNytClick = onOpenNyt,
       )
@@ -93,6 +94,7 @@ private fun LandscapeGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () 
         showNytButton = model.mostlyComplete,
         rainbowStatus = model.rainbowStatus,
         onAboutClick = onClickAbout,
+        onResetClick = { game.reset() },
         onRainbowClick = { game.rainbowSort() },
         onOpenNytClick = onOpenNyt,
         modifier = Modifier

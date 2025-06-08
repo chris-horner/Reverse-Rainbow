@@ -12,6 +12,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.data.RainbowStatus
+import codes.chrishorner.planner.ui.screens.game.BottomBarAction.OpenNytClick
+import codes.chrishorner.planner.ui.screens.game.BottomBarAction.RainbowClick
+
+enum class BottomBarAction {
+  AboutClick,
+  ResetClick,
+  ShuffleClick,
+  RainbowClick,
+  OpenNytClick,
+}
 
 /**
  * Shown at the bottom of the screen in all UI configurations except for small screens in landscape.
@@ -20,10 +30,7 @@ import codes.chrishorner.planner.data.RainbowStatus
 fun BottomBar(
   showNytButton: Boolean,
   rainbowStatus: RainbowStatus,
-  onAboutClick: () -> Unit,
-  onResetClick: () -> Unit,
-  onRainbowClick: () -> Unit,
-  onOpenNytClick: () -> Unit,
+  onAction: (BottomBarAction) -> Unit,
 ) {
   BottomAppBar(
     containerColor = MaterialTheme.colorScheme.background,
@@ -31,15 +38,15 @@ fun BottomBar(
     actions = {
       Spacer(modifier = Modifier.size(16.dp))
 
-      OpenNytButton(showNytButton, onOpenNytClick)
+      OpenNytButton(showNytButton, onClick = { onAction(OpenNytClick) })
 
       Spacer(modifier = Modifier.size(16.dp))
 
-      RainbowButton(rainbowStatus, onRainbowClick)
+      RainbowButton(rainbowStatus, onClick = { onAction(RainbowClick) })
 
       Spacer(modifier = Modifier.weight(1f))
 
-      Menu(onAboutClick, onResetClick)
+      Menu(onAction)
     },
   )
 }
@@ -48,14 +55,11 @@ fun BottomBar(
 fun SideBar(
   showNytButton: Boolean,
   rainbowStatus: RainbowStatus,
-  onAboutClick: () -> Unit,
-  onResetClick: () -> Unit,
-  onRainbowClick: () -> Unit,
-  onOpenNytClick: () -> Unit,
+  onAction: (BottomBarAction) -> Unit,
   modifier: Modifier,
 ) {
   Column(modifier = modifier) {
-    Menu(onAboutClick, onResetClick)
+    Menu(onAction)
 
     Spacer(modifier = Modifier.size(32.dp))
 
@@ -64,7 +68,7 @@ fun SideBar(
         .fillMaxWidth()
         .padding(horizontal = 8.dp)
     ) {
-      OpenNytButton(showNytButton, onOpenNytClick, Modifier.fillMaxWidth())
+      OpenNytButton(showNytButton, onClick = { onAction(OpenNytClick) }, Modifier.fillMaxWidth())
     }
 
     Spacer(modifier = Modifier.size(8.dp))
@@ -74,7 +78,7 @@ fun SideBar(
         .fillMaxWidth()
         .padding(horizontal = 8.dp)
     ) {
-      RainbowButton(rainbowStatus, onRainbowClick, Modifier.fillMaxWidth())
+      RainbowButton(rainbowStatus, onClick = { onAction(RainbowClick) }, Modifier.fillMaxWidth())
     }
   }
 }

@@ -37,8 +37,7 @@ import codes.chrishorner.planner.ui.util.BetterDropdownMenu
 
 @Composable
 fun Menu(
-  onAboutClick: () -> Unit,
-  onResetClick: () -> Unit,
+  onAction: (BottomBarAction) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   var expanded by remember { mutableStateOf(false) }
@@ -60,7 +59,16 @@ fun Menu(
         text = { Text(stringResource(R.string.reset)) },
         onClick = {
           expanded = false
-          onResetClick()
+          onAction(BottomBarAction.ResetClick)
+        }
+      )
+
+      DropdownMenuItem(
+        // TODO: Find an appropriate icon.
+        text = { Text(stringResource(R.string.shuffle)) },
+        onClick = {
+          expanded = false
+          onAction(BottomBarAction.ShuffleClick)
         }
       )
 
@@ -75,7 +83,7 @@ fun Menu(
         text = { Text(stringResource(R.string.about)) },
         onClick = {
           expanded = false
-          onAboutClick()
+          onAction(BottomBarAction.AboutClick)
         },
       )
     }

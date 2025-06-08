@@ -43,10 +43,15 @@ private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -
       BottomBar(
         showNytButton = model.mostlyComplete,
         rainbowStatus = model.rainbowStatus,
-        onAboutClick = onClickAbout,
-        onResetClick = { game.reset() },
-        onRainbowClick = { game.rainbowSort() },
-        onOpenNytClick = onOpenNyt,
+        onAction = { action ->
+          when (action) {
+            BottomBarAction.AboutClick -> onClickAbout()
+            BottomBarAction.ResetClick -> game.reset()
+            BottomBarAction.ShuffleClick -> game.shuffle()
+            BottomBarAction.RainbowClick -> game.rainbowSort()
+            BottomBarAction.OpenNytClick -> onOpenNyt()
+          }
+        },
       )
     },
   ) { paddingValues ->
@@ -93,10 +98,15 @@ private fun LandscapeGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () 
       SideBar(
         showNytButton = model.mostlyComplete,
         rainbowStatus = model.rainbowStatus,
-        onAboutClick = onClickAbout,
-        onResetClick = { game.reset() },
-        onRainbowClick = { game.rainbowSort() },
-        onOpenNytClick = onOpenNyt,
+        onAction = { action ->
+          when (action) {
+            BottomBarAction.AboutClick -> onClickAbout()
+            BottomBarAction.ResetClick -> game.reset()
+            BottomBarAction.ShuffleClick -> game.shuffle()
+            BottomBarAction.RainbowClick -> game.rainbowSort()
+            BottomBarAction.OpenNytClick -> onOpenNyt()
+          }
+        },
         modifier = Modifier
           .weight(1f)
           .fillMaxHeight(),

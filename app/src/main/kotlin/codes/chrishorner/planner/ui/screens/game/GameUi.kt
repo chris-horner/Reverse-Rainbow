@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.Game
 import codes.chrishorner.planner.ui.LayoutOrientation
 import codes.chrishorner.planner.ui.LocalLayoutOrientation
@@ -59,14 +60,21 @@ private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -
           UiMode.Large -> Spacer(modifier = Modifier.weight(3f))
         }
 
-        Grid(model.tiles, game::select, game::longSelect, game::onDragOver)
+        Grid(
+          tiles = model.tiles,
+          onSelect = game::select,
+          onLongSelect = game::longSelect,
+          onDragOver = game::onDragOver,
+          modifier = Modifier.zIndex(2f),
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
         CategoryActions(
           categoryStatuses = model.categoryStatuses,
           rainbowStatus = model.rainbowStatus,
-          onCategoryClick = { category -> game.select(category) }
+          onCategoryClick = { category -> game.select(category) },
+          modifier = Modifier.zIndex(1f),
         )
 
         Spacer(modifier = Modifier.weight(3f))
@@ -92,14 +100,21 @@ private fun LandscapeGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () 
           .fillMaxHeight(),
       )
 
-      Grid(model.tiles, game::select, game::longSelect, game::onDragOver)
+      Grid(
+        tiles = model.tiles,
+        onSelect = game::select,
+        onLongSelect = game::longSelect,
+        onDragOver = game::onDragOver,
+        modifier = Modifier.zIndex(2f),
+      )
 
       Spacer(modifier = Modifier.size(16.dp))
 
       CategoryActions(
         categoryStatuses = model.categoryStatuses,
         rainbowStatus = model.rainbowStatus,
-        onCategoryClick = { category -> game.select(category) }
+        onCategoryClick = { category -> game.select(category) },
+        modifier = Modifier.zIndex(1f),
       )
 
       Spacer(modifier = Modifier.size(16.dp))

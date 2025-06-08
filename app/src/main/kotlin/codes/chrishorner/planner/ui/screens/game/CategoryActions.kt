@@ -51,6 +51,7 @@ fun CategoryActions(
   categoryStatuses: ImmutableMap<Category, CategoryStatus>,
   rainbowStatus: RainbowStatus,
   onCategoryClick: (Category) -> Unit,
+  modifier: Modifier,
 ) {
   val boardComplete = rainbowStatus != RainbowStatus.DISABLED
 
@@ -58,7 +59,7 @@ fun CategoryActions(
     LayoutOrientation.Portrait -> {
       Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
       ) {
         for ((category, status) in categoryStatuses) {
           CategoryAction(category, status, boardComplete, onCategoryClick)
@@ -69,7 +70,7 @@ fun CategoryActions(
     LayoutOrientation.Landscape -> {
       Column(
         verticalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.fillMaxHeight(),
+        modifier = modifier.fillMaxHeight(),
       ) {
         for ((category, status) in categoryStatuses) {
           CategoryAction(category, status, boardComplete, onCategoryClick)

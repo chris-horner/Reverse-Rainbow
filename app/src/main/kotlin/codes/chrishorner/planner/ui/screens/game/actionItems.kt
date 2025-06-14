@@ -55,7 +55,13 @@ fun Menu(
       onDismissRequest = { expanded = false },
     ) {
       DropdownMenuItem(
-        // TODO: Find an appropriate icon.
+        leadingIcon = {
+          Icon(
+            Icons.DeleteSweep,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface,
+          )
+        },
         text = { Text(stringResource(R.string.reset)) },
         onClick = {
           expanded = false
@@ -64,7 +70,13 @@ fun Menu(
       )
 
       DropdownMenuItem(
-        // TODO: Find an appropriate icon.
+        leadingIcon = {
+          Icon(
+            Icons.Shuffle,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface,
+          )
+        },
         text = { Text(stringResource(R.string.shuffle)) },
         onClick = {
           expanded = false

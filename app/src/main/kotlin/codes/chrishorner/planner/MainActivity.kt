@@ -16,6 +16,8 @@ import androidx.core.view.doOnLayout
 import codes.chrishorner.planner.ui.SplashScreenFadeMillis
 import codes.chrishorner.planner.ui.screens.MainUi
 import codes.chrishorner.planner.ui.theme.PlannerTheme
+import com.diamondedge.logging.KmLogging
+import com.diamondedge.logging.LogLevel
 
 class MainActivity : ComponentActivity() {
 
@@ -24,6 +26,7 @@ class MainActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    KmLogging.setLogLevel(if (BuildConfig.DEBUG) LogLevel.Verbose else LogLevel.Off)
     enableEdgeToEdge()
     handleSplashScreen()
 

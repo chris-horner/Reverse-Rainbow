@@ -1,6 +1,6 @@
 package codes.chrishorner.planner.data
 
-import android.util.Log
+import com.diamondedge.logging.logging
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +47,7 @@ sealed interface TileFetchResult {
 
 private fun Response.toResult(): TileFetchResult = use {
   if (!isSuccessful) {
-    Log.e("Planner", "Tile fetching failed with code $code")
+    logging("Planner").e { "Tile fetching failed with code $code" }
     return TileFetchResult.HttpFailure
   }
 
@@ -60,7 +60,7 @@ private fun Response.toResult(): TileFetchResult = use {
       .map { it.asTile() }
       .toImmutableList()
   } catch (e: Exception) {
-    Log.e("Planner", "Failed to parse tiles from server response.", e)
+    logging("Planner").e(err = e) { "Failed to parse tiles from server response." }
     return TileFetchResult.ParsingFailure
   }
 

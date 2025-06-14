@@ -1,4 +1,5 @@
-- 💥 Fixed a crash that could occur when swapping assigned categories.
-- 👇 Updated category selection to use long press - taps now always select a single tile.
-- 👓 Improved how long, multi-word tiles shrink their text to fit.
-- 🫳 Added ability to drag tiles to rearrange and reassign.
+- 🌈 Fixed a bug that allowed more than 4 tiles to be assigned to a category.
+- 💥 Fixed 2 crashes that could occur when restoring from process death.
+- 👓 Gave tile titles slightly more space to allow for better readability.
+- 👇 Improved the tile drag experience by adding a preview of the title and categories that will be swapped on release.
+- 🔀 Added shuffle and reset actions

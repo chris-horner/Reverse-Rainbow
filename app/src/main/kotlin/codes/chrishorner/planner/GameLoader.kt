@@ -14,15 +14,18 @@ import codes.chrishorner.planner.data.fetchTiles
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.time.Clock
-import java.time.LocalDate
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Stable
 class GameLoader private constructor(
   private val scope: CoroutineScope,
   private val initialState: LoaderState = LoaderState.Loading,
   private val fetchTiles: suspend () -> TileFetchResult = ::fetchTiles,
-  private val clock: Clock = Clock.systemDefaultZone(),
+  private val clock: Clock = Clock.System,
+  private val timeZoneProvider: () -> TimeZone = { TimeZone.currentSystemDefault() },
 ) {
 
   sealed interface LoaderState {
@@ -44,9 +47,10 @@ class GameLoader private constructor(
     _state.value = LoaderState.Loading
 
     val result = fetchTiles()
+    val currentLocalDate = clock.now().toLocalDateTime(timeZoneProvider()).date
 
     _state.value = when (result) {
-      is TileFetchResult.Success -> LoaderState.Success(LocalDate.now(clock), Game(result.tiles))
+      is TileFetchResult.Success -> LoaderState.Success(currentLocalDate, Game(result.tiles))
       is TileFetchResult.Failure -> LoaderState.Failure(
         type = when (result) {
           TileFetchResult.HttpFailure -> FailureType.HTTP
@@ -59,8 +63,9 @@ class GameLoader private constructor(
 
   fun refreshIfNecessary() {
     val currentState = _state.value
+    val currentLocalDate = clock.now().toLocalDateTime(timeZoneProvider()).date
 
-    if (currentState !is LoaderState.Success || currentState.date != LocalDate.now(clock)) {
+    if (currentState !is LoaderState.Success || currentState.date != currentLocalDate) {
       refresh()
     }
   }

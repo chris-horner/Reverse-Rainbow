@@ -162,7 +162,7 @@ fun Tile(
           onClick = onClick,
           onLongClick = onLongClick,
         )
-        .padding(8.dp)
+        .padding(4.dp)
     ) {
       TileContent(tile.content, color = foregroundColor)
     }

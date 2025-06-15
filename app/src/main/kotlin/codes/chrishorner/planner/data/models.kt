@@ -67,7 +67,7 @@ enum class RainbowStatus {
   REVERSIBLE,
 }
 
-class GameModel(
+data class GameModel(
   val tiles: ImmutableList<Tile>,
   val categoryStatuses: ImmutableMap<Category, CategoryStatus>,
   val rainbowStatus: RainbowStatus,

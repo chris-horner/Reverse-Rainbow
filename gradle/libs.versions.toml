@@ -4,6 +4,7 @@ agp = "8.9.3"
 assertk = "0.28.1"
 coil = "3.1.0"
 composeBom = "2025.06.00"
+continuousCorners = "1.0.1"
 coreKtx = "1.16.0"
 kotlin = "2.1.20"
 kotlinxCollections = "0.3.8"
@@ -29,6 +30,7 @@ assertk = { group = "com.willowtreeapps.assertk", name = "assertk", version.ref 
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
 coil-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
+continuous-corners = { group = "com.adamglin", name = "compose-continuous-rounded-corner-shape", version.ref = "continuousCorners" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable-jvm", version.ref = "kotlinxCollections" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,6 +34,7 @@ import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.OvershootEasing
 import codes.chrishorner.planner.ui.SplashScreenFadeMillis
+import codes.chrishorner.planner.ui.theme.TileShape
 import codes.chrishorner.planner.ui.theme.plannerColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -76,7 +76,7 @@ private fun LoadingTiles(
         animatedVisibilityScope = LocalAnimatedContentScope.current,
       )
       .size(64.dp)
-      .background(MaterialTheme.plannerColors.yellowSurface, shape = RoundedCornerShape(6.dp))
+      .background(MaterialTheme.plannerColors.yellowSurface, shape = TileShape)
   )
 
   Box(
@@ -87,7 +87,7 @@ private fun LoadingTiles(
         animatedVisibilityScope = LocalAnimatedContentScope.current,
       )
       .size(64.dp)
-      .background(MaterialTheme.plannerColors.greenSurface, shape = RoundedCornerShape(6.dp))
+      .background(MaterialTheme.plannerColors.greenSurface, shape = TileShape)
   )
 
   Box(
@@ -98,7 +98,7 @@ private fun LoadingTiles(
         animatedVisibilityScope = LocalAnimatedContentScope.current,
       )
       .size(64.dp)
-      .background(MaterialTheme.plannerColors.blueSurface, shape = RoundedCornerShape(6.dp))
+      .background(MaterialTheme.plannerColors.blueSurface, shape = TileShape)
   )
 
   Box(
@@ -109,7 +109,7 @@ private fun LoadingTiles(
         animatedVisibilityScope = LocalAnimatedContentScope.current,
       )
       .size(64.dp)
-      .background(MaterialTheme.plannerColors.purpleSurface, shape = RoundedCornerShape(6.dp))
+      .background(MaterialTheme.plannerColors.purpleSurface, shape = TileShape)
   )
 }
 

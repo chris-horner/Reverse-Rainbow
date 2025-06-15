@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,6 +45,7 @@ import androidx.compose.ui.zIndex
 import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
+import codes.chrishorner.planner.ui.theme.TileShape
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -235,8 +235,6 @@ private fun TileImage(
     modifier = if (size.isSpecified) Modifier.size(size) else Modifier,
   )
 }
-
-private val TileShape = RoundedCornerShape(6.dp)
 
 private fun Modifier.dashedBorder(
   color: ColorProducer,

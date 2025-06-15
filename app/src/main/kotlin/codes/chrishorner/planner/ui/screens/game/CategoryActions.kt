@@ -43,6 +43,7 @@ import codes.chrishorner.planner.ui.LayoutOrientation
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalLayoutOrientation
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
+import codes.chrishorner.planner.ui.theme.TileShape
 import codes.chrishorner.planner.ui.theme.plannerColors
 import kotlinx.collections.immutable.ImmutableMap
 
@@ -139,7 +140,7 @@ private fun CategoryAction(
       .alpha(alpha)
       .size(64.dp)
       .background(
-        shape = RoundedCornerShape(8.dp),
+        shape = TileShape,
         color = colors.background,
       )
       .clip(RoundedCornerShape(8.dp))

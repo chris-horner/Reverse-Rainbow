@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,11 +30,12 @@ import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.BuildConfig
 import codes.chrishorner.planner.R
 import codes.chrishorner.planner.data.Category
-import codes.chrishorner.planner.ui.util.CappedWidthContainer
 import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
+import codes.chrishorner.planner.ui.theme.TileShape
 import codes.chrishorner.planner.ui.theme.plannerColors
+import codes.chrishorner.planner.ui.util.CappedWidthContainer
 
 @Composable
 fun AboutUi(onBack: () -> Unit) {
@@ -151,7 +151,7 @@ private fun Block(
       .size(48.dp)
       .background(
         color = backgroundColor,
-        shape = RoundedCornerShape(6.dp),
+        shape = TileShape,
       )
   ) {
     Icon(

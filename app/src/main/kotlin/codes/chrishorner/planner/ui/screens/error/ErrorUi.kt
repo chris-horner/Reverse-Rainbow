@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -32,10 +31,11 @@ import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.GameLoader.FailureType
 import codes.chrishorner.planner.R
 import codes.chrishorner.planner.data.Category
-import codes.chrishorner.planner.ui.util.CappedWidthContainer
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
+import codes.chrishorner.planner.ui.theme.TileShape
 import codes.chrishorner.planner.ui.theme.plannerColors
+import codes.chrishorner.planner.ui.util.CappedWidthContainer
 
 @Composable
 fun ErrorUi(failureType: FailureType, onRetry: () -> Unit) {
@@ -145,7 +145,7 @@ private fun CategoryBlock(
       .size(52.dp)
       .background(
         color = backgroundColor,
-        shape = RoundedCornerShape(6.dp),
+        shape = TileShape,
       )
   ) {
     Image(

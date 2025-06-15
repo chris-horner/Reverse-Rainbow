@@ -5,6 +5,9 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -13,22 +16,24 @@ import kotlinx.serialization.json.decodeFromStream
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import java.time.LocalDate
+import kotlin.coroutines.CoroutineContext
 
-suspend fun fetchTiles(): TileFetchResult {
-  val today = LocalDate.now()
+suspend fun fetchTiles(
+  clock: Clock = Clock.System,
+  timeZone: TimeZone = TimeZone.currentSystemDefault(),
+  networkCall: (url: String) -> Response = ::realNetworkCall,
+  context: CoroutineContext = Dispatchers.IO,
+): TileFetchResult {
+  val today = clock.now().toLocalDateTime(timeZone)
   val year = today.year
-  val month = today.monthValue.toString().padStart(2, '0')
+  val month = today.monthNumber.toString().padStart(2, '0')
   val day = today.dayOfMonth.toString().padStart(2, '0')
+  val url = "https://www.nytimes.com/svc/connections/v2/$year-$month-$day.json"
 
-  val client = OkHttpClient()
-  val request = Request.Builder()
-    .url("https://www.nytimes.com/svc/connections/v2/$year-$month-$day.json")
-    .build()
-
-  return withContext(Dispatchers.IO) {
+  return withContext(context) {
     try {
-      client.newCall(request).execute().use { response -> response.toResult() }
+      val response = networkCall(url)
+      response.toResult()
     } catch (_: Exception) {
       TileFetchResult.NetworkFailure
     }
@@ -45,26 +50,33 @@ sealed interface TileFetchResult {
   data object ParsingFailure : Failure
 }
 
-private fun Response.toResult(): TileFetchResult = use {
+private fun realNetworkCall(url: String): Response {
+  val request = Request.Builder().url(url).build()
+  return OkHttpClient().newCall(request).execute()
+}
+
+private fun Response.toResult(): TileFetchResult {
   if (!isSuccessful) {
     logging("Planner").e { "Tile fetching failed with code $code" }
     return TileFetchResult.HttpFailure
   }
 
-  val tiles = try {
-    val stream = body!!.byteStream()
-    val apiResponse = Json.decodeFromStream<ApiResponse>(stream)
-    apiResponse.categories
-      .flatMap { it.cards }
-      .sortedBy { it.position }
-      .map { it.asTile() }
-      .toImmutableList()
-  } catch (e: Exception) {
-    logging("Planner").e(err = e) { "Failed to parse tiles from server response." }
-    return TileFetchResult.ParsingFailure
-  }
+  return use {
+    val tiles = try {
+      val stream = body!!.byteStream()
+      val apiResponse = Json.decodeFromStream<ApiResponse>(stream)
+      apiResponse.categories
+        .flatMap { it.cards }
+        .sortedBy { it.position }
+        .map { it.asTile() }
+        .toImmutableList()
+    } catch (e: Exception) {
+      logging("Planner").e(err = e) { "Failed to parse tiles from server response." }
+      return TileFetchResult.ParsingFailure
+    }
 
-  TileFetchResult.Success(tiles)
+    TileFetchResult.Success(tiles)
+  }
 }
 
 @Serializable

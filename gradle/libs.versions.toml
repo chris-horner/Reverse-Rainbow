@@ -7,7 +7,9 @@ composeBom = "2025.06.00"
 coreKtx = "1.16.0"
 kotlin = "2.1.20"
 kotlinxCollections = "0.3.8"
+kotlinxCoroutines = "1.10.2"
 kotlinxSerializationJson = "1.8.1"
+kotlinxDatetime = "0.6.2"
 logging = "2.0.3"
 okhttp = "4.12.0"
 playPublisher = "3.12.1"
@@ -29,6 +31,8 @@ coil-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", versio
 coil-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable-jvm", version.ref = "kotlinxCollections" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 logging-android = { group = "com.diamondedge", name = "logging-android", version.ref = "logging" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }

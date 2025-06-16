@@ -43,6 +43,14 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * Begins by placing 4 colored squares in an arrangement that closely matches the app icon shown in
+ * the splash screen. Those squares then animate outwards in 4 directions. Once the squares have
+ * reached their final distance from the center, `onAnimationDone` will be invoked.
+ *
+ * If this composable continues to be shown on screen (if loading is taking a long time), then the
+ * squares will spin in a circle every few seconds.
+ */
 @Composable
 fun LoadingUi(splashIconSize: DpSize, onAnimationDone: () -> Unit) {
   Box(

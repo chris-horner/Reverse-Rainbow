@@ -30,6 +30,9 @@ fun rememberTileDragStates(
   return remember(tiles, onDragOver) { TileDragStates(tiles, onDragOver) }
 }
 
+/**
+ * Keeps track of the drag position and hover state of each tile.
+ */
 class TileDragStates(
   private val tiles: ImmutableList<Tile>,
   private val onDragOver: (source: Tile, destination: Tile) -> Unit,
@@ -107,7 +110,7 @@ class TileDragStates(
       }
 
       if (source != null && destination != null) {
-        onDragOver(source!!, destination!!)
+        onDragOver(source, destination)
       }
     }
 

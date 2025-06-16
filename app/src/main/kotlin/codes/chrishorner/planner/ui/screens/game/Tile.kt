@@ -180,6 +180,28 @@ private fun TileContent(
   }
 }
 
+/**
+ * Shown "under" the original position of a tile as it's being dragged. Displays a preview of the
+ * swap that will occur if the dragged tile is dropped.
+ */
+@Composable
+private fun SwapContent(
+  current: Tile.Content,
+  proposed: Tile.Content,
+  currentColor: Color,
+  proposedColor: Color,
+) {
+  Column(
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.spacedBy(4.dp),
+    modifier = Modifier.padding(12.dp),
+  ) {
+    SwapEntry(current, currentColor)
+    Icon(Icons.Shuffle, contentDescription = null, modifier = Modifier.size(16.dp))
+    SwapEntry(proposed, proposedColor)
+  }
+}
+
 @Composable
 private fun SwapEntry(content: Tile.Content, color: Color) {
   when (content) {
@@ -198,24 +220,6 @@ private fun SwapEntry(content: Tile.Content, color: Color) {
         color = color,
       )
     }
-  }
-}
-
-@Composable
-private fun SwapContent(
-  current: Tile.Content,
-  proposed: Tile.Content,
-  currentColor: Color,
-  proposedColor: Color,
-) {
-  Column(
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(4.dp),
-    modifier = Modifier.padding(12.dp),
-  ) {
-    SwapEntry(current, currentColor)
-    Icon(Icons.Shuffle, contentDescription = null, modifier = Modifier.size(16.dp))
-    SwapEntry(proposed, proposedColor)
   }
 }
 

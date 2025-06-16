@@ -51,6 +51,9 @@ fun BottomBar(
   )
 }
 
+/**
+ * Only shown on small screens in landscape. Arranges the bar actions vertically.
+ */
 @Composable
 fun SideBar(
   showNytButton: Boolean,

@@ -35,6 +35,9 @@ import codes.chrishorner.planner.data.RainbowStatus
 import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.util.BetterDropdownMenu
 
+/**
+ * 3 dot menu with secondary actions in the app.
+ */
 @Composable
 fun Menu(
   onAction: (BottomBarAction) -> Unit,

@@ -22,7 +22,8 @@ val LocalUiMode = staticCompositionLocalOf { UiMode.Small }
 
 /**
  * Sits at the root, looks at the available width and height, and decides the current
- * [LocalLayoutOrientation] and [LocalUiMode].
+ * [LocalLayoutOrientation] and [LocalUiMode]. This is similar to Compose UI's window class size
+ * API, but simpler since we don't need that many configurations.
  */
 @Composable
 fun UiLayoutManager(content: @Composable () -> Unit) {

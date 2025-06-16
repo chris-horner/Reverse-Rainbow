@@ -37,6 +37,9 @@ import codes.chrishorner.planner.ui.theme.TileShape
 import codes.chrishorner.planner.ui.theme.plannerColors
 import codes.chrishorner.planner.ui.util.CappedWidthContainer
 
+/**
+ * Shows various messages depending on the `failureType`.
+ */
 @Composable
 fun ErrorUi(failureType: FailureType, onRetry: () -> Unit) {
 

@@ -59,13 +59,14 @@ fun Grid(
   }
 }
 
+/**
+ * A simple layout that arranges exactly 16 children in a 4x4 grid with an equal width and height.
+ */
 @Composable
 private fun ConnectionsLayout(
   modifier: Modifier,
   content: @Composable () -> Unit,
 ) {
-  // We could use `LazyGrid`, but this gives us more control over the animations as items move. Not
-  // to mention it's much simpler.
   Layout(
     content = content,
     modifier = modifier,
@@ -91,6 +92,9 @@ private fun ConnectionsLayout(
   }
 }
 
+/**
+ * Slides and fades an individual tiles when the `Grid` enters the screen.
+ */
 private fun getEnterTransitionFor(index: Int): EnterTransition {
   val duration = 200
   // Animate tiles lower down in the grid earlier than those higher up to create a nice effect.

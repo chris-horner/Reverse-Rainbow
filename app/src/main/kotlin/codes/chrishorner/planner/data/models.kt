@@ -6,6 +6,9 @@ import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.parcelize.Parcelize
 
+/**
+ * Represents a single card on the Connections board.
+ */
 @Parcelize
 data class Tile(
   val initialPosition: Int,
@@ -49,6 +52,18 @@ data class CategoryState(
   val status: CategoryAction = CategoryAction.DISABLED,
 ) : Parcelable
 
+/**
+ * Based on the current selections and assigned categories on the Connections board,
+ * `CategoryAction` represents the current valid action for a category.
+ *
+ * A couple of examples:
+ *
+ * If no tiles were currently assigned to YELLOW, and 4 unassigned tiles were selected, then the
+ * `CategoryAction` for YELLOW would be `ASSIGN`.
+ *
+ * If 4 YELLOW tiles were selected and 4 other tiles on the board were assigned to GREEN, then the
+ * `CategoryAction` for GREEN would be `SWAP`.
+ */
 enum class CategoryAction {
   DISABLED,
   ASSIGN,

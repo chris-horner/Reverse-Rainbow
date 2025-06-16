@@ -21,6 +21,10 @@ import codes.chrishorner.planner.ui.LayoutOrientation
 import codes.chrishorner.planner.ui.LocalLayoutOrientation
 import codes.chrishorner.planner.ui.util.CappedWidthContainer
 
+/**
+ * Shows the Connections grid, the category assignment buttons, as well as the action bar. Uses
+ * [LocalLayoutOrientation] to conditionally show the game UI in portrait or landscape.
+ */
 @Composable
 fun GameUi(
   game: Game,

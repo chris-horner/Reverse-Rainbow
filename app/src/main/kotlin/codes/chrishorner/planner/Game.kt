@@ -13,6 +13,9 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 
+/**
+ * The current state of the Connections board and logic to manipulate it.
+ */
 class Game(tiles: ImmutableList<Tile>) {
   private val tiles = tiles.toMutableList()
 

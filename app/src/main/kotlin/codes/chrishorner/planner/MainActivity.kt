@@ -22,6 +22,10 @@ import com.diamondedge.logging.LogLevel
 class MainActivity : ComponentActivity() {
 
   private val viewModel by viewModels<GameLoader.ViewModelWrapper>()
+
+  // We want to seamlessly fade from the splash screen into a complex loading animation. To do that,
+  // we need to keep track of how big the splash screen's icon was once we have that information,
+  // and shuttle it along to LoadingUi.
   private val splashIconSize = mutableStateOf(DpSize.Unspecified)
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,6 +58,10 @@ class MainActivity : ComponentActivity() {
     viewModel.gameLoader.refreshIfNecessary()
   }
 
+  /**
+   * Listens for the resolved size of the splash screen icon, then fades out and removes splash
+   * screen content.
+   */
   private fun handleSplashScreen() {
     splashScreen.setOnExitAnimationListener { splashScreenView ->
       splashScreenView.iconView!!.doOnLayout {

@@ -20,6 +20,9 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
+/**
+ * Fetches today's Connections game from The New York Times API.
+ */
 @Stable
 class GameLoader(
   private val scope: CoroutineScope,

@@ -1,5 +1,6 @@
 package codes.chrishorner.planner.data
 
+import codes.chrishorner.planner.Game
 import com.diamondedge.logging.logging
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -18,6 +19,10 @@ import okhttp3.Request
 import okhttp3.Response
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Hits The New York Times' API, parses their JSON, and returns a list of [Tile] objects that can be
+ * used to construct a [Game].
+ */
 suspend fun fetchTiles(
   clock: Clock = Clock.System,
   timeZone: TimeZone = TimeZone.currentSystemDefault(),

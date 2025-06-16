@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
@@ -36,6 +37,13 @@ import codes.chrishorner.planner.ui.screens.error.ErrorUi
 import codes.chrishorner.planner.ui.screens.game.GameUi
 import codes.chrishorner.planner.ui.screens.loading.LoadingUi
 
+/**
+ * Root UI of the app. MainUi is responsible for:
+ * - drawing the app background
+ * - maintaining a dirt simple navigation stack
+ * - showing appropriate screens based on [LoaderState]
+ * - forwarding events back up to the main UI host.
+ */
 @Composable
 fun MainUi(
   loaderState: LoaderState,
@@ -45,6 +53,11 @@ fun MainUi(
 ) {
   var loadingAnimationDone by remember { mutableStateOf(loaderState !is LoaderState.Loading) }
   var navDestination by rememberSaveable { mutableStateOf(NavDestination.Game) }
+
+  // Since this app is so simple we don't make use of any navigation frameworks. A
+  // consequence of that is that calls to rememberSaveable will be cleared on navigation, so
+  // we take care of holding that state ourselves.
+  val saveableStateHolder = rememberSaveableStateHolder()
 
   BackHandler(enabled = navDestination == NavDestination.About) {
     navDestination = NavDestination.Game
@@ -57,17 +70,7 @@ fun MainUi(
   ) {
     UiLayoutManager {
       SharedTransitionLayout {
-        val state = if (!loadingAnimationDone) LoaderState.Loading else loaderState
-
-        val screen = when {
-          !loadingAnimationDone -> Screen.Loading
-          navDestination == NavDestination.About -> Screen.About
-          else -> when (state) {
-            is LoaderState.Failure -> Screen.Error(state.type)
-            LoaderState.Loading -> Screen.Loading
-            is LoaderState.Success -> Screen.Loaded(state.game)
-          }
-        }
+        val screen = deriveScreenFrom(navDestination, loadingAnimationDone, loaderState)
 
         AnimatedContent(
           targetState = screen,
@@ -78,20 +81,20 @@ fun MainUi(
             LocalSharedTransitionScope provides this@SharedTransitionLayout,
             LocalAnimatedContentScope provides this
           ) {
-            when (targetScreen) {
-              is Screen.Loading -> LoadingUi(
+            // Use the target screen's class as a key for associated saved state.
+            saveableStateHolder.SaveableStateProvider(key = targetScreen::class.java) {
+              ShowScreen(
+                screen = targetScreen,
                 splashIconSize = splashIconSize,
-                onAnimationDone = { loadingAnimationDone = true },
+                onAction = { action ->
+                  when (action) {
+                    ScreenAction.FinishLoading -> { loadingAnimationDone = true }
+                    is ScreenAction.Navigate -> { navDestination = action.destination }
+                    ScreenAction.OpenNyt -> { onOpenNyt() }
+                    ScreenAction.Refresh -> { onRefresh() }
+                  }
+                }
               )
-
-              is Screen.Loaded -> GameUi(
-                targetScreen.game, onOpenNyt,
-                onClickAbout = { navDestination = NavDestination.About }
-              )
-
-              is Screen.Error -> ErrorUi(targetScreen.type, onRetry = onRefresh)
-
-              is Screen.About -> AboutUi(onBack = { navDestination = NavDestination.Game })
             }
           }
         }
@@ -106,11 +109,64 @@ private enum class NavDestination {
   About,
 }
 
+// All screens that can be shown in the app.
 private sealed interface Screen {
   data object Loading : Screen
   data class Error(val type: GameLoader.FailureType) : Screen
   data class Loaded(val game: Game) : Screen
   data object About : Screen
+}
+
+private sealed interface ScreenAction {
+  data class Navigate(val destination: NavDestination): ScreenAction
+  data object Refresh : ScreenAction
+  data object OpenNyt : ScreenAction
+  data object FinishLoading : ScreenAction
+}
+
+private fun deriveScreenFrom(
+  navDestination: NavDestination,
+  loadingAnimationDone: Boolean,
+  loaderState: LoaderState
+): Screen {
+  return when (navDestination) {
+    NavDestination.About -> Screen.About
+    NavDestination.Game -> when (loaderState) {
+      is LoaderState.Failure -> Screen.Error(loaderState.type)
+      LoaderState.Loading -> Screen.Loading
+      // Even if we've finished loading, continue to show the loading screen until the loading
+      // animation is complete.
+      is LoaderState.Success -> if (!loadingAnimationDone) {
+        Screen.Loading
+      } else {
+        Screen.Loaded(loaderState.game)
+      }
+    }
+  }
+}
+
+@Composable
+private fun ShowScreen(
+  screen: Screen,
+  splashIconSize: DpSize,
+  onAction: (ScreenAction) -> Unit,
+) {
+  when (screen) {
+    is Screen.Loading -> LoadingUi(
+      splashIconSize = splashIconSize,
+      onAnimationDone = { onAction(ScreenAction.FinishLoading) },
+    )
+
+    is Screen.Loaded -> GameUi(
+      game = screen.game,
+      onOpenNyt = { onAction(ScreenAction.OpenNyt) },
+      onClickAbout = { onAction(ScreenAction.Navigate(NavDestination.About)) }
+    )
+
+    is Screen.Error -> ErrorUi(screen.type, onRetry = { onAction(ScreenAction.Refresh) })
+
+    is Screen.About -> AboutUi(onBack = { onAction(ScreenAction.Navigate(NavDestination.Game)) })
+  }
 }
 
 private fun <S> transitionSpec(): AnimatedContentTransitionScope<S>.() -> ContentTransform = {

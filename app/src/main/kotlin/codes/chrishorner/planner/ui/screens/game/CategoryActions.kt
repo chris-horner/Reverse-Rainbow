@@ -1,6 +1,7 @@
 package codes.chrishorner.planner.ui.screens.game
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animateFloatAsState
@@ -49,6 +50,10 @@ import codes.chrishorner.planner.ui.theme.TileShape
 import codes.chrishorner.planner.ui.theme.plannerColors
 import kotlinx.collections.immutable.ImmutableMap
 
+/**
+ * 4 square buttons shown underneath or beside the Connections grid. Provides affordances for
+ * assigning, clearing, and swapping tiles to different categories.
+ */
 @Composable
 fun CategoryActions(
   categoryStatuses: ImmutableMap<Category, CategoryStatus>,
@@ -96,36 +101,7 @@ private fun CategoryAction(
     targetValue = if (action == CategoryAction.DISABLED) 0.5f else 1f,
     label = "category action alpha",
   )
-
-  val density = LocalDensity.current
-  val jumpAnimatable = remember { Animatable(IntOffset.Zero, IntOffset.VectorConverter) }
-  var runCelebration by rememberSaveable { mutableStateOf(false) }
-
-  LaunchedEffect(boardComplete, density) {
-    if (!boardComplete) runCelebration = false
-
-    if (!boardComplete || runCelebration) return@LaunchedEffect
-
-    val delay = when (category) {
-      Category.YELLOW -> 0
-      Category.GREEN -> 60
-      Category.BLUE -> 120
-      Category.PURPLE -> 180
-    }
-
-    val yPosition = with(density) { (-16).dp.roundToPx() }
-
-    jumpAnimatable.animateTo(
-      targetValue = IntOffset(0, yPosition),
-      animationSpec = tween(durationMillis = 240, delayMillis = delay, easing = JumpStartEasing)
-    )
-    jumpAnimatable.animateTo(
-      targetValue = IntOffset.Zero,
-      animationSpec = tween(durationMillis = 220, easing = JumpEndEasing)
-    )
-
-    runCelebration = true
-  }
+  val jumpAnimatable = rememberJumpAnimatable(category, boardComplete)
 
   Box(
     contentAlignment = Alignment.Center,
@@ -168,6 +144,48 @@ private fun CategoryAction(
       )
     }
   }
+}
+
+/**
+ * Provides an `Animatable` for each category action button to "jump" when the board is completed.
+ */
+@Composable
+private fun rememberJumpAnimatable(
+  category: Category,
+  boardComplete: Boolean,
+): Animatable<IntOffset, AnimationVector2D> {
+  val jumpAnimatable = remember { Animatable(IntOffset.Zero, IntOffset.VectorConverter) }
+  val density = LocalDensity.current
+
+  var runCelebration by rememberSaveable { mutableStateOf(false) }
+
+  LaunchedEffect(boardComplete, density) {
+    if (!boardComplete) runCelebration = false
+
+    if (!boardComplete || runCelebration) return@LaunchedEffect
+
+    val delay = when (category) {
+      Category.YELLOW -> 0
+      Category.GREEN -> 60
+      Category.BLUE -> 120
+      Category.PURPLE -> 180
+    }
+
+    val yPosition = with(density) { (-16).dp.roundToPx() }
+
+    jumpAnimatable.animateTo(
+      targetValue = IntOffset(0, yPosition),
+      animationSpec = tween(durationMillis = 240, delayMillis = delay, easing = JumpStartEasing)
+    )
+    jumpAnimatable.animateTo(
+      targetValue = IntOffset.Zero,
+      animationSpec = tween(durationMillis = 220, easing = JumpEndEasing)
+    )
+
+    runCelebration = true
+  }
+
+  return jumpAnimatable
 }
 
 private data class CategoryActionColors(

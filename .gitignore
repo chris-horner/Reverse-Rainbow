@@ -13,6 +13,9 @@ local.properties
 # Gradle cache.
 .gradle
 
+# Kotlin
+.kotlin
+
 # Most IDEA/Android Studio project files as they're specific to a user.
 /.idea/*
 *.iml

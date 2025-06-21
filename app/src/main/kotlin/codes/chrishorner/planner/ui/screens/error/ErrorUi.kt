@@ -24,8 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.GameLoader.FailureType
@@ -77,25 +76,25 @@ fun ErrorUi(failureType: FailureType, onRetry: () -> Unit) {
           category = Category.YELLOW,
           backgroundColor = MaterialTheme.plannerColors.yellowSurface,
           foregroundColor = MaterialTheme.plannerColors.onYellowSurface,
-          image = painterResource(R.drawable.sad_face1),
+          image = ErrorImages.SadFace1,
         )
         CategoryBlock(
           category = Category.GREEN,
           backgroundColor = MaterialTheme.plannerColors.greenSurface,
           foregroundColor = MaterialTheme.plannerColors.onYellowSurface,
-          image = painterResource(R.drawable.sad_face2),
+          image = ErrorImages.SadFace2,
         )
         CategoryBlock(
           category = Category.BLUE,
           backgroundColor = MaterialTheme.plannerColors.blueSurface,
           foregroundColor = MaterialTheme.plannerColors.onBlueSurface,
-          image = painterResource(R.drawable.sad_face3),
+          image = ErrorImages.SadFace3,
         )
         CategoryBlock(
           category = Category.PURPLE,
           backgroundColor = MaterialTheme.plannerColors.purpleSurface,
           foregroundColor = MaterialTheme.plannerColors.onPurpleSurface,
-          image = painterResource(R.drawable.sad_face4),
+          image = ErrorImages.SadFace4,
         )
       }
 
@@ -136,7 +135,7 @@ private fun CategoryBlock(
   category: Category,
   backgroundColor: Color,
   foregroundColor: Color,
-  image: Painter,
+  image: ImageVector,
 ) = with(LocalSharedTransitionScope.current) {
   Box(
     contentAlignment = Alignment.Center,
@@ -152,7 +151,7 @@ private fun CategoryBlock(
       )
   ) {
     Image(
-      painter = image,
+      imageVector = image,
       contentDescription = null,
       colorFilter = ColorFilter.tint(foregroundColor),
     )

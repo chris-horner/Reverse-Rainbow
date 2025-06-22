@@ -21,7 +21,7 @@ import com.diamondedge.logging.LogLevel
 
 class MainActivity : ComponentActivity() {
 
-  private val viewModel by viewModels<GameLoader.ViewModelWrapper>()
+  private val viewModel by viewModels<GameLoaderViewModel>()
 
   // We want to seamlessly fade from the splash screen into a complex loading animation. To do that,
   // we need to keep track of how big the splash screen's icon was once we have that information,

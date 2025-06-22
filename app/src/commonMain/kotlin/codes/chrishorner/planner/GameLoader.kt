@@ -3,11 +3,10 @@ package codes.chrishorner.planner
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.savedstate.SavedState
+import androidx.savedstate.savedState
 import androidx.savedstate.serialization.encodeToSavedState
 import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.data.TileFetchResult
@@ -27,7 +26,7 @@ import kotlinx.datetime.toLocalDateTime
 @Stable
 class GameLoader(
   private val scope: CoroutineScope,
-  private val initialState: LoaderState = LoaderState.Loading,
+  initialState: LoaderState = LoaderState.Loading,
   private val fetchTiles: suspend () -> TileFetchResult = ::fetchTiles,
   private val clock: Clock = Clock.System,
   private val timeZoneProvider: () -> TimeZone = { TimeZone.currentSystemDefault() },
@@ -72,50 +71,6 @@ class GameLoader(
 
     if (currentState !is LoaderState.Success || currentState.date != currentLocalDate) {
       refresh()
-    }
-  }
-
-  /**
-   * Use as little of the ViewModel API as possible to persist the game's loaded state and survive
-   * Activity restarts.
-   */
-  class ViewModelWrapper(savedStateHandle: SavedStateHandle) : ViewModel() {
-    val gameLoader: GameLoader
-
-    init {
-      val previousTiles = savedStateHandle.get<ImmutableList<Tile>?>("tiles")
-      val previousDate = savedStateHandle.get<LocalDate>("date")
-
-      val initialLoaderState = if (previousTiles != null && previousDate != null) {
-        LoaderState.Success(previousDate, Game(previousTiles))
-      } else {
-        LoaderState.Loading
-      }
-
-      gameLoader = GameLoader(
-        scope = CoroutineScope(viewModelScope.coroutineContext + AndroidUiDispatcher.Main),
-        initialState = initialLoaderState,
-      )
-
-      savedStateHandle.setSavedStateProvider("tiles") {
-        val loaderState = gameLoader.state.value
-
-        if (loaderState is LoaderState.Success) {
-          encodeToSavedState(loaderState.game.model.value.tiles)
-        } else {
-          SavedState.EMPTY
-        }
-      }
-
-      savedStateHandle.setSavedStateProvider("date") {
-        val loaderState = gameLoader.state.value
-
-        if (loaderState is LoaderState.Success) {
-          encodeToSavedState(loaderState.date)
-        } else {
-          SavedState.EMPTY
-        }
-      }
     }
   }
 }

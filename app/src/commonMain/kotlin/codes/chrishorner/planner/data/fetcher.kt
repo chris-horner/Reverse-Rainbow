@@ -1,33 +1,32 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package codes.chrishorner.planner.data
 
-import codes.chrishorner.planner.Game
 import com.diamondedge.logging.logging
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
+import io.ktor.client.statement.HttpResponse
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
-import kotlinx.serialization.json.decodeFromStream
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import kotlin.coroutines.CoroutineContext
 
 /**
  * Hits The New York Times' API, parses their JSON, and returns a list of [Tile] objects that can be
- * used to construct a [Game].
+ * used to construct a [codes.chrishorner.planner.Game].
  */
 suspend fun fetchTiles(
   clock: Clock = Clock.System,
   timeZone: TimeZone = TimeZone.currentSystemDefault(),
-  networkCall: (url: String) -> Response = ::realNetworkCall,
-  context: CoroutineContext = Dispatchers.IO,
+  networkCall: suspend (url: String) -> HttpResponse = ::realNetworkCall,
 ): TileFetchResult {
   val today = clock.now().toLocalDateTime(timeZone)
   val year = today.year
@@ -35,13 +34,10 @@ suspend fun fetchTiles(
   val day = today.dayOfMonth.toString().padStart(2, '0')
   val url = "https://www.nytimes.com/svc/connections/v2/$year-$month-$day.json"
 
-  return withContext(context) {
-    try {
-      val response = networkCall(url)
-      response.toResult()
-    } catch (_: Exception) {
-      TileFetchResult.NetworkFailure
-    }
+  return try {
+    networkCall(url).toResult()
+  } catch (_: Exception) {
+    TileFetchResult.NetworkFailure
   }
 }
 
@@ -55,32 +51,29 @@ sealed interface TileFetchResult {
   data object ParsingFailure : Failure
 }
 
-private fun realNetworkCall(url: String): Response {
-  val request = Request.Builder().url(url).build()
-  return OkHttpClient().newCall(request).execute()
+private suspend fun realNetworkCall(url: String): HttpResponse {
+  return HttpClient {
+    install(ContentNegotiation) { json() }
+  }.get(url)
 }
 
-private fun Response.toResult(): TileFetchResult {
-  if (!isSuccessful) {
-    logging("Planner").e { "Tile fetching failed with code $code" }
+private suspend fun HttpResponse.toResult(): TileFetchResult {
+  if (status.value !in 200..299) {
+    logging("Planner").e { "Tile fetching failed with code ${status.value}" }
     return TileFetchResult.HttpFailure
   }
 
-  return use {
-    val tiles = try {
-      val stream = body!!.byteStream()
-      val apiResponse = Json.decodeFromStream<ApiResponse>(stream)
-      apiResponse.categories
-        .flatMap { it.cards }
-        .sortedBy { it.position }
-        .map { it.asTile() }
-        .toImmutableList()
-    } catch (e: Exception) {
-      logging("Planner").e(err = e) { "Failed to parse tiles from server response." }
-      return TileFetchResult.ParsingFailure
-    }
-
-    TileFetchResult.Success(tiles)
+  try {
+    val apiResponse = body<ApiResponse>()
+    val tiles = apiResponse.categories
+      .flatMap { it.cards }
+      .sortedBy { it.position }
+      .map { it.asTile() }
+      .toImmutableList()
+    return TileFetchResult.Success(tiles)
+  } catch (e: Exception) {
+    logging("Planner").e(err = e) { "Failed to parse tiles from server response." }
+    return TileFetchResult.ParsingFailure
   }
 }
 
@@ -97,7 +90,9 @@ private data class ApiCategory(
   val cards: List<ApiCard>
 )
 
-@Suppress("PropertyName") // Match the network API. https://publicobject.com/2016/01/20/strict-naming-conventions-are-a-liability/
+@Suppress(
+  "PropertyName"
+) // Match the network API. https://publicobject.com/2016/01/20/strict-naming-conventions-are-a-liability/
 @Serializable
 @JsonIgnoreUnknownKeys
 private data class ApiCard(

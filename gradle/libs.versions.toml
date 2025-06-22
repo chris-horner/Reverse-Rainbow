@@ -7,11 +7,13 @@ composeBom = "2025.06.00"
 composeMultiplatform = "1.8.1"
 continuousCorners = "1.0.1"
 coreKtx = "1.16.0"
-kotlin = "2.1.20"
+kotlin = "2.1.21"
 kotlinxCollections = "0.3.8"
 kotlinxCoroutines = "1.10.2"
 kotlinxSerializationJson = "1.8.1"
 kotlinxDatetime = "0.6.2"
+ktor = "3.1.3"
+lifecycle = "2.9.1"
 logging = "2.0.3"
 okhttp = "4.12.0"
 playPublisher = "3.12.1"
@@ -21,6 +23,7 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-animation = { group = "androidx.compose.animation", name = "animation" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom-alpha", version.ref = "composeBom" }
+androidx-lifecycle-savedstate = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
@@ -33,11 +36,15 @@ coil-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", versio
 coil-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
 continuous-corners = { group = "com.adamglin", name = "compose-continuous-rounded-corner-shape", version.ref = "continuousCorners" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
-kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable-jvm", version.ref = "kotlinxCollections" }
+kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollections" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-logging-android = { group = "com.diamondedge", name = "logging-android", version.ref = "logging" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+logging = { group = "com.diamondedge", name = "logging", version.ref = "logging" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 
 [plugins]

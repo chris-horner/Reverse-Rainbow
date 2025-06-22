@@ -1,6 +1,5 @@
 package codes.chrishorner.planner
 
-import android.os.Bundle
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -8,10 +7,12 @@ import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.savedstate.SavedState
+import androidx.savedstate.serialization.encodeToSavedState
 import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.data.TileFetchResult
 import codes.chrishorner.planner.data.fetchTiles
-import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
@@ -82,14 +83,11 @@ class GameLoader(
     val gameLoader: GameLoader
 
     init {
-      val previousBundle = savedStateHandle.get<Bundle>("wrapper_state")?.apply {
-        classLoader = Tile::class.java.classLoader
-      }
-      @Suppress("DEPRECATION") // Alternative only available API 33 and up.
-      val previousTiles = previousBundle?.getParcelableArrayList<Tile>("tiles")
-      val previousDate = previousBundle?.getString("date")?.let { LocalDate.parse(it) }
+      val previousTiles = savedStateHandle.get<ImmutableList<Tile>?>("tiles")
+      val previousDate = savedStateHandle.get<LocalDate>("date")
+
       val initialLoaderState = if (previousTiles != null && previousDate != null) {
-        LoaderState.Success(previousDate, Game(previousTiles.toImmutableList()))
+        LoaderState.Success(previousDate, Game(previousTiles))
       } else {
         LoaderState.Loading
       }
@@ -99,14 +97,23 @@ class GameLoader(
         initialState = initialLoaderState,
       )
 
-      savedStateHandle.setSavedStateProvider("wrapper_state") {
-        Bundle().apply {
-          val loaderState = gameLoader.state.value
+      savedStateHandle.setSavedStateProvider("tiles") {
+        val loaderState = gameLoader.state.value
 
-          if (loaderState is LoaderState.Success) {
-            putParcelableArrayList("tiles", ArrayList(loaderState.game.model.value.tiles))
-            putString("date", loaderState.date.toString())
-          }
+        if (loaderState is LoaderState.Success) {
+          encodeToSavedState(loaderState.game.model.value.tiles)
+        } else {
+          SavedState.EMPTY
+        }
+      }
+
+      savedStateHandle.setSavedStateProvider("date") {
+        val loaderState = gameLoader.state.value
+
+        if (loaderState is LoaderState.Success) {
+          encodeToSavedState(loaderState.date)
+        } else {
+          SavedState.EMPTY
         }
       }
     }

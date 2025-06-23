@@ -67,12 +67,6 @@ kotlin {
       implementation libs.okhttp
     }
 
-    androidUnitTest.dependencies {
-      implementation libs.assertk
-      implementation libs.kotlin.test
-      implementation libs.kotlinx.coroutines.test
-    }
-
     commonMain.dependencies {
       implementation compose.runtime
       implementation compose.foundation

@@ -22,6 +22,7 @@ val JumpEndEasing = CubicBezierEasing(.68f,0f,.75f,1.63f)
 class OvershootEasing(private val tension: Float) : Easing {
 
   override fun transform(fraction: Float): Float {
+    val fraction = fraction - 1f
     return fraction * fraction * ((tension + 1) * fraction + tension) + 1f
   }
 }

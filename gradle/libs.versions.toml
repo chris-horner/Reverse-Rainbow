@@ -2,6 +2,7 @@
 activityCompose = "1.10.1"
 agp = "8.9.3"
 assertk = "0.28.1"
+buildKonfig = "0.17.1"
 coil = "3.1.0"
 composeBom = "2025.06.00"
 composeMultiplatform = "1.8.1"
@@ -51,6 +52,7 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+build-konfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildKonfig" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

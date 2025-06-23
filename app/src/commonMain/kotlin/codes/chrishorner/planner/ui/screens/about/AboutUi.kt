@@ -26,7 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import codes.chrishorner.planner.BuildConfig
+import codes.chrishorner.planner.BuildKonfig
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
@@ -36,6 +36,13 @@ import codes.chrishorner.planner.ui.theme.plannerColors
 import codes.chrishorner.planner.ui.util.CappedWidthContainer
 import org.jetbrains.compose.resources.stringResource
 import planner.app.generated.resources.Res
+import planner.app.generated.resources.about
+import planner.app.generated.resources.about_app_name
+import planner.app.generated.resources.about_point1
+import planner.app.generated.resources.about_point2
+import planner.app.generated.resources.about_point3
+import planner.app.generated.resources.about_point4
+import planner.app.generated.resources.back_description
 
 @Composable
 fun AboutUi(onBack: () -> Unit) {
@@ -56,7 +63,7 @@ fun AboutUi(onBack: () -> Unit) {
         )
 
         Text(
-          text = BuildConfig.VERSION_NAME,
+          text = BuildKonfig.versionName,
           color = MaterialTheme.colorScheme.onBackground,
           style = MaterialTheme.typography.titleSmall,
           modifier = Modifier.padding(horizontal = 16.dp)

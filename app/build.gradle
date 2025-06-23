@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
   alias(libs.plugins.android.application)
+  alias(libs.plugins.build.konfig)
   alias(libs.plugins.compose.multiplatform)
   alias(libs.plugins.kotlin.compose)
   alias(libs.plugins.kotlin.parcelize)
@@ -163,8 +164,12 @@ android {
 
   packagingOptions {
     resources {
-      excludes +=
-              ['**/*.kotlin_metadata', 'META-INF/*.kotlin_module', 'META-INF/*.properties', '/*.properties']
+      excludes += [
+              '**/*.kotlin_metadata',
+              'META-INF/*.kotlin_module',
+              'META-INF/*.properties',
+              '/*.properties',
+      ]
     }
   }
 
@@ -185,6 +190,14 @@ play {
   serviceAccountCredentials = file('keys/play_access.json')
   defaultToAppBundles = true
   resolutionStrategy = com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE
+}
+
+buildkonfig {
+  packageName = 'codes.chrishorner.planner'
+
+  defaultConfigs {
+    buildConfigField 'STRING', 'versionName', versionMajor + '.' + versionMinor + '.' + versionPatch
+  }
 }
 
 dependencies {

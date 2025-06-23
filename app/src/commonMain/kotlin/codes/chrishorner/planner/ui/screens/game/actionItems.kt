@@ -28,12 +28,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import codes.chrishorner.planner.R
 import codes.chrishorner.planner.data.RainbowStatus
 import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.util.BetterDropdownMenu
+import org.jetbrains.compose.resources.stringResource
+import planner.app.generated.resources.Res
+import planner.app.generated.resources.about
+import planner.app.generated.resources.make_rainbow_button
+import planner.app.generated.resources.menu_description
+import planner.app.generated.resources.open_nyt
+import planner.app.generated.resources.reset
+import planner.app.generated.resources.reverse_rainbow_button
+import planner.app.generated.resources.shuffle
 
 /**
  * 3 dot menu with secondary actions in the app.
@@ -49,7 +56,7 @@ fun Menu(
     IconButton(onClick = { expanded = true }) {
       Icon(
         imageVector = Icons.MoreVert,
-        contentDescription = stringResource(R.string.menu_description),
+        contentDescription = stringResource(Res.string.menu_description),
       )
     }
 
@@ -65,7 +72,7 @@ fun Menu(
             tint = MaterialTheme.colorScheme.onSurface,
           )
         },
-        text = { Text(stringResource(R.string.reset)) },
+        text = { Text(stringResource(Res.string.reset)) },
         onClick = {
           expanded = false
           onAction(BottomBarAction.ResetClick)
@@ -80,7 +87,7 @@ fun Menu(
             tint = MaterialTheme.colorScheme.onSurface,
           )
         },
-        text = { Text(stringResource(R.string.shuffle)) },
+        text = { Text(stringResource(Res.string.shuffle)) },
         onClick = {
           expanded = false
           onAction(BottomBarAction.ShuffleClick)
@@ -95,7 +102,7 @@ fun Menu(
             tint = MaterialTheme.colorScheme.onSurface
           )
         },
-        text = { Text(stringResource(R.string.about)) },
+        text = { Text(stringResource(Res.string.about)) },
         onClick = {
           expanded = false
           onAction(BottomBarAction.AboutClick)
@@ -122,7 +129,7 @@ fun OpenNytButton(
       ),
       modifier = modifier,
     ) {
-      Text(stringResource(R.string.open_nyt))
+      Text(stringResource(Res.string.open_nyt))
     }
   }
 }
@@ -139,9 +146,9 @@ fun RainbowButton(
   )
 
   val text = if (status == RainbowStatus.REVERSIBLE) {
-    stringResource(R.string.reverse_rainbow_button)
+    stringResource(Res.string.reverse_rainbow_button)
   } else {
-    stringResource(R.string.make_rainbow_button)
+    stringResource(Res.string.make_rainbow_button)
   }
 
   AnimatedVisibility(

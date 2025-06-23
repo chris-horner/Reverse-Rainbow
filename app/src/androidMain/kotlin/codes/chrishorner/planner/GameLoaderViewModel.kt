@@ -1,13 +1,16 @@
 package codes.chrishorner.planner
 
+import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.savedstate.SavedState
+import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
 import codes.chrishorner.planner.GameLoader.LoaderState
 import codes.chrishorner.planner.data.Tile
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.datetime.LocalDate
 
@@ -19,11 +22,16 @@ class GameLoaderViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
   val gameLoader: GameLoader
 
   init {
-    val previousTiles = savedStateHandle.get<ImmutableList<Tile>?>("tiles")
-    val previousDate = savedStateHandle.get<LocalDate>("date")
+    val savedTiles: List<Tile>? = savedStateHandle
+      .get<Bundle>("tiles")
+      ?.let { decodeFromSavedState(it) }
 
-    val initialLoaderState = if (previousTiles != null && previousDate != null) {
-      LoaderState.Success(previousDate, Game(previousTiles))
+    val savedDate: LocalDate? = savedStateHandle
+      .get<Bundle>("date")
+      ?.let { decodeFromSavedState(it) }
+
+    val initialLoaderState = if (savedTiles != null && savedDate != null) {
+      LoaderState.Success(savedDate, Game(savedTiles.toImmutableList()))
     } else {
       LoaderState.Loading
     }
@@ -34,23 +42,29 @@ class GameLoaderViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     )
 
     savedStateHandle.setSavedStateProvider("tiles") {
-      val loaderState = gameLoader.state.value
+      val currentTiles = gameLoader.currentTiles
 
-      if (loaderState is LoaderState.Success) {
-        encodeToSavedState(loaderState.game.model.value.tiles)
+      if (currentTiles != null) {
+        encodeToSavedState(currentTiles.toList())
       } else {
         SavedState.EMPTY
       }
     }
 
     savedStateHandle.setSavedStateProvider("date") {
-      val loaderState = gameLoader.state.value
+      val currentDate = gameLoader.currentDate
 
-      if (loaderState is LoaderState.Success) {
-        encodeToSavedState(loaderState.date)
+      if (currentDate != null) {
+        encodeToSavedState(currentDate)
       } else {
         SavedState.EMPTY
       }
     }
   }
+
+  private val GameLoader.currentTiles: ImmutableList<Tile>?
+    get() = (state.value as? LoaderState.Success)?.game?.model?.value?.tiles
+
+  private val GameLoader.currentDate: LocalDate?
+    get() = (state.value as? LoaderState.Success)?.date
 }

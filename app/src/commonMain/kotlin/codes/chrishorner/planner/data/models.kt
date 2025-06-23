@@ -16,6 +16,7 @@ data class Tile(
   val selected: Boolean = false,
   val category: Category? = null,
 ) {
+  @Serializable
   sealed interface Content {
     @Serializable
     data class Text(val body: String) : Content

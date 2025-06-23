@@ -4,3 +4,5 @@
 
 # NavDestination.values accessed reflectively via rememberSaveable.
 -keep class codes.chrishorner.planner.ui.screens.NavDestination { *; }
+
+-dontwarn androidx.test.platform.app.InstrumentationRegistry

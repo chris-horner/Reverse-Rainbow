@@ -190,7 +190,9 @@ private fun Density.intOffsetFrom(dpOffset: DpOffset): IntOffset {
 }
 
 // Starting angles for each of the colors.
-private val YellowAngle = Math.toRadians(225.0).toFloat()
-private val GreenAngle = Math.toRadians(315.0).toFloat()
-private val BlueAngle = Math.toRadians(135.0).toFloat()
-private val PurpleAngle = Math.toRadians(45.0).toFloat()
+private val YellowAngle = 225f.toRadians()
+private val GreenAngle = 315f.toRadians()
+private val BlueAngle = 135f.toRadians()
+private val PurpleAngle = 45f.toRadians()
+
+private fun Float.toRadians(): Float = (this / 180.0 * PI).toFloat()

@@ -1,6 +1,6 @@
 # Connections Planner
 
-An Android application that allows you to plan today's New York Times Connections answers.
+An application that allows you to plan today's New York Times Connections answers.
 
 > [!IMPORTANT]  
 > This application is not associated with the New York Times. It also does not allow you to play

@@ -36,11 +36,12 @@ suspend fun fetchTiles(
   val year = today.year
   val month = today.monthNumber.toString().padStart(2, '0')
   val day = today.dayOfMonth.toString().padStart(2, '0')
-  val url = "https://www.nytimes.com/svc/connections/v2/$year-$month-$day.json"
+  val url = "$ApiEndpoint$year-$month-$day.json"
 
   return try {
     HttpClient(httpEngine).get(url).toResult()
-  } catch (_: Exception) {
+  } catch (e: Exception) {
+    logging("Planner").e(e) { "Failed to fetch tiles." }
     TileFetchResult.NetworkFailure
   }
 }
@@ -84,7 +85,7 @@ private suspend fun HttpResponse.toResult(): TileFetchResult {
       .toImmutableList()
     return TileFetchResult.Success(tiles)
   } catch (e: Exception) {
-    logging("Planner").e(err = e) { "Failed to parse tiles from server response." }
+    logging("Planner").e( e) { "Failed to parse tiles from server response." }
     return TileFetchResult.ParsingFailure
   }
 }

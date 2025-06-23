@@ -81,7 +81,7 @@ fun MainUi(
             LocalAnimatedContentScope provides this
           ) {
             // Use the target screen's class as a key for associated saved state.
-            saveableStateHolder.SaveableStateProvider(key = targetScreen::class.java) {
+            saveableStateHolder.SaveableStateProvider(key = targetScreen::class.toString()) {
               ShowScreen(
                 screen = targetScreen,
                 splashIconSize = splashIconSize,

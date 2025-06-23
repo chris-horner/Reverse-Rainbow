@@ -2,12 +2,16 @@
 
 package codes.chrishorner.planner.data
 
+import codes.chrishorner.planner.Game
 import com.diamondedge.logging.logging
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
+import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -21,12 +25,12 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 /**
  * Hits The New York Times' API, parses their JSON, and returns a list of [Tile] objects that can be
- * used to construct a [codes.chrishorner.planner.Game].
+ * used to construct a [Game].
  */
 suspend fun fetchTiles(
   clock: Clock = Clock.System,
   timeZone: TimeZone = TimeZone.currentSystemDefault(),
-  networkCall: suspend (url: String) -> HttpResponse = ::realNetworkCall,
+  httpEngine: HttpClientEngine? = null,
 ): TileFetchResult {
   val today = clock.now().toLocalDateTime(timeZone)
   val year = today.year
@@ -35,7 +39,7 @@ suspend fun fetchTiles(
   val url = "https://www.nytimes.com/svc/connections/v2/$year-$month-$day.json"
 
   return try {
-    networkCall(url).toResult()
+    HttpClient(httpEngine).get(url).toResult()
   } catch (_: Exception) {
     TileFetchResult.NetworkFailure
   }
@@ -51,14 +55,22 @@ sealed interface TileFetchResult {
   data object ParsingFailure : Failure
 }
 
-private suspend fun realNetworkCall(url: String): HttpResponse {
-  return HttpClient {
+private fun HttpClient(engine: HttpClientEngine?): HttpClient {
+  val config: HttpClientConfig<*>.() -> Unit = {
     install(ContentNegotiation) { json() }
-  }.get(url)
+  }
+
+  val client = if (engine != null) {
+    HttpClient(engine, config)
+  } else {
+    HttpClient(config)
+  }
+
+  return client
 }
 
 private suspend fun HttpResponse.toResult(): TileFetchResult {
-  if (status.value !in 200..299) {
+  if (!status.isSuccess()) {
     logging("Planner").e { "Tile fetching failed with code ${status.value}" }
     return TileFetchResult.HttpFailure
   }
@@ -90,9 +102,8 @@ private data class ApiCategory(
   val cards: List<ApiCard>
 )
 
-@Suppress(
-  "PropertyName"
-) // Match the network API. https://publicobject.com/2016/01/20/strict-naming-conventions-are-a-liability/
+// Match the network API. https://publicobject.com/2016/01/20/strict-naming-conventions-are-a-liability/
+@Suppress("PropertyName")
 @Serializable
 @JsonIgnoreUnknownKeys
 private data class ApiCard(

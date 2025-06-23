@@ -3,15 +3,8 @@ package codes.chrishorner.planner
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import androidx.savedstate.savedState
-import androidx.savedstate.serialization.encodeToSavedState
-import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.data.TileFetchResult
 import codes.chrishorner.planner.data.fetchTiles
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
@@ -27,7 +20,7 @@ import kotlinx.datetime.toLocalDateTime
 class GameLoader(
   private val scope: CoroutineScope,
   initialState: LoaderState = LoaderState.Loading,
-  private val fetchTiles: suspend () -> TileFetchResult = ::fetchTiles,
+  private val tileFetcher: suspend () -> TileFetchResult = ::fetchTiles,
   private val clock: Clock = Clock.System,
   private val timeZoneProvider: () -> TimeZone = { TimeZone.currentSystemDefault() },
 ) {
@@ -50,7 +43,7 @@ class GameLoader(
   fun refresh() = scope.launch(start = CoroutineStart.UNDISPATCHED) {
     _state.value = LoaderState.Loading
 
-    val result = fetchTiles()
+    val result = tileFetcher()
     val currentLocalDate = clock.now().toLocalDateTime(timeZoneProvider()).date
 
     _state.value = when (result) {

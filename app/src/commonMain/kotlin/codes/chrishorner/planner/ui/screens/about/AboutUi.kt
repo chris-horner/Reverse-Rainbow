@@ -25,10 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.BuildConfig
-import codes.chrishorner.planner.R
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
@@ -36,6 +34,8 @@ import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.TileShape
 import codes.chrishorner.planner.ui.theme.plannerColors
 import codes.chrishorner.planner.ui.util.CappedWidthContainer
+import org.jetbrains.compose.resources.stringResource
+import planner.app.generated.resources.Res
 
 @Composable
 fun AboutUi(onBack: () -> Unit) {
@@ -49,7 +49,7 @@ fun AboutUi(onBack: () -> Unit) {
         Spacer(modifier = Modifier.size(32.dp))
 
         Text(
-          text = stringResource(R.string.about_app_name),
+          text = stringResource(Res.string.about_app_name),
           color = MaterialTheme.colorScheme.onBackground,
           style = MaterialTheme.typography.headlineMedium,
           modifier = Modifier.padding(horizontal = 16.dp)
@@ -64,10 +64,10 @@ fun AboutUi(onBack: () -> Unit) {
 
         Spacer(modifier = Modifier.size(32.dp))
 
-        Entry(Category.YELLOW, Icons.Construction, stringResource(R.string.about_point1))
-        Entry(Category.GREEN, Icons.Warning, stringResource(R.string.about_point2))
-        Entry(Category.BLUE, Icons.EditNote, stringResource(R.string.about_point3))
-        Entry(Category.PURPLE, Icons.GitHub, stringResource(R.string.about_point4))
+        Entry(Category.YELLOW, Icons.Construction, stringResource(Res.string.about_point1))
+        Entry(Category.GREEN, Icons.Warning, stringResource(Res.string.about_point2))
+        Entry(Category.BLUE, Icons.EditNote, stringResource(Res.string.about_point3))
+        Entry(Category.PURPLE, Icons.GitHub, stringResource(Res.string.about_point4))
       }
     }
   }
@@ -85,11 +85,11 @@ private fun TopBar(onBack: () -> Unit) {
       IconButton(onClick = onBack) {
         Icon(
           Icons.ArrowBack,
-          contentDescription = stringResource(R.string.back_description),
+          contentDescription = stringResource(Res.string.back_description),
         )
       }
     },
-    title = { Text(stringResource(R.string.about)) },
+    title = { Text(stringResource(Res.string.about)) },
   )
 }
 

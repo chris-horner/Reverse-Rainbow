@@ -19,11 +19,6 @@ kotlin {
   androidTarget {
     compilerOptions {
       jvmTarget.set(JvmTarget.JVM_11)
-      freeCompilerArgs = [
-        '-opt-in=androidx.compose.animation.ExperimentalSharedTransitionApi',
-        '-opt-in=androidx.compose.material3.ExperimentalMaterial3Api',
-        '-opt-in=kotlinx.serialization.ExperimentalSerializationApi',
-      ]
     }
   }
 
@@ -64,7 +59,6 @@ kotlin {
       implementation libs.coil.compose
       implementation libs.coil.okhttp
       implementation libs.coil.svg
-      implementation libs.continuous.corners
       implementation libs.kotlinx.collections.immutable
       implementation libs.kotlinx.datetime
       implementation libs.kotlinx.serialization.json
@@ -87,6 +81,8 @@ kotlin {
       implementation compose.components.uiToolingPreview
 
       implementation libs.androidx.lifecycle.savedstate
+      implementation libs.compose.backhandler
+      implementation libs.continuous.corners
       implementation libs.kotlinx.collections.immutable
       implementation libs.kotlinx.datetime
       implementation libs.kotlinx.serialization.json
@@ -102,6 +98,15 @@ kotlin {
       implementation libs.kotlinx.coroutines.test
       implementation libs.ktor.client.mock
     }
+  }
+
+  compilerOptions {
+    freeCompilerArgs = [
+            '-opt-in=androidx.compose.animation.ExperimentalSharedTransitionApi',
+            '-opt-in=androidx.compose.material3.ExperimentalMaterial3Api',
+            '-opt-in=androidx.compose.ui.ExperimentalComposeUiApi',
+            '-opt-in=kotlinx.serialization.ExperimentalSerializationApi',
+    ]
   }
 }
 
@@ -158,7 +163,8 @@ android {
 
   packagingOptions {
     resources {
-      excludes += ['**/*.kotlin_metadata', 'META-INF/*.kotlin_module', 'META-INF/*.properties', '/*.properties']
+      excludes +=
+              ['**/*.kotlin_metadata', 'META-INF/*.kotlin_module', 'META-INF/*.properties', '/*.properties']
     }
   }
 

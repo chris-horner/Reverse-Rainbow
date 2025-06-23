@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -47,6 +46,7 @@ import codes.chrishorner.planner.ui.Icons
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.TileShape
 import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 
@@ -230,7 +230,7 @@ private fun TileImage(
   size: Dp = Dp.Unspecified,
 ) {
   AsyncImage(
-    model = ImageRequest.Builder(LocalContext.current)
+    model = ImageRequest.Builder(LocalPlatformContext.current)
       .data(content.url)
       .crossfade(true)
       .build(),

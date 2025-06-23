@@ -6,27 +6,30 @@ import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.data.Tile.Content
 import codes.chrishorner.planner.data.TileFetchResult
 import codes.chrishorner.planner.data.fetchTiles
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.respondError
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.headersOf
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
-import okhttp3.Protocol
-import okhttp3.Request
-import okhttp3.Response
-import okhttp3.ResponseBody
-import okhttp3.ResponseBody.Companion.toResponseBody
-import okio.IOException
+import kotlinx.io.IOException
 import kotlin.test.Test
 
 class FetchTilesTest {
+
   @Test
   fun `server error`() = runTest {
     val result = fetchTiles(
       clock = june14at9am,
       timeZone = melbourneTimeZone,
-      networkCall = { url -> httpResponse(url, code = 500, message = "Internal Server Error") },
-      context = this.coroutineContext,
+      httpEngine = MockEngine {
+        respondError(status = HttpStatusCode.InternalServerError)
+      }
     )
 
     assertThat(result).isEqualTo(TileFetchResult.HttpFailure)
@@ -37,10 +40,12 @@ class FetchTilesTest {
     val result = fetchTiles(
       clock = june14at9am,
       timeZone = melbourneTimeZone,
-      networkCall = { url ->
-        httpResponse(url, code = 200, message = "OK", body = INVALID_JSON.toResponseBody())
+      httpEngine = MockEngine {
+        respond(
+          content = INVALID_JSON,
+          headers = headersOf(HttpHeaders.ContentType, "application/json"),
+        )
       },
-      context = this.coroutineContext,
     )
 
     assertThat(result).isEqualTo(TileFetchResult.ParsingFailure)
@@ -51,8 +56,9 @@ class FetchTilesTest {
     val result = fetchTiles(
       clock = june14at9am,
       timeZone = melbourneTimeZone,
-      networkCall = { url -> throw IOException() },
-      context = this.coroutineContext,
+      httpEngine = MockEngine {
+        throw IOException()
+      },
     )
 
     assertThat(result).isEqualTo(TileFetchResult.NetworkFailure)
@@ -63,10 +69,12 @@ class FetchTilesTest {
     val result = fetchTiles(
       clock = june14at9am,
       timeZone = melbourneTimeZone,
-      networkCall = { url ->
-        httpResponse(url, code = 200, message = "OK", body = VALID_TEXT_JSON.toResponseBody())
+      httpEngine = MockEngine {
+        respond(
+          content = VALID_TEXT_JSON,
+          headers = headersOf(HttpHeaders.ContentType, "application/json"),
+        )
       },
-      context = this.coroutineContext,
     )
 
     assertThat(result).isEqualTo(
@@ -98,10 +106,12 @@ class FetchTilesTest {
     val result = fetchTiles(
       clock = june14at9am,
       timeZone = melbourneTimeZone,
-      networkCall = { url ->
-        httpResponse(url, code = 200, message = "OK", body = VALID_IMAGE_JSON.toResponseBody())
+      httpEngine = MockEngine {
+        respond(
+          content = VALID_IMAGE_JSON,
+          headers = headersOf(HttpHeaders.ContentType, "application/json"),
+        )
       },
-      context = this.coroutineContext,
     )
 
     assertThat(result).isEqualTo(
@@ -133,15 +143,12 @@ class FetchTilesTest {
     val result = fetchTiles(
       clock = june14at9am,
       timeZone = melbourneTimeZone,
-      networkCall = { url ->
-        httpResponse(
-          url = url,
-          code = 200,
-          message = "OK",
-          body = VALID_JSON_INVALID_TILES.toResponseBody()
+      httpEngine = MockEngine {
+        respond(
+          content = VALID_JSON_INVALID_TILES,
+          headers = headersOf(HttpHeaders.ContentType, "application/json"),
         )
       },
-      context = this.coroutineContext,
     )
 
     assertThat(result).isEqualTo(TileFetchResult.ParsingFailure)
@@ -149,36 +156,24 @@ class FetchTilesTest {
 
   @Test
   fun `local year, month, and day are passed to NYT URL`() = runTest {
-    var capturedUrl: String? = null
-
     fetchTiles(
       // Use a clock at June 14, 11pm UTC
       clock = object : Clock {
         override fun now() = Instant.parse("2025-06-14T23:00:00Z")
       },
       timeZone = melbourneTimeZone,
-      networkCall = { url ->
-        capturedUrl = url
-        httpResponse(url, code = 200, message = "OK", body = VALID_TEXT_JSON.toResponseBody())
-      }
+      httpEngine = MockEngine { request ->
+        // URL should be June 15 as provided time zone is ahead of UTC.
+        assertThat(request.url.toString())
+          .isEqualTo("https://www.nytimes.com/svc/connections/v2/2025-06-15.json")
+
+        respond(
+          content = VALID_TEXT_JSON,
+          headers = headersOf(HttpHeaders.ContentType, "application/json"),
+        )
+      },
     )
-
-    // URL should be June 15 as provided time zone is ahead of UTC.
-    assertThat(capturedUrl).isEqualTo("https://www.nytimes.com/svc/connections/v2/2025-06-15.json")
   }
-
-  private fun httpResponse(
-    url: String,
-    code: Int,
-    message: String,
-    body: ResponseBody? = null,
-  ): Response = Response.Builder()
-    .request(Request.Builder().url(url).build())
-    .protocol(Protocol.HTTP_2)
-    .code(code)
-    .message(message)
-    .apply { if (body != null) body(body) }
-    .build()
 
   private companion object TestData {
     val june14at9am = object : Clock {

@@ -39,7 +39,7 @@ class GameLoaderTest {
   fun `refresh with successful fetch loads game`() = runTest {
     val loader = GameLoader(
       scope = this,
-      fetchTiles = resultProvider::receive,
+      tileFetcher = resultProvider::receive,
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
     )
@@ -57,7 +57,7 @@ class GameLoaderTest {
   fun `refresh with failure loads failure state`() = runTest {
     val loader = GameLoader(
       scope = this,
-      fetchTiles = resultProvider::receive,
+      tileFetcher = resultProvider::receive,
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
     )
@@ -73,7 +73,7 @@ class GameLoaderTest {
   fun `refresh with currently loaded game updates to loading state`() = runTest {
     val loader = GameLoader(
       scope = backgroundScope,
-      fetchTiles = resultProvider::receive,
+      tileFetcher = resultProvider::receive,
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
       initialState = LoaderState.Success(
@@ -94,7 +94,7 @@ class GameLoaderTest {
   fun `refreshIfNecessary refreshes if current state is failure`() = runTest {
     val loader = GameLoader(
       scope = backgroundScope,
-      fetchTiles = resultProvider::receive,
+      tileFetcher = resultProvider::receive,
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
       initialState = LoaderState.Failure(type = FailureType.NETWORK),
@@ -112,7 +112,7 @@ class GameLoaderTest {
   fun `refreshIfNecessary refreshes if current local date is different`() = runTest {
     val loader = GameLoader(
       scope = backgroundScope,
-      fetchTiles = resultProvider::receive,
+      tileFetcher = resultProvider::receive,
       // Current date is June 14h.
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
@@ -135,7 +135,7 @@ class GameLoaderTest {
   fun `refreshIfNecessary does not refresh if current local date is same`() = runTest {
     val loader = GameLoader(
       scope = backgroundScope,
-      fetchTiles = resultProvider::receive,
+      tileFetcher = resultProvider::receive,
       // Current date is June 14h.
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
@@ -162,7 +162,7 @@ class GameLoaderTest {
 
     val loader = GameLoader(
       scope = backgroundScope,
-      fetchTiles = resultProvider::receive,
+      tileFetcher = resultProvider::receive,
       clock = object : Clock {
         override fun now() = vancouver3pmJune14
       },

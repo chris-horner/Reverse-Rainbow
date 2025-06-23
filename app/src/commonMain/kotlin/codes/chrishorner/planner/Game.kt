@@ -331,4 +331,10 @@ class Game(tiles: ImmutableList<Tile>) {
       tiles.slice(8..11).all { it.category == Category.BLUE } &&
       tiles.slice(12..15).all { it.category == Category.PURPLE }
   }
+
+  private inline fun <T> MutableList<T>.replaceAll(operator: (T) -> T) {
+    for (index in indices) {
+      set(index, operator(get(index)))
+    }
+  }
 }

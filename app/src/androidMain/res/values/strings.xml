@@ -1,26 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="app_name">Planner</string>
-
-  <string name="menu_description">Menu</string>
-  <string name="make_rainbow_button">Make a rainbow</string>
-  <string name="reverse_rainbow_button">Reverse the rainbow</string>
-  <string name="open_nyt">Open NYT</string>
-  <string name="about">About</string>
-  <string name="reset">Reset</string>
-  <string name="shuffle">Shuffle</string>
-
-  <string name="back_description">Back</string>
-  <string name="about_app_name">Connections Planner</string>
-  <string name="about_point1">This app was hand made in Melbourne by Chris Horner.</string>
-  <string name="about_point2">It is not a product of, or affiliated with The New York Times.</string>
-  <string name="about_point3">It does not let you play Connections - only plan your answers.</string>
-  <string name="about_point4">All code is open source, and can be found here on GitHub.</string>
-
-  <string name="error_title_network">Connection issues!</string>
-  <string name="error_title_http">They OK?</string>
-  <string name="error_title_parsing">What\'s this!?</string>
-  <string name="error_message_network">Looks like something went wrong with your internet connection.</string>
-  <string name="error_message_http">Looks like something went wrong with The New York Times\' servers. Are they down right now? Check the official app.</string>
-  <string name="error_message_parsing">The New York Times\' server returned something strange. Maybe today\'s game is weird? Check the official app.</string>
-  <string name="error_retry_button">Retry</string>
 </resources>

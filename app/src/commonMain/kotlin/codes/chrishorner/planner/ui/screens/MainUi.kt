@@ -1,7 +1,5 @@
 package codes.chrishorner.planner.ui.screens
 
-import androidx.activity.compose.BackHandler
-import androidx.annotation.Keep
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
@@ -25,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.unit.DpSize
 import codes.chrishorner.planner.Game
 import codes.chrishorner.planner.GameLoader
@@ -103,7 +102,6 @@ fun MainUi(
   }
 }
 
-@Keep // NavDestination.values accessed reflectively via rememberSaveable.
 private enum class NavDestination {
   Game,
   About,

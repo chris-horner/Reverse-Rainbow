@@ -1,28 +1,26 @@
 package codes.chrishorner.planner.data
 
-import android.os.Parcelable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 /**
  * Represents a single card on the Connections board.
  */
-@Parcelize
+@Serializable
 data class Tile(
   val initialPosition: Int,
   val content: Content,
   val currentPosition: Int = initialPosition,
   val selected: Boolean = false,
   val category: Category? = null,
-) : Parcelable {
-  @Parcelize
-  sealed interface Content : Parcelable {
-    @Parcelize
+) {
+  sealed interface Content {
+    @Serializable
     data class Text(val body: String) : Content
 
-    @Parcelize
+    @Serializable
     data class Image(val url: String, val description: String?) : Content
   }
 }
@@ -34,7 +32,7 @@ enum class Category {
   PURPLE,
 }
 
-@Parcelize
+@Serializable
 data class GameState(
   val tiles: ImmutableList<Tile>,
   val selectionCount: Int = 0,
@@ -44,13 +42,13 @@ data class GameState(
     Category.BLUE to CategoryState(),
     Category.PURPLE to CategoryState(),
   ),
-) : Parcelable
+)
 
-@Parcelize
+@Serializable
 data class CategoryState(
   val assigned: Boolean = false,
   val status: CategoryAction = CategoryAction.DISABLED,
-) : Parcelable
+)
 
 /**
  * Based on the current selections and assigned categories on the Connections board,

@@ -25,16 +25,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.planner.GameLoader.FailureType
-import codes.chrishorner.planner.R
 import codes.chrishorner.planner.data.Category
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
 import codes.chrishorner.planner.ui.LocalSharedTransitionScope
 import codes.chrishorner.planner.ui.theme.TileShape
 import codes.chrishorner.planner.ui.theme.plannerColors
 import codes.chrishorner.planner.ui.util.CappedWidthContainer
+import org.jetbrains.compose.resources.stringResource
+import planner.app.generated.resources.Res
+import planner.app.generated.resources.error_message_http
+import planner.app.generated.resources.error_message_network
+import planner.app.generated.resources.error_message_parsing
+import planner.app.generated.resources.error_retry_button
+import planner.app.generated.resources.error_title_http
+import planner.app.generated.resources.error_title_network
+import planner.app.generated.resources.error_title_parsing
 
 /**
  * Shows various messages depending on the `failureType`.
@@ -55,9 +62,9 @@ fun ErrorUi(failureType: FailureType, onRetry: () -> Unit) {
 
       Text(
         text = when (failureType) {
-          FailureType.NETWORK -> stringResource(R.string.error_title_network)
-          FailureType.HTTP -> stringResource(R.string.error_title_http)
-          FailureType.PARSING -> stringResource(R.string.error_title_parsing)
+          FailureType.NETWORK -> stringResource(Res.string.error_title_network)
+          FailureType.HTTP -> stringResource(Res.string.error_title_http)
+          FailureType.PARSING -> stringResource(Res.string.error_title_parsing)
         },
         style = MaterialTheme.typography.headlineLarge,
         color = MaterialTheme.colorScheme.onBackground,
@@ -102,9 +109,9 @@ fun ErrorUi(failureType: FailureType, onRetry: () -> Unit) {
 
       Text(
         text = when (failureType) {
-          FailureType.NETWORK -> stringResource(R.string.error_message_network)
-          FailureType.HTTP -> stringResource(R.string.error_message_http)
-          FailureType.PARSING -> stringResource(R.string.error_message_parsing)
+          FailureType.NETWORK -> stringResource(Res.string.error_message_network)
+          FailureType.HTTP -> stringResource(Res.string.error_message_http)
+          FailureType.PARSING -> stringResource(Res.string.error_message_parsing)
         },
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onBackground,
@@ -122,7 +129,7 @@ fun ErrorUi(failureType: FailureType, onRetry: () -> Unit) {
         ),
         modifier = Modifier.widthIn(min = 248.dp)
       ) {
-        Text(text = stringResource(R.string.error_retry_button))
+        Text(text = stringResource(Res.string.error_retry_button))
       }
 
       Spacer(modifier = Modifier.weight(5f))

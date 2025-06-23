@@ -6,7 +6,6 @@ plugins {
   alias(libs.plugins.build.konfig)
   alias(libs.plugins.compose.multiplatform)
   alias(libs.plugins.kotlin.compose)
-  alias(libs.plugins.kotlin.parcelize)
   alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.kotlin.serialization)
   alias(libs.plugins.playpublisher)
@@ -48,23 +47,8 @@ kotlin {
 
   sourceSets {
     androidMain.dependencies {
-      implementation project.dependencies.platform(libs.androidx.compose.bom)
-
       implementation libs.androidx.activity.compose
-      implementation libs.androidx.animation
-      implementation libs.androidx.core.ktx
-      implementation libs.androidx.material3
-      implementation libs.androidx.ui
-      implementation libs.androidx.ui.graphics
-      implementation libs.androidx.ui.tooling.preview
-      implementation libs.coil.compose
-      implementation libs.coil.okhttp
-      implementation libs.coil.svg
-      implementation libs.kotlinx.collections.immutable
-      implementation libs.kotlinx.datetime
-      implementation libs.kotlinx.serialization.json
       implementation libs.ktor.client.okhttp
-      implementation libs.okhttp
     }
 
     commonMain.dependencies {
@@ -83,7 +67,6 @@ kotlin {
       implementation libs.continuous.corners
       implementation libs.kotlinx.collections.immutable
       implementation libs.kotlinx.datetime
-      implementation libs.kotlinx.serialization.json
       implementation libs.ktor.client.core
       implementation libs.ktor.client.content.negotiation
       implementation libs.ktor.serialization.kotlinx.json
@@ -195,8 +178,4 @@ buildkonfig {
   defaultConfigs {
     buildConfigField 'STRING', 'versionName', versionMajor + '.' + versionMinor + '.' + versionPatch
   }
-}
-
-dependencies {
-  debugImplementation libs.androidx.ui.tooling
 }

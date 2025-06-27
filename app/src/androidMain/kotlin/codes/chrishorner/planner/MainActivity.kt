@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
    */
   private fun handleSplashScreen() {
     splashScreen.setOnExitAnimationListener { splashScreenView ->
-      splashScreenView.iconView!!.doOnLayout {
+      splashScreenView.iconView?.doOnLayout {
         splashIconSize.value = DpSize(it.width.pxToDp(), it.height.pxToDp())
       }
 

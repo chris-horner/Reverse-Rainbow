@@ -41,7 +41,7 @@ suspend fun fetchTiles(
   return try {
     HttpClient(httpEngine).get(url).toResult()
   } catch (e: Exception) {
-    logging("Planner").e(e) { "Failed to fetch tiles." }
+    logging("Reverse Rainbow").e(e) { "Failed to fetch tiles." }
     TileFetchResult.NetworkFailure
   }
 }
@@ -72,7 +72,7 @@ private fun HttpClient(engine: HttpClientEngine?): HttpClient {
 
 private suspend fun HttpResponse.toResult(): TileFetchResult {
   if (!status.isSuccess()) {
-    logging("Planner").e { "Tile fetching failed with code ${status.value}" }
+    logging("Reverse Rainbow").e { "Tile fetching failed with code ${status.value}" }
     return TileFetchResult.HttpFailure
   }
 
@@ -85,7 +85,7 @@ private suspend fun HttpResponse.toResult(): TileFetchResult {
       .toImmutableList()
     return TileFetchResult.Success(tiles)
   } catch (e: Exception) {
-    logging("Planner").e( e) { "Failed to parse tiles from server response." }
+    logging("Reverse Rainbow").e( e) { "Failed to parse tiles from server response." }
     return TileFetchResult.ParsingFailure
   }
 }

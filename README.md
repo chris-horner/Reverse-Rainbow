@@ -1,4 +1,4 @@
-# Connections Planner
+# Reverse Rainbow
 
 An application that allows you to plan today's New York Times Connections answers.
 

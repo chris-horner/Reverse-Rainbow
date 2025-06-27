@@ -9,7 +9,6 @@ import androidx.compose.ui.window.ComposeViewport
 import codes.chrishorner.planner.ui.screens.MainUi
 import com.diamondedge.logging.KmLogging
 import com.diamondedge.logging.LogLevel
-import com.diamondedge.logging.logging
 import kotlinx.browser.document
 import kotlinx.browser.window
 
@@ -24,7 +23,6 @@ fun main() {
     MainUi(
       loaderState = gameLoader.state.value,
       onRefresh = {
-        logging("Planner").d { "Here?" }
         gameLoader.refresh()
       },
       splashIconSize = DpSize(260.dp, 260.dp),

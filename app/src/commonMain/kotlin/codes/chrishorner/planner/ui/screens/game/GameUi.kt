@@ -60,7 +60,7 @@ private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -
       )
     },
   ) { paddingValues ->
-    CappedWidthContainer {
+    CappedWidthContainer(maxWidth = 656.dp) {
       Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier

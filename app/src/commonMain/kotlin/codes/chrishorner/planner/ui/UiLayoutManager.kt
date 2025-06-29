@@ -3,6 +3,9 @@ package codes.chrishorner.planner.ui
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
@@ -28,14 +31,22 @@ val LocalUiMode = staticCompositionLocalOf { UiMode.Small }
 @Composable
 fun UiLayoutManager(content: @Composable () -> Unit) {
   BoxWithConstraints {
-    val layout = when {
-      maxHeight < maxWidth && maxHeight < 700.dp -> LayoutOrientation.Landscape
-      else -> LayoutOrientation.Portrait
+    val layout by remember {
+      derivedStateOf {
+        when {
+          maxHeight < maxWidth && maxHeight < 700.dp -> LayoutOrientation.Landscape
+          else -> LayoutOrientation.Portrait
+        }
+      }
     }
 
-    val uiMode = when {
-      min(maxWidth, maxHeight) > 700.dp -> UiMode.Large
-      else -> UiMode.Small
+    val uiMode by remember {
+      derivedStateOf {
+        when {
+          min(maxWidth, maxHeight) > 700.dp -> UiMode.Large
+          else -> UiMode.Small
+        }
+      }
     }
 
     CompositionLocalProvider(

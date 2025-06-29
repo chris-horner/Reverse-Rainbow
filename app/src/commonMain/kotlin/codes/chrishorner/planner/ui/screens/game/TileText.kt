@@ -6,10 +6,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import codes.chrishorner.planner.ui.theme.tile
 
 // This approach seems to have fewer bugs than the new `autoSize` parameter on `BasicText`.
 @Composable
@@ -19,12 +19,8 @@ fun TileText(
 ) = with(LocalDensity.current) {
   BoxWithConstraints {
     val textMeasurer = rememberTextMeasurer()
-    var style = MaterialTheme.typography.titleMedium.copy(
-      fontWeight = FontWeight.Bold,
-      textAlign = TextAlign.Center,
-      lineHeight = (MaterialTheme.typography.titleMedium.lineHeight.toPx() - 4.dp.toPx()).toSp(),
-      color = color,
-    )
+
+    var style = MaterialTheme.typography.tile.copy(color = color)
 
     fun measure(text: String) = textMeasurer.measure(
       text = text,

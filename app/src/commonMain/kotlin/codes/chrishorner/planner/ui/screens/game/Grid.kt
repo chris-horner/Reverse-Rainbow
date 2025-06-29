@@ -19,7 +19,9 @@ import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import codes.chrishorner.planner.data.Tile
 import codes.chrishorner.planner.ui.LocalAnimatedContentScope
+import codes.chrishorner.planner.ui.LocalUiMode
 import codes.chrishorner.planner.ui.OvershootEasing
+import codes.chrishorner.planner.ui.UiMode
 import kotlinx.collections.immutable.ImmutableList
 import kotlin.math.min
 
@@ -59,11 +61,21 @@ fun Grid(
   }
 }
 
-/**
- * A simple layout that arranges exactly 16 children in a 4x4 grid with an equal width and height.
- */
 @Composable
 private fun ConnectionsLayout(
+  modifier: Modifier,
+  content: @Composable () -> Unit,
+) {
+  val uiMode = LocalUiMode.current
+
+  when (uiMode) {
+    UiMode.Small -> SquareConnectionsLayout(modifier, content)
+    UiMode.Large -> WideConnectionsLayout(modifier, content)
+  }
+}
+
+@Composable
+private fun SquareConnectionsLayout(
   modifier: Modifier,
   content: @Composable () -> Unit,
 ) {
@@ -86,6 +98,39 @@ private fun ConnectionsLayout(
         val horizontalOffset = itemSize * horizontalIndex
         val verticalIndex = index / 4
         val verticalOffset = itemSize * verticalIndex
+        placeable.place(x = horizontalOffset, y = verticalOffset)
+      }
+    }
+  }
+}
+
+@Composable
+private fun WideConnectionsLayout(
+  modifier: Modifier,
+  content: @Composable () -> Unit,
+) {
+  Layout(
+    content = content,
+    modifier = modifier,
+  ) { measurables, constraints ->
+    require(measurables.size == 16) {
+      "WideConnectionsLayout layout requires 16 children exactly."
+    }
+
+    val width = constraints.maxWidth
+    val itemWidth = width / 4
+    val itemHeight = 96.dp.roundToPx()
+    val height = itemHeight * 4
+
+    val itemConstraints = Constraints.fixed(width = itemWidth, height = itemHeight)
+    val placeables = measurables.fastMap { it.measure(itemConstraints) }
+
+    layout(width, height) {
+      placeables.fastForEachIndexed { index, placeable ->
+        val horizontalIndex = index % 4
+        val horizontalOffset = itemWidth * horizontalIndex
+        val verticalIndex = index / 4
+        val verticalOffset = itemHeight * verticalIndex
         placeable.place(x = horizontalOffset, y = verticalOffset)
       }
     }

@@ -19,7 +19,7 @@ jobs:
           java-version: 17
 
       - name: Run tests
-        run: bash ./gradlew testDebug
+        run: bash ./gradlew testDebugUnitTest
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
@@ -27,3 +27,9 @@ jobs:
         with:
           name: test-results
           path: app/build/test-results/testDebugUnitTest/TEST-*.xml
+
+      - name: Build Android app
+        run: bash ./gradlew assembleDebug
+
+      - name: Build wasmJs app
+        run: bash ./gradlew wasmJsBrowserDistribution

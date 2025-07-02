@@ -27,8 +27,10 @@ class GameLoader(
 
   sealed interface LoaderState {
     data object Loading : LoaderState
-    class Success(val date: LocalDate, val game: Game) : LoaderState
     data class Failure(val type: FailureType) : LoaderState
+
+    @Stable
+    class Success(val date: LocalDate, val game: Game) : LoaderState
   }
 
   enum class FailureType {

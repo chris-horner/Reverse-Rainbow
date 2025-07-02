@@ -1,6 +1,7 @@
 package codes.chrishorner.planner
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import codes.chrishorner.planner.data.Tile
@@ -16,6 +17,7 @@ import kotlinx.collections.immutable.toImmutableMap
 /**
  * The current state of the Connections board and logic to manipulate it.
  */
+@Stable
 class Game(tiles: ImmutableList<Tile>) {
   private val tiles = tiles.toMutableList()
 

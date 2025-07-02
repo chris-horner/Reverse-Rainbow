@@ -15,7 +15,7 @@ import androidx.core.net.toUri
 import androidx.core.view.doOnLayout
 import codes.chrishorner.planner.ui.SplashScreenFadeMillis
 import codes.chrishorner.planner.ui.screens.MainUi
-import codes.chrishorner.planner.ui.theme.PlannerTheme
+import codes.chrishorner.planner.ui.theme.ReverseRainbowTheme
 import com.diamondedge.logging.KmLogging
 import com.diamondedge.logging.LogLevel
 
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
     val gameLoader = viewModel.gameLoader
 
     setContent {
-      PlannerTheme {
+      ReverseRainbowTheme {
         MainUi(
           loaderState = gameLoader.state.value,
           splashIconSize = splashIconSize.value,

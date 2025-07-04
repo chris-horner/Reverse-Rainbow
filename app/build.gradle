@@ -92,11 +92,11 @@ kotlin {
 }
 
 android {
-  namespace 'codes.chrishorner.planner'
+  namespace 'codes.chrishorner.reverserainbow'
   compileSdk 35
 
   defaultConfig {
-    applicationId "codes.chrishorner.planner"
+    applicationId "codes.chrishorner.reverserainbow"
     minSdk 31
     targetSdk 35
     versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch
@@ -173,7 +173,7 @@ play {
 }
 
 buildkonfig {
-  packageName = 'codes.chrishorner.planner'
+  packageName = 'codes.chrishorner.reverserainbow'
 
   defaultConfigs {
     buildConfigField 'STRING', 'versionName', versionMajor + '.' + versionMinor + '.' + versionPatch

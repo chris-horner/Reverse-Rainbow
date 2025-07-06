@@ -3,11 +3,13 @@ package codes.chrishorner.reverserainbow
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeViewport
 import codes.chrishorner.reverserainbow.ui.screens.MainUi
 import codes.chrishorner.reverserainbow.ui.theme.ReverseRainbowTheme
+import codes.chrishorner.reverserainbow.ui.theme.getInter
 import com.diamondedge.logging.KmLogging
 import com.diamondedge.logging.LogLevel
 import kotlinx.browser.document
@@ -18,7 +20,15 @@ fun main() {
 
   ComposeViewport(document.body!!) {
     val scope = rememberCoroutineScope()
-    val gameLoader = remember { GameLoader(scope = scope) }
+    val fontResolver = LocalFontFamilyResolver.current
+    val fontFamily = getInter()
+
+    val gameLoader = remember {
+      GameLoader(
+        scope = scope,
+        resourceLoader = { fontResolver.preload(fontFamily) },
+      )
+    }
     LaunchedEffect(Unit) { gameLoader.refresh() }
 
     ReverseRainbowTheme {

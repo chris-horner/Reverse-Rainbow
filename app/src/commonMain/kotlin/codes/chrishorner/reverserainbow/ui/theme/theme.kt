@@ -11,5 +11,6 @@ fun ReverseRainbowTheme(
   MaterialTheme(
     colorScheme = if (isSystemInDarkTheme()) MaterialDarkScheme else MaterialLightScheme,
     content = content,
+    typography = getTypography(),
   )
 }

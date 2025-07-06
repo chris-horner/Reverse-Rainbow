@@ -185,6 +185,32 @@ class GameLoaderTest {
     assertThat(loader.state.value).isEqualTo(LoaderState.Loading)
   }
 
+  @Test
+  fun `refresh waits for resources to load before updating state`() = runTest {
+    val resourceResults = Channel<Unit>()
+
+    val loader = GameLoader(
+      scope = this,
+      tileFetcher = resultProvider::receive,
+      resourceLoader = resourceResults::receive,
+      clock = june14at9am,
+      timeZoneProvider = { melbourneTimeZone },
+    )
+
+    loader.refresh()
+    resultProvider.send(TileFetchResult.Success(loadedTiles))
+    advanceUntilIdle()
+
+    // Resource loader hasn't completed yet, so we should still be loading.
+    assertThat(loader.state.value).isEqualTo(LoaderState.Loading)
+
+    resourceResults.send(Unit)
+    advanceUntilIdle()
+
+    // And with resources loaded, we should now be successfully loaded.
+    assertThat(loader.state.value).isInstanceOf<LoaderState.Success>()
+  }
+
   private object TestData {
     val june14at9am = object : Clock {
       override fun now() = Instant.parse("2025-06-14T09:00:00Z")

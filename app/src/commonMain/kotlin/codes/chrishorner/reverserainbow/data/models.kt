@@ -33,24 +33,6 @@ enum class Category {
   PURPLE,
 }
 
-@Serializable
-data class GameState(
-  val tiles: ImmutableList<Tile>,
-  val selectionCount: Int = 0,
-  val categoryStatuses: ImmutableMap<Category, CategoryState> = persistentMapOf(
-    Category.YELLOW to CategoryState(),
-    Category.GREEN to CategoryState(),
-    Category.BLUE to CategoryState(),
-    Category.PURPLE to CategoryState(),
-  ),
-)
-
-@Serializable
-data class CategoryState(
-  val assigned: Boolean = false,
-  val status: CategoryAction = CategoryAction.DISABLED,
-)
-
 /**
  * Based on the current selections and assigned categories on the Connections board,
  * `CategoryAction` represents the current valid action for a category.

@@ -300,6 +300,10 @@ class Game(tiles: ImmutableList<Tile>) {
       .distinctBy { it.category }
       .count()
 
+    val allAndOnlyThisCategorySelected = tilesInThisCategoryCount > 0 &&
+      otherCategorySelectionCount == 0 &&
+      tiles.filter { it.category == category }.all { it.selected }
+
     val allOfOneOtherCategorySelectedWithMatchingCount = otherCategorySelectionCount == 1 &&
       selectedTiles.all { it.category != null } &&
       selectedTiles.all { it.category != category } &&
@@ -323,6 +327,8 @@ class Game(tiles: ImmutableList<Tile>) {
 
     return CategoryStatus(
       complete = tilesInThisCategoryCount == 4,
+      allSelected = allAndOnlyThisCategorySelected,
+      bulkSelectable = tilesInThisCategoryCount > 1,
       action = action,
     )
   }

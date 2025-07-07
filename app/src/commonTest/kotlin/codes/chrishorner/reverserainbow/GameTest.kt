@@ -481,6 +481,57 @@ class GameTest {
     assertThat(categoryStatuses[Category.PURPLE]!!.action).isEqualTo(CategoryAction.ASSIGN)
   }
 
+  @Test
+  fun `selecting all and only tiles in category marks it as selected`() {
+    val game = Game(tilesInRainbowOrder)
+    game.select(tilesInRainbowOrder[0])
+    game.select(tilesInRainbowOrder[1])
+    game.select(tilesInRainbowOrder[2])
+    assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.allSelected).isFalse()
+
+    game.select(tilesInRainbowOrder[3])
+    assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.allSelected).isTrue()
+  }
+
+  @Test
+  fun `selecting all of a category and one other does not mark it as selected`() {
+    val tiles = validTiles
+      .mapIndexed { index, tile ->
+        tile.copy(
+          category = when (index) {
+            0, 1 -> Category.YELLOW
+            4 -> Category.GREEN
+            else -> null
+          },
+          selected = index == 0 || index == 1 || index == 4,
+        )
+      }
+      .toImmutableList()
+
+    val game = Game(tiles)
+    // Even though all yellow tiles are selected, a green tile is too.
+    assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.allSelected).isFalse()
+  }
+
+  @Test
+  fun `category is bulk selectable when there is more than one tile in category`() {
+    val tiles = validTiles
+      .mapIndexed { index, tile ->
+        tile.copy(
+          category = when (index) {
+            0, 1 -> Category.YELLOW
+            4 -> Category.GREEN
+            else -> null
+          },
+        )
+      }
+      .toImmutableList()
+
+    val game = Game(tiles)
+    assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.bulkSelectable).isTrue()
+    assertThat(game.model.value.categoryStatuses[Category.GREEN]!!.bulkSelectable).isFalse()
+  }
+
   private val Game.tiles
     get() = model.value.tiles
 

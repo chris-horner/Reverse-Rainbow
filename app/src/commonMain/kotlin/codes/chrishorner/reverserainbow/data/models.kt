@@ -72,6 +72,8 @@ enum class CategoryAction {
 
 data class CategoryStatus(
   val complete: Boolean,
+  val allSelected: Boolean,
+  val bulkSelectable: Boolean,
   val action: CategoryAction,
 )
 

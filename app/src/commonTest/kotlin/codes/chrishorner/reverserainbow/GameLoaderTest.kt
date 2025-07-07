@@ -240,10 +240,30 @@ class GameLoaderTest {
     val loadedGameModel = GameModel(
       tiles = loadedTiles,
       categoryStatuses = persistentMapOf(
-        Category.YELLOW to CategoryStatus(complete = false, action = CategoryAction.DISABLED),
-        Category.GREEN to CategoryStatus(complete = false, action = CategoryAction.DISABLED),
-        Category.BLUE to CategoryStatus(complete = false, action = CategoryAction.DISABLED),
-        Category.PURPLE to CategoryStatus(complete = false, action = CategoryAction.DISABLED),
+        Category.YELLOW to CategoryStatus(
+          complete = false,
+          allSelected = false,
+          bulkSelectable = false,
+          action = CategoryAction.DISABLED,
+        ),
+        Category.GREEN to CategoryStatus(
+          complete = false,
+          allSelected = false,
+          bulkSelectable = false,
+          action = CategoryAction.DISABLED,
+        ),
+        Category.BLUE to CategoryStatus(
+          complete = false,
+          allSelected = false,
+          bulkSelectable = false,
+          action = CategoryAction.DISABLED,
+        ),
+        Category.PURPLE to CategoryStatus(
+          complete = false,
+          allSelected = false,
+          bulkSelectable = false,
+          action = CategoryAction.DISABLED,
+        ),
       ),
       rainbowStatus = RainbowStatus.DISABLED,
       mostlyComplete = false,

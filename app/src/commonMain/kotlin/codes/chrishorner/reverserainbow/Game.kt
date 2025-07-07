@@ -63,7 +63,12 @@ class Game(tiles: ImmutableList<Tile>) {
     }
   }
 
-  fun select(category: Category) {
+  fun selectAll(category: Category) {
+    tiles.replaceAll { it.copy(selected = it.category == category) }
+    publishModelUpdate()
+  }
+
+  fun applyCategoryAction(category: Category) {
     val action = determineCategoryStatus(category).action
 
     when (action) {

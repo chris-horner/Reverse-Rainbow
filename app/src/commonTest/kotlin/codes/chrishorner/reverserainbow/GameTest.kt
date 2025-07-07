@@ -1,8 +1,10 @@
 package codes.chrishorner.reverserainbow
 
+import assertk.all
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.hasMessage
+import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNull
@@ -100,14 +102,30 @@ class GameTest {
   }
 
   @Test
-  fun `category selection assigns selected, uncategorized tiles`() {
+  fun `selecting all in category replaces selection with only that category`() {
+    val oneYellowTileSelected = tilesInRainbowOrder
+      .mapIndexed { index, tile ->
+        tile.copy(selected = index == 0)
+      }
+      .toImmutableList()
+
+    val game = Game(oneYellowTileSelected)
+    game.selectAll(Category.GREEN)
+
+    val selectedTiles = game.tiles.filter { it.selected }
+    assertThat(selectedTiles).hasSize(4)
+    assertThat(selectedTiles.all { it.category == Category.GREEN }).isTrue()
+  }
+
+  @Test
+  fun `applying category assigns selected, uncategorized tiles`() {
     val game = Game(validTiles)
 
     game.select(validTiles[0])
     game.select(validTiles[5])
     game.select(validTiles[7])
     game.select(validTiles[11])
-    game.select(Category.YELLOW)
+    game.applyCategoryAction(Category.YELLOW)
 
     with(game.tiles[0]) {
       assertThat(initialPosition).isEqualTo(0)
@@ -139,14 +157,14 @@ class GameTest {
     val game = Game(validTiles)
     game.select(validTiles[0])
     game.select(validTiles[1])
-    game.select(Category.YELLOW)
+    game.applyCategoryAction(Category.YELLOW)
 
     assertThat(game.tiles[2].category).isNull()
     assertThat(game.tiles[3].category).isNull()
 
     game.select(validTiles[4])
     game.select(validTiles[5])
-    game.select(Category.YELLOW)
+    game.applyCategoryAction(Category.YELLOW)
 
     with(game.tiles[2]) {
       assertThat(initialPosition).isEqualTo(4)
@@ -164,10 +182,10 @@ class GameTest {
     val game = Game(validTiles)
     game.select(validTiles[0])
     game.select(validTiles[1])
-    game.select(Category.YELLOW)
+    game.applyCategoryAction(Category.YELLOW)
 
     game.select(validTiles[7])
-    game.select(Category.YELLOW)
+    game.applyCategoryAction(Category.YELLOW)
 
     assertThat(game.tiles[2].initialPosition).isEqualTo(7)
     assertThat(game.tiles[7].initialPosition).isEqualTo(2)
@@ -176,7 +194,7 @@ class GameTest {
   @Test
   fun `category selection clears categorized tiles`() {
     val game = Game(tilesInRainbowOrder)
-    game.select(Category.GREEN)
+    game.applyCategoryAction(Category.GREEN)
 
     val rows = game.tiles.chunked(4)
 
@@ -192,7 +210,7 @@ class GameTest {
     game.select(tilesInRainbowOrder[0])
     game.select(tilesInRainbowOrder[4])
 
-    game.select(Category.GREEN)
+    game.applyCategoryAction(Category.GREEN)
 
     with(game.tiles[0]) {
       assertThat(initialPosition).isEqualTo(4)
@@ -208,7 +226,7 @@ class GameTest {
   @Test
   fun `category selection with no selected tiles or categories does nothing`() {
     val game = Game(validTiles)
-    game.select(Category.YELLOW)
+    game.applyCategoryAction(Category.YELLOW)
     assertThat(game.tiles).isEqualTo(validTiles)
   }
 
@@ -269,14 +287,14 @@ class GameTest {
     val game = Game(validTiles)
 
     game.select(validTiles[2])
-    game.select(Category.YELLOW)
+    game.applyCategoryAction(Category.YELLOW)
 
     game.select(validTiles[6])
-    game.select(Category.GREEN)
+    game.applyCategoryAction(Category.GREEN)
 
     game.select(validTiles[7])
     game.select(validTiles[8])
-    game.select(Category.PURPLE)
+    game.applyCategoryAction(Category.PURPLE)
 
     game.reset()
     assertThat(game.tiles).isEqualTo(validTiles)
@@ -287,10 +305,10 @@ class GameTest {
     val game = Game(validTiles)
 
     game.select(validTiles[0])
-    game.select(Category.YELLOW)
+    game.applyCategoryAction(Category.YELLOW)
 
     game.select(validTiles[4])
-    game.select(Category.GREEN)
+    game.applyCategoryAction(Category.GREEN)
 
     game.shuffle()
 
@@ -360,7 +378,7 @@ class GameTest {
     assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.complete).isFalse()
 
     repeat(4) { index -> game.select(validTiles[index]) }
-    game.select(Category.YELLOW)
+    game.applyCategoryAction(Category.YELLOW)
 
     assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.complete).isTrue()
   }

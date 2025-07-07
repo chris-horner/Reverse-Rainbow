@@ -64,7 +64,16 @@ class Game(tiles: ImmutableList<Tile>) {
   }
 
   fun selectAll(category: Category) {
-    tiles.replaceAll { it.copy(selected = it.category == category) }
+    val categoryStatus = determineCategoryStatus(category)
+
+    if (categoryStatus.allSelected) {
+      // If all tiles in the category are already selected, deselect them.
+      tiles.replaceAll { if (it.category == category) it.copy(selected = false) else it }
+    } else {
+      // Otherwise select _only_ these tiles.
+      tiles.replaceAll { it.copy(selected = it.category == category) }
+    }
+
     publishModelUpdate()
   }
 

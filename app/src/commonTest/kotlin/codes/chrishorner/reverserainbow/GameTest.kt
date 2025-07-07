@@ -1,6 +1,5 @@
 package codes.chrishorner.reverserainbow
 
-import assertk.all
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.hasMessage
@@ -89,8 +88,7 @@ class GameTest {
   @Test
   fun `long selecting selected, categorized tile deselects all in category`() {
     val allBlueSelectedTiles = tilesInRainbowOrder
-      .mapIndexed { index,
-        tile ->
+      .mapIndexed { index, tile ->
         tile.copy(selected = index in 8..11)
       }
       .toImmutableList()
@@ -115,6 +113,20 @@ class GameTest {
     val selectedTiles = game.tiles.filter { it.selected }
     assertThat(selectedTiles).hasSize(4)
     assertThat(selectedTiles.all { it.category == Category.GREEN }).isTrue()
+  }
+
+  @Test
+  fun `selecting all in already selected category deselects them`() {
+    val allGreenSelectedTiles = tilesInRainbowOrder
+      .mapIndexed { index, tile ->
+        tile.copy(selected = index in 4..7)
+      }
+      .toImmutableList()
+
+    val game = Game(allGreenSelectedTiles)
+    game.selectAll(Category.GREEN)
+
+    assertThat(game.tiles.none { it.selected }).isTrue()
   }
 
   @Test

@@ -84,6 +84,7 @@ private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -
           categoryStatuses = model.categoryStatuses,
           rainbowStatus = model.rainbowStatus,
           onCategoryClick = { category -> game.applyCategoryAction(category) },
+          onCategorySelect = { category -> game.selectAll(category) },
           modifier = Modifier.zIndex(1f),
         )
 
@@ -136,6 +137,7 @@ private fun LandscapeGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () 
         categoryStatuses = model.categoryStatuses,
         rainbowStatus = model.rainbowStatus,
         onCategoryClick = { category -> game.applyCategoryAction(category) },
+        onCategorySelect = { category -> game.selectAll(category) },
         modifier = Modifier.zIndex(1f),
       )
 

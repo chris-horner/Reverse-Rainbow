@@ -18,8 +18,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,6 +62,7 @@ fun CategoryActions(
   categoryStatuses: ImmutableMap<Category, CategoryStatus>,
   rainbowStatus: RainbowStatus,
   onCategoryClick: (Category) -> Unit,
+  onCategorySelect: (Category) -> Unit,
   modifier: Modifier,
 ) {
   val boardComplete = rainbowStatus != RainbowStatus.DISABLED
@@ -70,7 +74,13 @@ fun CategoryActions(
         modifier = modifier.fillMaxWidth(),
       ) {
         for ((category, status) in categoryStatuses) {
-          CategoryAction(category, status, boardComplete, onCategoryClick)
+          Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+          ) {
+            CategoryAction(category, status, boardComplete, onCategoryClick)
+            CategoryCheckbox(category, status, onCategorySelect)
+          }
         }
       }
     }
@@ -81,7 +91,13 @@ fun CategoryActions(
         modifier = modifier.fillMaxHeight(),
       ) {
         for ((category, status) in categoryStatuses) {
-          CategoryAction(category, status, boardComplete, onCategoryClick)
+          Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            CategoryAction(category, status, boardComplete, onCategoryClick)
+            CategoryCheckbox(category, status, onCategorySelect)
+          }
         }
       }
     }
@@ -141,6 +157,31 @@ private fun CategoryAction(
         imageVector = Icons.Shuffle,
         contentDescription = null,
         tint = colors.icon,
+      )
+    }
+  }
+}
+
+@Composable
+private fun CategoryCheckbox(
+  category: Category,
+  status: CategoryStatus,
+  onSelect: (Category) -> Unit,
+) {
+  Box(
+    modifier = Modifier.minimumInteractiveComponentSize()
+  ) {
+    if (status.bulkSelectable) {
+      val colors = getColors(category)
+
+      Checkbox(
+        checked = status.allSelected,
+        onCheckedChange = { onSelect(category) },
+        colors = CheckboxDefaults.colors().copy(
+          checkedBoxColor = colors.background,
+          checkedCheckmarkColor = colors.icon,
+          checkedBorderColor = colors.background,
+        )
       )
     }
   }

@@ -192,8 +192,11 @@ class GameTest {
   }
 
   @Test
-  fun `category selection clears categorized tiles`() {
+  fun `clearing a category clears categorized tiles`() {
     val game = Game(tilesInRainbowOrder)
+    assertThat(game.model.value.categoryStatuses[Category.GREEN]!!.action)
+      .isEqualTo(CategoryAction.CLEAR)
+
     game.applyCategoryAction(Category.GREEN)
 
     val rows = game.tiles.chunked(4)
@@ -205,10 +208,12 @@ class GameTest {
   }
 
   @Test
-  fun `category selection swaps even number of selected tiles between categories`() {
+  fun `category swap swaps even number of selected tiles between categories`() {
     val game = Game(tilesInRainbowOrder)
     game.select(tilesInRainbowOrder[0])
     game.select(tilesInRainbowOrder[4])
+    assertThat(game.model.value.categoryStatuses[Category.GREEN]!!.action)
+      .isEqualTo(CategoryAction.SWAP)
 
     game.applyCategoryAction(Category.GREEN)
 
@@ -224,7 +229,7 @@ class GameTest {
   }
 
   @Test
-  fun `category selection with no selected tiles or categories does nothing`() {
+  fun `applying category action with no selected tiles or categories does nothing`() {
     val game = Game(validTiles)
     game.applyCategoryAction(Category.YELLOW)
     assertThat(game.tiles).isEqualTo(validTiles)

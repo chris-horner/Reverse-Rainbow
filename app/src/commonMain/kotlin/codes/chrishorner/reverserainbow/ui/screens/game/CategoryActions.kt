@@ -156,6 +156,7 @@ private fun rememberJumpAnimatable(
 ): Animatable<IntOffset, AnimationVector2D> {
   val jumpAnimatable = remember { Animatable(IntOffset.Zero, IntOffset.VectorConverter) }
   val density = LocalDensity.current
+  val orientation = LocalLayoutOrientation.current
 
   var runCelebration by rememberSaveable { mutableStateOf(false) }
 
@@ -171,10 +172,14 @@ private fun rememberJumpAnimatable(
       Category.PURPLE -> 180
     }
 
-    val yPosition = with(density) { (-16).dp.roundToPx() }
+    val jumpDistance = with(density) { 16.dp.roundToPx() }
+    val jumpTarget = when (orientation) {
+      LayoutOrientation.Portrait -> IntOffset(0, -jumpDistance)
+      LayoutOrientation.Landscape -> IntOffset(jumpDistance, 0)
+    }
 
     jumpAnimatable.animateTo(
-      targetValue = IntOffset(0, yPosition),
+      targetValue = jumpTarget,
       animationSpec = tween(durationMillis = 240, delayMillis = delay, easing = JumpStartEasing)
     )
     jumpAnimatable.animateTo(

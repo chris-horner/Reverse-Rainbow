@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalSerializationApi::class)
-
 package codes.chrishorner.reverserainbow.data
 
 import codes.chrishorner.reverserainbow.Game
@@ -15,13 +13,12 @@ import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
+import kotlin.time.Clock
 
 /**
  * Hits The New York Times' API, parses their JSON, and returns a list of [Tile] objects that can be

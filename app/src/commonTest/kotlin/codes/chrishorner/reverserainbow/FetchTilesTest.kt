@@ -14,11 +14,11 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.io.IOException
 import kotlin.test.Test
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 class FetchTilesTest {
 

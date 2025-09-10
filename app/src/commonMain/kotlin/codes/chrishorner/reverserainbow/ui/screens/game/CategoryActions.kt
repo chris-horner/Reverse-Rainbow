@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import codes.chrishorner.reverserainbow.data.Category
 import codes.chrishorner.reverserainbow.data.CategoryAction
 import codes.chrishorner.reverserainbow.data.CategoryStatus
-import codes.chrishorner.reverserainbow.data.RainbowStatus
 import codes.chrishorner.reverserainbow.ui.Icons
 import codes.chrishorner.reverserainbow.ui.JumpEndEasing
 import codes.chrishorner.reverserainbow.ui.JumpStartEasing
@@ -60,13 +59,11 @@ import kotlinx.collections.immutable.ImmutableMap
 @Composable
 fun CategoryActions(
   categoryStatuses: ImmutableMap<Category, CategoryStatus>,
-  rainbowStatus: RainbowStatus,
+  boardComplete: Boolean,
   onCategoryClick: (Category) -> Unit,
   onCategorySelect: (Category) -> Unit,
   modifier: Modifier,
 ) {
-  val boardComplete = rainbowStatus != RainbowStatus.DISABLED
-
   when (LocalLayoutOrientation.current) {
     LayoutOrientation.Portrait -> {
       Row(

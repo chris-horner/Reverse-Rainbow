@@ -13,7 +13,6 @@ import codes.chrishorner.reverserainbow.data.Category
 import codes.chrishorner.reverserainbow.data.CategoryAction
 import codes.chrishorner.reverserainbow.data.CategoryStatus
 import codes.chrishorner.reverserainbow.data.GameModel
-import codes.chrishorner.reverserainbow.data.RainbowStatus
 import codes.chrishorner.reverserainbow.data.Tile
 import codes.chrishorner.reverserainbow.data.Tile.Content
 import codes.chrishorner.reverserainbow.data.TileFetchResult
@@ -265,7 +264,7 @@ class GameLoaderTest {
           action = CategoryAction.DISABLED,
         ),
       ),
-      rainbowStatus = RainbowStatus.DISABLED,
+      allTilesAssigned = false,
       mostlyComplete = false,
     )
   }

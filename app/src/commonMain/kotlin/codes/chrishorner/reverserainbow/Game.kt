@@ -9,7 +9,6 @@ import codes.chrishorner.reverserainbow.data.Category
 import codes.chrishorner.reverserainbow.data.CategoryAction
 import codes.chrishorner.reverserainbow.data.CategoryStatus
 import codes.chrishorner.reverserainbow.data.GameModel
-import codes.chrishorner.reverserainbow.data.RainbowStatus
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
@@ -104,29 +103,6 @@ class Game(tiles: ImmutableList<Tile>) {
     publishModelUpdate()
   }
 
-  fun rainbowSort() {
-    require(tiles.all { it.category != null }) {
-      "Can't sort rainbows if not all tiles have a category"
-    }
-
-    val yellow = tiles.filter { it.category == Category.YELLOW }
-    val green = tiles.filter { it.category == Category.GREEN }
-    val blue = tiles.filter { it.category == Category.BLUE }
-    val purple = tiles.filter { it.category == Category.PURPLE }
-
-    val orderedCategories = if (isCurrentlyInRainbowOrder()) {
-      listOf(purple, blue, green, yellow)
-    } else {
-      listOf(yellow, green, blue, purple)
-    }
-
-    orderedCategories.flatten().forEachIndexed { index, tile ->
-      tiles[index] = tile.copy(currentPosition = index)
-    }
-
-    publishModelUpdate()
-  }
-
   fun reset() {
     tiles.replaceAll { tile ->
       tile.copy(
@@ -160,29 +136,11 @@ class Game(tiles: ImmutableList<Tile>) {
   }
 
   private fun assignTiles(selectedCategory: Category) {
-    val selectedTiles = tiles.filter { it.selected }
-    val categoryHasAssignedTiles = tiles.any { it.category == selectedCategory }
-
-    val row = if (categoryHasAssignedTiles) {
-      tiles.chunked(4).single { row -> row.any { it.category == selectedCategory } }
-    } else {
-      tiles.chunked(4).first { row -> row.all { it.category == null } }
-    }
-
-    var swapPosition = if (categoryHasAssignedTiles) {
-      row.first { it.category == null }.currentPosition
-    } else {
-      row.first().currentPosition
-    }
-
-    for (tile in selectedTiles) {
-      val currentTile = tiles.single { it.initialPosition == tile.initialPosition }
-      val updatedTile = currentTile.copy(category = selectedCategory)
-      tiles[updatedTile.currentPosition] = updatedTile
-      val tileToSwap = tiles[swapPosition]
-      swapTiles(updatedTile, tileToSwap)
-      swapPosition++
-    }
+    tiles
+      .filter { it.selected }
+      .forEach { tile ->
+        tiles[tile.currentPosition] = tile.copy(category = selectedCategory)
+      }
   }
 
   private fun clearTiles(selectedCategory: Category) {
@@ -204,14 +162,15 @@ class Game(tiles: ImmutableList<Tile>) {
     val selectedCategories = selectedTiles.distinctBy { it.category }.map { it.category }
 
     if (selectedCategories.size == 1) {
-      val tilesInCategory = tiles.filter { it.category == category }
+      val selectedTilesCategory = selectedCategories.single()
+      val originalTilesInCategory = tiles.filter { it.category == category }
 
-      require(selectedTiles.count() == tilesInCategory.count()) {
-        "The number of selected tiles should equal the number of tiles in a category being swapped to, but had ${selectedTiles.count()} selected ad ${tilesInCategory.count()} in category"
+      for (tile in selectedTiles) {
+        tiles[tile.currentPosition] = tile.copy(category = category)
       }
 
-      selectedTiles.zip(tilesInCategory) { tile1, tile2 ->
-        swapTiles(tile1.copy(category = tile2.category), tile2.copy(category = tile1.category))
+      for (tile in originalTilesInCategory) {
+        tiles[tile.currentPosition] = tile.copy(category = selectedTilesCategory)
       }
     } else {
       // Selected tiles should span across two categories, and there should be an even number
@@ -244,36 +203,28 @@ class Game(tiles: ImmutableList<Tile>) {
   }
 
   /**
-   * For each row, ensure that tiles with an assigned category are positioned before tiles without
-   * a category.
-   *
-   * For all rows, ensure that those with assigned categories are positioned higher than those
-   * without categories.
+   * For each category, ensure that all assigned tiles are positioned in the appropriate
+   * reverse-rainbow sorted row, with any missing tiles positioned on the right.
    */
   private fun sortGrid() {
-    for (rowStartIndex in 0..12 step 4) {
-      val row = tiles.subList(rowStartIndex, rowStartIndex + 4)
-
-      // If some tiles in a row have a category and some do not, sort them to remove any gaps.
-      if (row.any { it.category != null } && row.any { it.category == null }) {
-        for ((rowIndex, tile) in row.sortedByDescending { it.category }.withIndex()) {
-          val tileIndex = rowStartIndex + rowIndex
-          tiles[tileIndex] = tile.copy(currentPosition = tileIndex)
-        }
+    for (category in Category.entries) {
+      val tilesToSort = tiles.filter { it.category == category }.toMutableList()
+      val rowStartIndex = when (category) {
+        Category.YELLOW -> 12
+        Category.GREEN -> 8
+        Category.BLUE -> 4
+        Category.PURPLE -> 0
       }
 
-      // Check that there will actually be a next row before attempting further sorting.
-      if (rowStartIndex > 8) continue
+      for (position in rowStartIndex..(rowStartIndex + 3)) {
+        val tile = tiles[position]
 
-      // If this entire row has no category, and the next row _does_ have a category, swap all
-      // tiles from the next row that do have an assigned category.
-      val nextRow = tiles.subList(rowStartIndex + 4, rowStartIndex + 8)
-      if (row.all { it.category == null } && nextRow.any { it.category != null }) {
-        row.zip(nextRow)
-          .filter { (_, tile2) -> tile2.category != null }
-          .forEach { (tile1, tile2) ->
-            swapTiles(tile1, tile2)
-          }
+        if (tile.category == category) {
+          tilesToSort.remove(tile)
+        } else {
+          val replacement = tilesToSort.removeFirstOrNull() ?: break
+          swapTiles(tile, replacement)
+        }
       }
     }
   }
@@ -284,17 +235,12 @@ class Game(tiles: ImmutableList<Tile>) {
 
   private fun generateModel(): GameModel {
     val categoryStatuses = Category.entries.associateWith { determineCategoryStatus(it) }
-    val rainbowStatus = when {
-      isCurrentlyInRainbowOrder() -> RainbowStatus.REVERSIBLE
-      tiles.all { it.category != null } -> RainbowStatus.SETTABLE
-      else -> RainbowStatus.DISABLED
-    }
     val completedCategoryCount = categoryStatuses.count { it.value.complete }
 
     return GameModel(
       tiles = tiles.toImmutableList(),
       categoryStatuses = categoryStatuses.toImmutableMap(),
-      rainbowStatus = rainbowStatus,
+      allTilesAssigned = tiles.all { it.category != null },
       mostlyComplete = completedCategoryCount >= 3,
     )
   }
@@ -309,27 +255,28 @@ class Game(tiles: ImmutableList<Tile>) {
     val thisCategorySelected = selectedTiles.any { it.category == category }
     val tilesInThisCategoryCount = tiles.count { it.category == category }
 
-    val otherCategorySelectionCount = selectedTiles
+    val otherCategoriesSelected = selectedTiles
       .filter { it.category != category }
       .distinctBy { it.category }
-      .count()
+      .map { it.category }
+
+    val otherCategorySelectionCount = otherCategoriesSelected.count()
 
     val allAndOnlyThisCategorySelected = tilesInThisCategoryCount > 0 &&
       otherCategorySelectionCount == 0 &&
       tiles.filter { it.category == category }.all { it.selected }
 
-    val allOfOneOtherCategorySelectedWithMatchingCount = otherCategorySelectionCount == 1 &&
-      selectedTiles.all { it.category != null } &&
-      selectedTiles.all { it.category != category } &&
-      selectedTiles.count() == tilesInThisCategoryCount
+    val allOfOneOtherCategorySelected = otherCategorySelectionCount == 1 && tiles
+      .filter { it.category == otherCategoriesSelected.single() }
+      .all { it.selected }
 
     val equalNumberFromOtherCategorySelected = otherCategorySelectionCount == 1 &&
-      selectedTiles.count { it.category == category } == selectedTiles.count { it.category != category }
+      selectedTiles.count { it.category == category } == selectedTiles.count { it.category == otherCategoriesSelected.single() }
 
     val action = when {
       selectionCount > 0 -> when {
         tilesInThisCategoryCount + selectionCount <= 4 && !thisCategorySelected -> CategoryAction.ASSIGN
-        allOfOneOtherCategorySelectedWithMatchingCount -> CategoryAction.SWAP
+        allOfOneOtherCategorySelected -> CategoryAction.SWAP
         equalNumberFromOtherCategorySelected -> CategoryAction.SWAP
         selectedTiles.all { it.category == category } -> CategoryAction.CLEAR
         else -> CategoryAction.DISABLED
@@ -345,13 +292,6 @@ class Game(tiles: ImmutableList<Tile>) {
       bulkSelectable = tilesInThisCategoryCount > 1,
       action = action,
     )
-  }
-
-  private fun isCurrentlyInRainbowOrder(): Boolean {
-    return tiles.slice(0..3).all { it.category == Category.YELLOW } &&
-      tiles.slice(4..7).all { it.category == Category.GREEN } &&
-      tiles.slice(8..11).all { it.category == Category.BLUE } &&
-      tiles.slice(12..15).all { it.category == Category.PURPLE }
   }
 
   private inline fun <T> MutableList<T>.replaceAll(operator: (T) -> T) {

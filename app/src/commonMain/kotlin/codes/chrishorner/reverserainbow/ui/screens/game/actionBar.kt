@@ -11,15 +11,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import codes.chrishorner.reverserainbow.data.RainbowStatus
 import codes.chrishorner.reverserainbow.ui.screens.game.BottomBarAction.OpenNytClick
-import codes.chrishorner.reverserainbow.ui.screens.game.BottomBarAction.RainbowClick
 
 enum class BottomBarAction {
   AboutClick,
   ResetClick,
   ShuffleClick,
-  RainbowClick,
   OpenNytClick,
 }
 
@@ -29,7 +26,6 @@ enum class BottomBarAction {
 @Composable
 fun BottomBar(
   showNytButton: Boolean,
-  rainbowStatus: RainbowStatus,
   onAction: (BottomBarAction) -> Unit,
 ) {
   BottomAppBar(
@@ -39,10 +35,6 @@ fun BottomBar(
       Spacer(modifier = Modifier.size(16.dp))
 
       OpenNytButton(showNytButton, onClick = { onAction(OpenNytClick) })
-
-      Spacer(modifier = Modifier.size(16.dp))
-
-      RainbowButton(rainbowStatus, onClick = { onAction(RainbowClick) })
 
       Spacer(modifier = Modifier.weight(1f))
 
@@ -57,7 +49,6 @@ fun BottomBar(
 @Composable
 fun SideBar(
   showNytButton: Boolean,
-  rainbowStatus: RainbowStatus,
   onAction: (BottomBarAction) -> Unit,
   modifier: Modifier,
 ) {
@@ -72,16 +63,6 @@ fun SideBar(
         .padding(horizontal = 8.dp)
     ) {
       OpenNytButton(showNytButton, onClick = { onAction(OpenNytClick) }, Modifier.fillMaxWidth())
-    }
-
-    Spacer(modifier = Modifier.size(8.dp))
-
-    Box(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 8.dp)
-    ) {
-      RainbowButton(rainbowStatus, onClick = { onAction(RainbowClick) }, Modifier.fillMaxWidth())
     }
   }
 }

@@ -47,13 +47,11 @@ private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -
     bottomBar = {
       BottomBar(
         showNytButton = model.mostlyComplete,
-        rainbowStatus = model.rainbowStatus,
         onAction = { action ->
           when (action) {
             BottomBarAction.AboutClick -> onClickAbout()
             BottomBarAction.ResetClick -> game.reset()
             BottomBarAction.ShuffleClick -> game.shuffle()
-            BottomBarAction.RainbowClick -> game.rainbowSort()
             BottomBarAction.OpenNytClick -> onOpenNyt()
           }
         },
@@ -82,7 +80,7 @@ private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -
 
         CategoryActions(
           categoryStatuses = model.categoryStatuses,
-          rainbowStatus = model.rainbowStatus,
+          boardComplete = model.allTilesAssigned,
           onCategoryClick = { category -> game.applyCategoryAction(category) },
           onCategorySelect = { category -> game.selectAll(category) },
           modifier = Modifier.zIndex(1f),
@@ -102,13 +100,11 @@ private fun LandscapeGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () 
     Row(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
       SideBar(
         showNytButton = model.mostlyComplete,
-        rainbowStatus = model.rainbowStatus,
         onAction = { action ->
           when (action) {
             BottomBarAction.AboutClick -> onClickAbout()
             BottomBarAction.ResetClick -> game.reset()
             BottomBarAction.ShuffleClick -> game.shuffle()
-            BottomBarAction.RainbowClick -> game.rainbowSort()
             BottomBarAction.OpenNytClick -> onOpenNyt()
           }
         },
@@ -135,7 +131,7 @@ private fun LandscapeGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () 
 
       CategoryActions(
         categoryStatuses = model.categoryStatuses,
-        rainbowStatus = model.rainbowStatus,
+        boardComplete = model.allTilesAssigned,
         onCategoryClick = { category -> game.applyCategoryAction(category) },
         onCategorySelect = { category -> game.selectAll(category) },
         modifier = Modifier.zIndex(1f),

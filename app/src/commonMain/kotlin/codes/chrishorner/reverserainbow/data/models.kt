@@ -2,7 +2,6 @@ package codes.chrishorner.reverserainbow.data
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.serialization.Serializable
 
 /**
@@ -59,16 +58,10 @@ data class CategoryStatus(
   val action: CategoryAction,
 )
 
-enum class RainbowStatus {
-  DISABLED,
-  SETTABLE,
-  REVERSIBLE,
-}
-
 data class GameModel(
   val tiles: ImmutableList<Tile>,
   val categoryStatuses: ImmutableMap<Category, CategoryStatus>,
-  val rainbowStatus: RainbowStatus,
+  val allTilesAssigned: Boolean,
 
   /**
    * If 3/4 or more of the categories have been fully assigned. Useful for showing the NYT app

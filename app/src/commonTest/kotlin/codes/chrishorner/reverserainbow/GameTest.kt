@@ -533,13 +533,13 @@ class GameTest {
   }
 
   @Test
-  fun `category is bulk selectable when there is more than one tile in category`() {
+  fun `category is bulk selectable when there is at least one tile in category`() {
     val tiles = unassignedTiles
       .mapIndexed { index, tile ->
         tile.copy(
           category = when (index) {
-            0, 1 -> Category.YELLOW
-            4 -> Category.GREEN
+            0, 1 -> Category.PURPLE
+            4 -> Category.BLUE
             else -> null
           },
         )
@@ -547,8 +547,10 @@ class GameTest {
       .toImmutableList()
 
     val game = Game(tiles)
-    assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.bulkSelectable).isTrue()
+    assertThat(game.model.value.categoryStatuses[Category.PURPLE]!!.bulkSelectable).isTrue()
+    assertThat(game.model.value.categoryStatuses[Category.BLUE]!!.bulkSelectable).isTrue()
     assertThat(game.model.value.categoryStatuses[Category.GREEN]!!.bulkSelectable).isFalse()
+    assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.bulkSelectable).isFalse()
   }
 
   private val Game.tiles

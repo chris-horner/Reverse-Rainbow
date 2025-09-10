@@ -289,7 +289,7 @@ class Game(tiles: ImmutableList<Tile>) {
     return CategoryStatus(
       complete = tilesInThisCategoryCount == 4,
       allSelected = allAndOnlyThisCategorySelected,
-      bulkSelectable = tilesInThisCategoryCount > 1,
+      bulkSelectable = tilesInThisCategoryCount > 0,
       action = action,
     )
   }

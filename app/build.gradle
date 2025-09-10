@@ -94,12 +94,12 @@ kotlin {
 
 android {
   namespace 'codes.chrishorner.reverserainbow'
-  compileSdk 35
+  compileSdk = 36
 
   defaultConfig {
     applicationId "codes.chrishorner.reverserainbow"
     minSdk 31
-    targetSdk 35
+    targetSdk 36
     versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch
     versionName "${versionMajor}.${versionMinor}.${versionPatch}"
   }

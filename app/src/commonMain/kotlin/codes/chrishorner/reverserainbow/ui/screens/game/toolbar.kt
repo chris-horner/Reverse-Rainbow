@@ -185,7 +185,7 @@ private fun AppBarScope.actions(
       ) {
         IconButton(onClick = onResetClick) {
           Icon(
-            imageVector = Icons.DeleteSweep,
+            imageVector = Icons.Restart,
             contentDescription = stringResource(Res.string.reset),
             tint = MaterialTheme.colorScheme.onSurface,
           )
@@ -198,7 +198,7 @@ private fun AppBarScope.actions(
         text = { Text(stringResource(Res.string.reset)) },
         leadingIcon = {
           Icon(
-            imageVector = Icons.DeleteSweep,
+            imageVector = Icons.Restart,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurface,
           )

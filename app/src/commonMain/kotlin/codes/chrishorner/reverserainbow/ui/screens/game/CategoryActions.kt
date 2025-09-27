@@ -151,7 +151,7 @@ private fun CategoryAction(
       )
     } else if (action == CategoryAction.SWAP) {
       Icon(
-        imageVector = Icons.Shuffle,
+        imageVector = Icons.SwapVert,
         contentDescription = null,
         tint = colors.icon,
       )

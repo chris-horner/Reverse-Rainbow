@@ -668,97 +668,6 @@ object Icons {
 
   private var _EditNote: ImageVector? = null
 
-  val DeleteSweep: ImageVector
-    get() {
-      if (_DeleteSweep != null) {
-        return _DeleteSweep!!
-      }
-      _DeleteSweep = ImageVector.Builder(
-        name = "Rounded.DeleteSweep",
-        defaultWidth = 24.0.dp,
-        defaultHeight = 24.0.dp,
-        viewportWidth = 960.0f,
-        viewportHeight = 960.0f
-      ).apply {
-        path(
-          fill = SolidColor(Color(0xFFE3E3E3)),
-          stroke = null,
-          strokeLineWidth = 0.0f,
-          strokeLineCap = StrokeCap.Butt,
-          strokeLineJoin = StrokeJoin.Miter,
-          strokeLineMiter = 1.0f,
-          pathFillType = PathFillType.NonZero
-        ) {
-          moveTo(200.0f, 760.0f)
-          quadToRelative(-33.0f, 0.0f, -56.5f, -23.5f)
-          reflectiveQuadTo(120.0f, 680.0f)
-          verticalLineToRelative(-360.0f)
-          quadToRelative(-17.0f, 0.0f, -28.5f, -11.5f)
-          reflectiveQuadTo(80.0f, 280.0f)
-          quadToRelative(0.0f, -17.0f, 11.5f, -28.5f)
-          reflectiveQuadTo(120.0f, 240.0f)
-          horizontalLineToRelative(120.0f)
-          verticalLineToRelative(-20.0f)
-          quadToRelative(0.0f, -17.0f, 11.5f, -28.5f)
-          reflectiveQuadTo(280.0f, 180.0f)
-          horizontalLineToRelative(80.0f)
-          quadToRelative(17.0f, 0.0f, 28.5f, 11.5f)
-          reflectiveQuadTo(400.0f, 220.0f)
-          verticalLineToRelative(20.0f)
-          horizontalLineToRelative(120.0f)
-          quadToRelative(17.0f, 0.0f, 28.5f, 11.5f)
-          reflectiveQuadTo(560.0f, 280.0f)
-          quadToRelative(0.0f, 17.0f, -11.5f, 28.5f)
-          reflectiveQuadTo(520.0f, 320.0f)
-          verticalLineToRelative(360.0f)
-          quadToRelative(0.0f, 33.0f, -23.5f, 56.5f)
-          reflectiveQuadTo(440.0f, 760.0f)
-          lineTo(200.0f, 760.0f)
-          close()
-          moveTo(640.0f, 720.0f)
-          quadToRelative(-17.0f, 0.0f, -28.5f, -11.5f)
-          reflectiveQuadTo(600.0f, 680.0f)
-          quadToRelative(0.0f, -17.0f, 11.5f, -28.5f)
-          reflectiveQuadTo(640.0f, 640.0f)
-          horizontalLineToRelative(80.0f)
-          quadToRelative(17.0f, 0.0f, 28.5f, 11.5f)
-          reflectiveQuadTo(760.0f, 680.0f)
-          quadToRelative(0.0f, 17.0f, -11.5f, 28.5f)
-          reflectiveQuadTo(720.0f, 720.0f)
-          horizontalLineToRelative(-80.0f)
-          close()
-          moveTo(640.0f, 560.0f)
-          quadToRelative(-17.0f, 0.0f, -28.5f, -11.5f)
-          reflectiveQuadTo(600.0f, 520.0f)
-          quadToRelative(0.0f, -17.0f, 11.5f, -28.5f)
-          reflectiveQuadTo(640.0f, 480.0f)
-          horizontalLineToRelative(160.0f)
-          quadToRelative(17.0f, 0.0f, 28.5f, 11.5f)
-          reflectiveQuadTo(840.0f, 520.0f)
-          quadToRelative(0.0f, 17.0f, -11.5f, 28.5f)
-          reflectiveQuadTo(800.0f, 560.0f)
-          lineTo(640.0f, 560.0f)
-          close()
-          moveTo(640.0f, 400.0f)
-          quadToRelative(-17.0f, 0.0f, -28.5f, -11.5f)
-          reflectiveQuadTo(600.0f, 360.0f)
-          quadToRelative(0.0f, -17.0f, 11.5f, -28.5f)
-          reflectiveQuadTo(640.0f, 320.0f)
-          horizontalLineToRelative(200.0f)
-          quadToRelative(17.0f, 0.0f, 28.5f, 11.5f)
-          reflectiveQuadTo(880.0f, 360.0f)
-          quadToRelative(0.0f, 17.0f, -11.5f, 28.5f)
-          reflectiveQuadTo(840.0f, 400.0f)
-          lineTo(640.0f, 400.0f)
-          close()
-        }
-      }
-        .build()
-      return _DeleteSweep!!
-    }
-
-  private var _DeleteSweep: ImageVector? = null
-
   val OpenInNew: ImageVector
     get() {
       if (_OpenInNew != null) {
@@ -825,4 +734,144 @@ object Icons {
     }
 
   private var _OpenInNew: ImageVector? = null
+
+  val Restart: ImageVector
+    get() {
+      if (_Restart != null) {
+        return _Restart!!
+      }
+      _Restart = ImageVector.Builder(
+        name = "Rounded.Restart",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 960f,
+        viewportHeight = 960f
+      ).apply {
+        path(fill = SolidColor(Color(0xFFE3E3E3))) {
+          moveTo(393f, 828f)
+          quadToRelative(-103f, -29f, -168f, -113.5f)
+          reflectiveQuadTo(160f, 520f)
+          quadToRelative(0f, -57f, 19f, -108.5f)
+          reflectiveQuadToRelative(54f, -94.5f)
+          quadToRelative(11f, -12f, 27f, -12.5f)
+          reflectiveQuadToRelative(29f, 12.5f)
+          quadToRelative(11f, 11f, 11.5f, 27f)
+          reflectiveQuadTo(290f, 374f)
+          quadToRelative(-24f, 31f, -37f, 68f)
+          reflectiveQuadToRelative(-13f, 78f)
+          quadToRelative(0f, 81f, 47.5f, 144.5f)
+          reflectiveQuadTo(410f, 751f)
+          quadToRelative(13f, 4f, 21.5f, 15f)
+          reflectiveQuadToRelative(8.5f, 24f)
+          quadToRelative(0f, 20f, -14f, 31.5f)
+          reflectiveQuadToRelative(-33f, 6.5f)
+          close()
+          moveTo(567f, 828f)
+          quadToRelative(-19f, 5f, -33f, -7f)
+          reflectiveQuadToRelative(-14f, -32f)
+          quadToRelative(0f, -12f, 8.5f, -23f)
+          reflectiveQuadToRelative(21.5f, -15f)
+          quadToRelative(75f, -24f, 122.5f, -87f)
+          reflectiveQuadTo(720f, 520f)
+          quadToRelative(0f, -100f, -70f, -170f)
+          reflectiveQuadToRelative(-170f, -70f)
+          horizontalLineToRelative(-3f)
+          lineToRelative(16f, 16f)
+          quadToRelative(11f, 11f, 11f, 28f)
+          reflectiveQuadToRelative(-11f, 28f)
+          quadToRelative(-11f, 11f, -28f, 11f)
+          reflectiveQuadToRelative(-28f, -11f)
+          lineToRelative(-84f, -84f)
+          quadToRelative(-6f, -6f, -8.5f, -13f)
+          reflectiveQuadToRelative(-2.5f, -15f)
+          quadToRelative(0f, -8f, 2.5f, -15f)
+          reflectiveQuadToRelative(8.5f, -13f)
+          lineToRelative(84f, -84f)
+          quadToRelative(11f, -11f, 28f, -11f)
+          reflectiveQuadToRelative(28f, 11f)
+          quadToRelative(11f, 11f, 11f, 28f)
+          reflectiveQuadToRelative(-11f, 28f)
+          lineToRelative(-16f, 16f)
+          horizontalLineToRelative(3f)
+          quadToRelative(134f, 0f, 227f, 93f)
+          reflectiveQuadToRelative(93f, 227f)
+          quadToRelative(0f, 109f, -65f, 194f)
+          reflectiveQuadTo(567f, 828f)
+          close()
+        }
+      }.build()
+
+      return _Restart!!
+    }
+
+  private var _Restart: ImageVector? = null
+
+  val SwapVert: ImageVector
+    get() {
+      if (_SwapVert != null) {
+        return _SwapVert!!
+      }
+      _SwapVert = ImageVector.Builder(
+        name = "Rounded.SwapVert",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 960f,
+        viewportHeight = 960f
+      ).apply {
+        path(fill = SolidColor(Color(0xFFE3E3E3))) {
+          moveTo(360f, 520f)
+          quadToRelative(-17f, 0f, -28.5f, -11.5f)
+          reflectiveQuadTo(320f, 480f)
+          verticalLineToRelative(-247f)
+          lineToRelative(-75f, 75f)
+          quadToRelative(-11f, 11f, -27.5f, 11f)
+          reflectiveQuadTo(189f, 308f)
+          quadToRelative(-12f, -12f, -12f, -28.5f)
+          reflectiveQuadToRelative(12f, -28.5f)
+          lineToRelative(143f, -143f)
+          quadToRelative(6f, -6f, 13f, -8.5f)
+          reflectiveQuadToRelative(15f, -2.5f)
+          quadToRelative(8f, 0f, 15f, 2.5f)
+          reflectiveQuadToRelative(13f, 8.5f)
+          lineToRelative(144f, 144f)
+          quadToRelative(12f, 12f, 11.5f, 28f)
+          reflectiveQuadTo(531f, 308f)
+          quadToRelative(-12f, 11f, -28f, 11.5f)
+          reflectiveQuadTo(475f, 308f)
+          lineToRelative(-75f, -75f)
+          verticalLineToRelative(247f)
+          quadToRelative(0f, 17f, -11.5f, 28.5f)
+          reflectiveQuadTo(360f, 520f)
+          close()
+          moveTo(600f, 863f)
+          quadToRelative(-8f, 0f, -15f, -2.5f)
+          reflectiveQuadToRelative(-13f, -8.5f)
+          lineTo(428f, 708f)
+          quadToRelative(-12f, -12f, -11.5f, -28f)
+          reflectiveQuadToRelative(12.5f, -28f)
+          quadToRelative(12f, -11f, 28f, -11.5f)
+          reflectiveQuadToRelative(28f, 11.5f)
+          lineToRelative(75f, 75f)
+          verticalLineToRelative(-247f)
+          quadToRelative(0f, -17f, 11.5f, -28.5f)
+          reflectiveQuadTo(600f, 440f)
+          quadToRelative(17f, 0f, 28.5f, 11.5f)
+          reflectiveQuadTo(640f, 480f)
+          verticalLineToRelative(247f)
+          lineToRelative(75f, -75f)
+          quadToRelative(11f, -11f, 27.5f, -11f)
+          reflectiveQuadToRelative(28.5f, 11f)
+          quadToRelative(12f, 12f, 12f, 28.5f)
+          reflectiveQuadTo(771f, 709f)
+          lineTo(628f, 852f)
+          quadToRelative(-6f, 6f, -13f, 8.5f)
+          reflectiveQuadTo(600f, 863f)
+          close()
+        }
+      }.build()
+
+      return _SwapVert!!
+    }
+
+  private var _SwapVert: ImageVector? = null
 }

@@ -85,6 +85,7 @@ kotlin {
     freeCompilerArgs = [
             '-opt-in=androidx.compose.animation.ExperimentalSharedTransitionApi',
             '-opt-in=androidx.compose.material3.ExperimentalMaterial3Api',
+            '-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi',
             '-opt-in=androidx.compose.ui.ExperimentalComposeUiApi',
             '-opt-in=kotlin.time.ExperimentalTime',
             '-opt-in=kotlinx.serialization.ExperimentalSerializationApi',

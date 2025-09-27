@@ -71,7 +71,7 @@ private fun PortraitGameUi(
           )
         },
         actions = {
-          AppBarActions(
+          HorizontalAppBarActions(
             showNytButton = model.mostlyComplete,
             onResetClick = { game.reset() },
             onShuffleClick = { game.shuffle() },
@@ -131,22 +131,8 @@ private fun LandscapeGameUi(
 
   Scaffold { paddingValues ->
     Row(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-      SideBar(
-        showNytButton = model.mostlyComplete,
-        onAction = { action ->
-          when (action) {
-            BottomBarAction.AboutClick -> onClickAbout()
-            BottomBarAction.ResetClick -> game.reset()
-            BottomBarAction.ShuffleClick -> game.shuffle()
-            BottomBarAction.OpenNytClick -> onOpenNyt()
-          }
-        },
-        modifier = Modifier
-          .weight(1f)
-          .fillMaxHeight(),
-      )
 
-      Spacer(modifier = Modifier.size(16.dp))
+      Spacer(modifier = Modifier.weight(1f))
 
       Grid(
         tiles = model.tiles,
@@ -158,7 +144,6 @@ private fun LandscapeGameUi(
           .wrapContentWidth()
           .zIndex(2f),
       )
-
 
       Spacer(modifier = Modifier.size(16.dp))
 
@@ -172,7 +157,14 @@ private fun LandscapeGameUi(
 
       Spacer(modifier = Modifier.size(16.dp))
 
-      Spacer(modifier = Modifier.weight(1f))
+      VerticalToolbar(
+        showNytButton = model.mostlyComplete,
+        onResetClick = { game.reset() },
+        onShuffleClick = { game.shuffle() },
+        onAboutClick = onClickAbout,
+        onOpenNytClick = onOpenNyt,
+        modifier = Modifier.padding(top = 4.dp, end = 4.dp)
+      )
     }
   }
 }

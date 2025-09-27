@@ -87,7 +87,7 @@ fun CategoryActions(
         verticalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxHeight(),
       ) {
-        for ((category, status) in categoryStatuses) {
+        for ((category, status) in categoryStatuses.entries.reversed()) {
           Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically

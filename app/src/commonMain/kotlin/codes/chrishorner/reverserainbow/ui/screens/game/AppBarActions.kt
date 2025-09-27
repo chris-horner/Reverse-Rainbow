@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AppBarRow
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
@@ -51,7 +53,12 @@ fun AppBarActions(
         tooltip = { PlainTooltip { Text(stringResource(Res.string.menu)) } },
         state = rememberTooltipState(),
       ) {
-        IconButton(onClick = { it.show() }) {
+        FilledTonalIconButton(
+          onClick = { it.show() },
+          colors = IconButtonDefaults.filledTonalIconButtonColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+          ),
+        ) {
           Icon(
             imageVector = Icons.MoreVert,
             contentDescription = stringResource(Res.string.menu),
@@ -214,7 +221,7 @@ private val ButtonEnterSpec = fadeIn(animationSpec = spring(stiffness = Spring.S
       stiffness = Spring.StiffnessMediumLow,
       dampingRatio = Spring.DampingRatioMediumBouncy,
     ),
-    initialOffsetX = { fullWidth ->  fullWidth / 2 },
+    initialOffsetX = { fullWidth -> fullWidth / 2 },
   )
 
 private val ButtonExitSpec = fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)) +

@@ -35,6 +35,7 @@ import codes.chrishorner.reverserainbow.ui.screens.about.AboutUi
 import codes.chrishorner.reverserainbow.ui.screens.error.ErrorUi
 import codes.chrishorner.reverserainbow.ui.screens.game.GameUi
 import codes.chrishorner.reverserainbow.ui.screens.loading.LoadingUi
+import kotlinx.datetime.LocalDate
 
 /**
  * Root UI of the app. MainUi is responsible for:
@@ -111,7 +112,7 @@ private enum class NavDestination {
 private sealed interface Screen {
   data object Loading : Screen
   data class Error(val type: GameLoader.FailureType) : Screen
-  data class Loaded(val game: Game) : Screen
+  data class Loaded(val date: LocalDate, val game: Game) : Screen
   data object About : Screen
 }
 
@@ -137,7 +138,7 @@ private fun deriveScreenFrom(
       is LoaderState.Success -> if (!loadingAnimationDone) {
         Screen.Loading
       } else {
-        Screen.Loaded(loaderState.game)
+        Screen.Loaded(loaderState.date, loaderState.game)
       }
     }
   }
@@ -157,6 +158,7 @@ private fun ShowScreen(
 
     is Screen.Loaded -> GameUi(
       game = screen.game,
+      date = screen.date,
       onOpenNyt = { onAction(ScreenAction.OpenNyt) },
       onClickAbout = { onAction(ScreenAction.Navigate(NavDestination.About)) }
     )

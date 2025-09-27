@@ -10,7 +10,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +24,11 @@ import codes.chrishorner.reverserainbow.Game
 import codes.chrishorner.reverserainbow.ui.LayoutOrientation
 import codes.chrishorner.reverserainbow.ui.LocalLayoutOrientation
 import codes.chrishorner.reverserainbow.ui.util.CappedWidthContainer
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.format
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
 
 /**
  * Shows the Connections grid, the category assignment buttons, as well as the action bar. Uses
@@ -28,33 +37,53 @@ import codes.chrishorner.reverserainbow.ui.util.CappedWidthContainer
 @Composable
 fun GameUi(
   game: Game,
+  date: LocalDate,
   onOpenNyt: () -> Unit,
   onClickAbout: () -> Unit,
 ) {
   val orientation = LocalLayoutOrientation.current
 
   when (orientation) {
-    LayoutOrientation.Portrait -> PortraitGameUi(game, onOpenNyt, onClickAbout)
+    LayoutOrientation.Portrait -> PortraitGameUi(game, date, onOpenNyt, onClickAbout)
     LayoutOrientation.Landscape -> LandscapeGameUi(game, onOpenNyt, onClickAbout)
   }
 }
 
 @Composable
-private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -> Unit) {
+private fun PortraitGameUi(
+  game: Game,
+  date: LocalDate,
+  onOpenNyt: () -> Unit,
+  onClickAbout: () -> Unit,
+) {
   val model = game.model.value
 
   Scaffold(
-    bottomBar = {
-      BottomBar(
-        showNytButton = model.mostlyComplete,
-        onAction = { action ->
-          when (action) {
-            BottomBarAction.AboutClick -> onClickAbout()
-            BottomBarAction.ResetClick -> game.reset()
-            BottomBarAction.ShuffleClick -> game.shuffle()
-            BottomBarAction.OpenNytClick -> onOpenNyt()
-          }
+    topBar = {
+      TopAppBar(
+        title = {
+          Text(
+            date.format(
+              LocalDate.Format {
+                monthName(MonthNames.ENGLISH_FULL); char(' '); day(Padding.NONE)
+              }
+            )
+          )
         },
+        actions = {
+          AppBarActions(
+            showNytButton = model.mostlyComplete,
+            onResetClick = { game.reset() },
+            onShuffleClick = { game.shuffle() },
+            onAboutClick = onClickAbout,
+            onOpenNytClick = onOpenNyt,
+          )
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+          containerColor = MaterialTheme.colorScheme.background,
+          titleContentColor = MaterialTheme.colorScheme.onBackground,
+          actionIconContentColor = MaterialTheme.colorScheme.onBackground,
+        )
       )
     },
   ) { paddingValues ->
@@ -93,7 +122,11 @@ private fun PortraitGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -
 }
 
 @Composable
-private fun LandscapeGameUi(game: Game, onOpenNyt: () -> Unit, onClickAbout: () -> Unit) {
+private fun LandscapeGameUi(
+  game: Game,
+  onOpenNyt: () -> Unit,
+  onClickAbout: () -> Unit
+) {
   val model = game.model.value
 
   Scaffold { paddingValues ->

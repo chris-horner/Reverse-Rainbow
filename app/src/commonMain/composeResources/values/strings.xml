@@ -5,6 +5,7 @@
   <string name="make_rainbow_button">Make a rainbow</string>
   <string name="reverse_rainbow_button">Reverse the rainbow</string>
   <string name="open_nyt">Open NYT</string>
+  <string name="menu">Menu</string>
   <string name="about">About</string>
   <string name="reset">Reset</string>
   <string name="shuffle">Shuffle</string>

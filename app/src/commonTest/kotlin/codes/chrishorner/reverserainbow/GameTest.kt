@@ -553,6 +553,26 @@ class GameTest {
     assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.bulkSelectable).isFalse()
   }
 
+  @Test
+  fun `one category left unassigned has complete action`() {
+    val tiles = assignedTiles
+      .mapIndexed { index, tile ->
+        if (index in 0..3) {
+          tile.copy(category = null)
+        } else {
+          tile
+        }
+      }
+      .toImmutableList()
+
+    val game = Game(tiles)
+    val categoryStatuses = game.model.value.categoryStatuses
+    assertThat(categoryStatuses[Category.YELLOW]!!.action).isEqualTo(CategoryAction.CLEAR)
+    assertThat(categoryStatuses[Category.GREEN]!!.action).isEqualTo(CategoryAction.CLEAR)
+    assertThat(categoryStatuses[Category.BLUE]!!.action).isEqualTo(CategoryAction.CLEAR)
+    assertThat(categoryStatuses[Category.PURPLE]!!.action).isEqualTo(CategoryAction.FINISH)
+  }
+
   private val Game.tiles
     get() = model.value.tiles
 

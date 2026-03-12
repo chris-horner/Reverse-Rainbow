@@ -84,6 +84,7 @@ class Game(tiles: ImmutableList<Tile>) {
       CategoryAction.ASSIGN -> assignTiles(category)
       CategoryAction.CLEAR -> clearTiles(category)
       CategoryAction.SWAP -> swapSelectedToCategory(category)
+      CategoryAction.FINISH -> assignAllUnassigned(category)
     }
 
     tiles.replaceAll { it.copy(selected = false) }
@@ -193,6 +194,12 @@ class Game(tiles: ImmutableList<Tile>) {
     }
   }
 
+  private fun assignAllUnassigned(category: Category) {
+    tiles.filter { it.category == null }.forEach { tile ->
+      tiles[tile.currentPosition] = tile.copy(category = category)
+    }
+  }
+
   private fun swapTiles(tile1: Tile, tile2: Tile) {
     if (tile1 == tile2) return
 
@@ -273,6 +280,10 @@ class Game(tiles: ImmutableList<Tile>) {
     val equalNumberFromOtherCategorySelected = otherCategorySelectionCount == 1 &&
       selectedTiles.count { it.category == category } == selectedTiles.count { it.category == otherCategoriesSelected.single() }
 
+    val allOtherCategoriesCompletelyAssigned = (Category.entries - category)
+      .map { otherCategory -> tiles.count { it.category == otherCategory } }
+      .all { tileCount -> tileCount == 4 }
+
     val action = when {
       selectionCount > 0 -> when {
         tilesInThisCategoryCount + selectionCount <= 4 && !thisCategorySelected -> CategoryAction.ASSIGN
@@ -282,7 +293,10 @@ class Game(tiles: ImmutableList<Tile>) {
         else -> CategoryAction.DISABLED
       }
 
+      tilesInThisCategoryCount < 4 && allOtherCategoriesCompletelyAssigned -> CategoryAction.FINISH
+
       tiles.any { it.category == category } -> CategoryAction.CLEAR
+
       else -> CategoryAction.DISABLED
     }
 

@@ -43,12 +43,16 @@ enum class Category {
  *
  * If 4 YELLOW tiles were selected and 4 other tiles on the board were assigned to GREEN, then the
  * `CategoryAction` for GREEN would be `SWAP`.
+ *
+ * If all tiles in all categories other than PURPLE were assigned, then PURPLE `CategoryAction`
+ * would be `FINISH`.
  */
 enum class CategoryAction {
   DISABLED,
   ASSIGN,
   CLEAR,
   SWAP,
+  FINISH,
 }
 
 data class CategoryStatus(

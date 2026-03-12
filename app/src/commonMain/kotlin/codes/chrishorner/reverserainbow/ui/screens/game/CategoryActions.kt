@@ -143,15 +143,16 @@ private fun CategoryAction(
       )
   ) {
 
-    if (action == CategoryAction.CLEAR) {
+    val iconVector = when (action) {
+      CategoryAction.CLEAR -> Icons.Clear
+      CategoryAction.SWAP -> Icons.SwapVert
+      CategoryAction.FINISH -> Icons.Check
+      else -> null
+    }
+
+    if (iconVector != null) {
       Icon(
-        imageVector = Icons.Clear,
-        contentDescription = null,
-        tint = colors.icon,
-      )
-    } else if (action == CategoryAction.SWAP) {
-      Icon(
-        imageVector = Icons.SwapVert,
+        imageVector = iconVector,
         contentDescription = null,
         tint = colors.icon,
       )

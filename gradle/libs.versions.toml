@@ -1,17 +1,18 @@
 [versions]
-activityCompose = "1.11.0"
-agp = "8.13.0"
+activityCompose = "1.13.0"
+agp = "8.13.2"
 assertk = "0.28.1"
 buildKonfig = "0.17.1"
-coil = "3.3.0"
-composeMultiplatform = "1.10.0-alpha03"
-continuousCorners = "1.0.5"
-kotlin = "2.2.21"
+coil = "3.4.0"
+composeMaterial3 = "1.11.0-alpha04"
+composeMultiplatform = "1.11.0-alpha04"
+continuousCorners = "1.0.6"
+kotlin = "2.3.10"
 kotlinxCollections = "0.4.0"
 kotlinxCoroutines = "1.10.2"
 kotlinxDatetime = "0.7.1"
-ktor = "3.3.1"
-lifecycle = "2.9.5"
+ktor = "3.4.1"
+lifecycle = "2.9.6"
 logging = "2.1.0"
 playPublisher = "3.12.1"
 
@@ -23,6 +24,7 @@ coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref 
 coil-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }
 coil-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
 compose-backhandler = { group = "org.jetbrains.compose.ui", name = "ui-backhandler", version.ref = "composeMultiplatform" }
+compose-material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "composeMaterial3" }
 continuous-corners = { group = "com.adamglin", name = "compose-continuous-rounded-corner-shape", version.ref = "continuousCorners" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollections" }

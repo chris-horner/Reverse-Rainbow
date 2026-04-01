@@ -290,6 +290,67 @@ class GameTest {
   }
 
   @Test
+  fun `row drag swaps positions and categories between rows`() {
+    val game = Game(assignedTiles)
+
+    // Drag from green row (8-11) over yellow row (12-15).
+    game.onRowDragOver(
+      source = assignedTiles[8],
+      destinationRowTile = assignedTiles[12],
+    )
+
+    // Green tiles should now be in yellow row with yellow category.
+    for (i in 12..15) {
+      assertThat(game.tiles[i].initialPosition).isEqualTo(i - 4)
+      assertThat(game.tiles[i].category).isEqualTo(Category.YELLOW)
+    }
+
+    // Yellow tiles should now be in green row with green category.
+    for (i in 8..11) {
+      assertThat(game.tiles[i].initialPosition).isEqualTo(i + 4)
+      assertThat(game.tiles[i].category).isEqualTo(Category.GREEN)
+    }
+  }
+
+  @Test
+  fun `row drag with null tiles preserves null categories`() {
+    // Green row has 2 assigned + 2 null, yellow row fully assigned.
+    val mixedTiles = assignedTiles
+      .mapIndexed { index, tile ->
+        if (index in 10..11) tile.copy(category = null) else tile
+      }
+      .toImmutableList()
+
+    val game = Game(mixedTiles)
+
+    game.onRowDragOver(
+      source = mixedTiles[8],
+      destinationRowTile = mixedTiles[12],
+    )
+
+    // The two green tiles become yellow, two null tiles stay null.
+    val destRow = (12..15).map { game.tiles[it] }
+    assertThat(destRow.count { it.category == Category.YELLOW }).isEqualTo(2)
+    assertThat(destRow.count { it.category == null }).isEqualTo(2)
+
+    // The four yellow tiles become green.
+    val sourceRow = (8..11).map { game.tiles[it] }
+    assertThat(sourceRow.count { it.category == Category.GREEN }).isEqualTo(4)
+  }
+
+  @Test
+  fun `row drag with null source category does nothing`() {
+    val game = Game(unassignedTiles)
+
+    game.onRowDragOver(
+      source = unassignedTiles[0],
+      destinationRowTile = unassignedTiles[4],
+    )
+
+    assertThat(game.tiles).isEqualTo(unassignedTiles)
+  }
+
+  @Test
   fun `reset moves tiles to their original positions and clears categories`() {
     val game = Game(unassignedTiles)
 

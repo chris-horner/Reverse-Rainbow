@@ -31,9 +31,10 @@ fun Grid(
   onSelect: (Tile) -> Unit,
   onLongSelect: (Tile) -> Unit,
   onDragOver: (source: Tile, destination: Tile) -> Unit,
+  onRowDragOver: (source: Tile, destinationRowTile: Tile) -> Unit,
   modifier: Modifier,
 ) = with(LocalAnimatedContentScope.current) {
-  val tileDragStates = rememberTileDragStates(tiles, onDragOver)
+  val tileDragStates = rememberTileDragStates(tiles, onDragOver, onRowDragOver)
 
   ConnectionsLayout(
     modifier = modifier

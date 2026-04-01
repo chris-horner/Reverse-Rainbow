@@ -12,8 +12,6 @@ class TileColors(
   val foreground: Color,
   val dragTileBorder: Color,
   val dragSlotBorder: Color,
-  val swapCurrentForeground: Color,
-  val swapProposedForeground: Color,
   val hoverSlotBorder: Color,
 )
 
@@ -50,7 +48,6 @@ fun getColorsFor(tile: Tile, dragState: TileDragState): TileColors {
     }
   }
 
-  val hoveredTile = (dragStatus as? DragStatus.Dragged)?.hoveredTile
   val foreground = if (tile.selected && dragStatus !is DragStatus.Dragged) {
     primaryColor
   } else {
@@ -65,8 +62,8 @@ fun getColorsFor(tile: Tile, dragState: TileDragState): TileColors {
     },
     foreground = foreground,
     dragTileBorder = when {
-      dragStatus is DragStatus.Dragged && tile.category != null -> foreground.copy(alpha = 0.3f)
-      dragStatus is DragStatus.Dragged -> foreground.copy(alpha = 0.1f)
+      (dragStatus is DragStatus.Dragged || dragStatus is DragStatus.Companion) && tile.category != null -> foreground.copy(alpha = 0.3f)
+      (dragStatus is DragStatus.Dragged || dragStatus is DragStatus.Companion) -> foreground.copy(alpha = 0.1f)
       else -> Color.Transparent
     },
     dragSlotBorder = if (dragStatus is DragStatus.Dragged) {
@@ -74,13 +71,7 @@ fun getColorsFor(tile: Tile, dragState: TileDragState): TileColors {
     } else {
       Color.Transparent
     },
-    swapCurrentForeground = getSwapTextColorFor(tile.category),
-    swapProposedForeground = if (hoveredTile != null) {
-      getSwapTextColorFor(hoveredTile.category)
-    } else {
-      Color.Transparent
-    },
-    hoverSlotBorder = if (dragStatus == DragStatus.Hovered) {
+    hoverSlotBorder = if (dragStatus == DragStatus.Hovered || dragStatus == DragStatus.RowHovered) {
       getSlotBorderColorFor(tile.category)
     } else {
       Color.Transparent
@@ -95,13 +86,4 @@ private fun getSlotBorderColorFor(category: Category?): Color = when (category) 
   Category.BLUE -> MaterialTheme.plannerColors.blueSurface
   Category.PURPLE -> MaterialTheme.plannerColors.purpleSurface
   null -> MaterialTheme.colorScheme.secondary
-}
-
-@Composable
-private fun getSwapTextColorFor(category: Category?): Color = when (category) {
-  Category.YELLOW -> MaterialTheme.plannerColors.yellowSurface
-  Category.GREEN -> MaterialTheme.plannerColors.greenSurface
-  Category.BLUE -> MaterialTheme.plannerColors.blueSurface
-  Category.PURPLE -> MaterialTheme.plannerColors.purpleSurface
-  null -> MaterialTheme.colorScheme.onBackground
 }

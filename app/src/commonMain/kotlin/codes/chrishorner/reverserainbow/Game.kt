@@ -104,6 +104,44 @@ class Game(tiles: ImmutableList<Tile>) {
     publishModelUpdate()
   }
 
+  fun onRowDragOver(source: Tile, destinationRowTile: Tile) {
+    val sourceCategory = source.category ?: return
+    val sourceRowStart = (source.currentPosition / 4) * 4
+    val destRowStart = (destinationRowTile.currentPosition / 4) * 4
+    val destCategory = categoryForRowStart(destRowStart)
+
+    for (i in 0..3) {
+      val sTile = tiles[sourceRowStart + i]
+      val dTile = tiles[destRowStart + i]
+
+      val newSCat = when (sTile.category) {
+        sourceCategory -> destCategory
+        destCategory -> sourceCategory
+        else -> sTile.category
+      }
+      val newDCat = when (dTile.category) {
+        destCategory -> sourceCategory
+        sourceCategory -> destCategory
+        else -> dTile.category
+      }
+
+      tiles[sourceRowStart + i] = dTile.copy(currentPosition = sourceRowStart + i, category = newDCat)
+      tiles[destRowStart + i] = sTile.copy(currentPosition = destRowStart + i, category = newSCat)
+    }
+
+    tiles.replaceAll { it.copy(selected = false) }
+    sortGrid()
+    publishModelUpdate()
+  }
+
+  private fun categoryForRowStart(rowStart: Int): Category = when (rowStart) {
+    0 -> Category.PURPLE
+    4 -> Category.BLUE
+    8 -> Category.GREEN
+    12 -> Category.YELLOW
+    else -> error("Invalid row start: $rowStart")
+  }
+
   fun reset() {
     tiles.replaceAll { tile ->
       tile.copy(

@@ -100,6 +100,7 @@ private fun PortraitGameUi(
           onSelect = game::select,
           onLongSelect = game::longSelect,
           onDragOver = game::onDragOver,
+          onRowDragOver = game::onRowDragOver,
           modifier = Modifier
             .fillMaxWidth()
             .zIndex(2f),
@@ -139,6 +140,7 @@ private fun LandscapeGameUi(
         onSelect = game::select,
         onLongSelect = game::longSelect,
         onDragOver = game::onDragOver,
+        onRowDragOver = game::onRowDragOver,
         modifier = Modifier
           .fillMaxHeight()
           .wrapContentWidth()

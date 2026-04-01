@@ -6,21 +6,21 @@ import androidx.compose.animation.core.SnapSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,14 +35,12 @@ import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.zIndex
 import codes.chrishorner.reverserainbow.data.Tile
-import codes.chrishorner.reverserainbow.ui.Icons
 import codes.chrishorner.reverserainbow.ui.LocalSharedTransitionScope
 import codes.chrishorner.reverserainbow.ui.theme.TileShape
 import coil3.compose.AsyncImage
@@ -80,19 +78,40 @@ fun Tile(
     targetValue = tileColors.dragSlotBorder,
     animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
-  val swapCurrentForegroundColor by animateColorAsState(
-    targetValue = tileColors.swapCurrentForeground,
-    animationSpec = spring(stiffness = Spring.StiffnessHigh)
-  )
-  val swapProposedForegroundColor by animateColorAsState(
-    targetValue = tileColors.swapProposedForeground,
-    animationSpec = spring(stiffness = Spring.StiffnessHigh)
+
+  // Track whether this tile was showing a preview and its position just changed (committed swap).
+  // When true, the tile is already at its destination — snap instead of animating.
+  val previewOffsetValue = IntOffset(dragState.previewOffset.longValue)
+  val prevPosition = remember { mutableIntStateOf(tile.currentPosition) }
+  val prevHadPreview = remember { mutableStateOf(false) }
+  val positionChanged = tile.currentPosition != prevPosition.intValue
+  val shouldSnap = positionChanged && prevHadPreview.value
+
+  SideEffect {
+    prevPosition.intValue = tile.currentPosition
+    prevHadPreview.value = previewOffsetValue != IntOffset.Zero
+  }
+
+  val animatedPreviewOffset by animateIntOffsetAsState(
+    targetValue = previewOffsetValue,
+    animationSpec = when {
+      shouldSnap -> SnapSpec()
+      dragState.status is DragStatus.Companion -> SnapSpec()
+      else -> spring(
+        dampingRatio = Spring.DampingRatioLowBouncy,
+        stiffness = Spring.StiffnessMediumLow,
+      )
+    },
   )
 
-  // When a tile is being dragged, make sure it renders over the others with a grace period,
-  // allowing it to continue being on top while it animates back into position.
+  // When a tile is being dragged or is a companion, make sure it renders over the others with a
+  // grace period, allowing it to continue being on top while it animates back into position.
   val dragZOffset by animateFloatAsState(
-    targetValue = if (dragState.status is DragStatus.Dragged) 100f else 0f,
+    targetValue = when (dragState.status) {
+      is DragStatus.Dragged -> 100f
+      is DragStatus.Companion -> 50f
+      else -> 0f
+    },
     animationSpec = SnapSpec(delay = 100),
   )
 
@@ -100,6 +119,8 @@ fun Tile(
     targetValue = when (dragState.status) {
       is DragStatus.Dragged -> 0.7f
       is DragStatus.Hovered -> 0.92f
+      is DragStatus.Companion -> 0.92f
+      is DragStatus.RowHovered -> 0.92f
       DragStatus.None -> 1f
     },
     animationSpec = spring(
@@ -113,17 +134,6 @@ fun Tile(
       // Make sure tiles animating to the top, or being dragged render over others.
       .zIndex(4f - tile.currentPosition + dragZOffset)
   ) {
-    val proposedSwapTile = (dragState.status as? DragStatus.Dragged)?.hoveredTile
-
-    if (proposedSwapTile != null && proposedSwapTile.currentPosition != tile.currentPosition) {
-      SwapContent(
-        current = tile.content,
-        proposed = proposedSwapTile.content,
-        currentColor = swapCurrentForegroundColor,
-        proposedColor = swapProposedForegroundColor,
-      )
-    }
-
     Box(
       contentAlignment = Alignment.Center,
       modifier = Modifier
@@ -134,17 +144,18 @@ fun Tile(
         .animateBounds(
           lookaheadScope = this@with,
           boundsTransform = { _, _ ->
-            if (dragState.status !is DragStatus.Dragged) {
-              spring(
+            when {
+              dragState.status is DragStatus.Dragged -> SnapSpec()
+              shouldSnap -> SnapSpec()
+              else -> spring(
                 dampingRatio = Spring.DampingRatioLowBouncy,
                 stiffness = Spring.StiffnessMediumLow,
                 visibilityThreshold = Rect.VisibilityThreshold,
               )
-            } else {
-              SnapSpec()
             }
           }
         )
+        .offset { animatedPreviewOffset }
         .dashedBorder(color = { hoverSlotBorderColor })
         .padding(3.dp)
         .graphicsLayer {
@@ -177,49 +188,6 @@ private fun TileContent(
   when (content) {
     is Tile.Content.Image -> TileImage(content, color)
     is Tile.Content.Text -> TileText(text = content.body, color = color)
-  }
-}
-
-/**
- * Shown "under" the original position of a tile as it's being dragged. Displays a preview of the
- * swap that will occur if the dragged tile is dropped.
- */
-@Composable
-private fun SwapContent(
-  current: Tile.Content,
-  proposed: Tile.Content,
-  currentColor: Color,
-  proposedColor: Color,
-) {
-  Column(
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(4.dp),
-    modifier = Modifier.padding(12.dp),
-  ) {
-    SwapEntry(current, currentColor)
-    Icon(Icons.Shuffle, contentDescription = null, modifier = Modifier.size(16.dp))
-    SwapEntry(proposed, proposedColor)
-  }
-}
-
-@Composable
-private fun SwapEntry(content: Tile.Content, color: Color) {
-  when (content) {
-    is Tile.Content.Image -> {
-      TileImage(content, color, size = 24.dp)
-    }
-
-    is Tile.Content.Text -> {
-      Text(
-        text = content.body,
-        style = MaterialTheme.typography.titleSmall.copy(
-          fontWeight = FontWeight.Bold,
-        ),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        color = color,
-      )
-    }
   }
 }
 

@@ -1,5 +1,6 @@
 package codes.chrishorner.reverserainbow.data
 
+import androidx.compose.runtime.Immutable
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.serialization.Serializable
@@ -8,6 +9,7 @@ import kotlinx.serialization.Serializable
  * Represents a single card on the Connections board.
  */
 @Serializable
+@Immutable
 data class Tile(
   val initialPosition: Int,
   val content: Content,
@@ -16,6 +18,7 @@ data class Tile(
   val category: Category? = null,
 ) {
   @Serializable
+  @Immutable
   sealed interface Content {
     @Serializable
     data class Text(val body: String) : Content

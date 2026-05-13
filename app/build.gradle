@@ -72,6 +72,8 @@ kotlin {
       implementation libs.ktor.client.content.negotiation
       implementation libs.ktor.serialization.kotlinx.json
       implementation libs.logging
+      implementation libs.navigationevent
+      implementation libs.navigationevent.compose
     }
 
     commonTest.dependencies {

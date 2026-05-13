@@ -31,6 +31,7 @@ class GameLoader(
   private val timeZoneProvider: () -> TimeZone = { TimeZone.currentSystemDefault() },
 ) {
 
+  @Stable
   sealed interface LoaderState {
     data object Loading : LoaderState
     data class Failure(val type: FailureType) : LoaderState

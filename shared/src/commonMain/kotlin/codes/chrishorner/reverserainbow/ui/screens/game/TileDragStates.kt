@@ -1,6 +1,10 @@
 package codes.chrishorner.reverserainbow.ui.screens.game
 
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.drag
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -12,7 +16,9 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.geometry.isUnspecified
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.fastFirst
 import androidx.compose.ui.util.fastForEach
@@ -45,8 +51,8 @@ class TileDragStates(
   }
 
   suspend fun detectDragGestures(scope: PointerInputScope) {
-    scope.detectDragGestures(
-      onDragStart = { position -> onDragStart(position) },
+    scope.betterDetectDragGestures(
+      onDragStart = ::onDragStart,
       onDrag = { _, dragAmount -> onDrag(dragAmount) },
       onDragEnd = { onDragFinish(cancelled = false) },
       onDragCancel = { onDragFinish(cancelled = true) },
@@ -119,6 +125,42 @@ class TileDragStates(
     }
 
     dragPosition = Offset.Unspecified
+  }
+}
+
+/**
+ * The default [detectDragGestures] provides conditional slop handling depending on if the gesture
+ * came from a touch or a mouse. This works well for touch events which provides an 8dp touch slop,
+ * but for mice it applies a 2px handwriting slop which leads to mouse clicks translating to
+ * accidental drag events.
+ *
+ * So to make the tiles feel nice to interact with via a mouse, this function always uses
+ * [awaitTouchSlopOrCancellation] regardless of the input type.
+ */
+private suspend fun PointerInputScope.betterDetectDragGestures(
+  onDragStart: (Offset) -> Unit,
+  onDrag: (PointerInputChange, Offset) -> Unit,
+  onDragEnd: () -> Unit,
+  onDragCancel: () -> Unit,
+) {
+  awaitEachGesture {
+    val down = awaitFirstDown(requireUnconsumed = false)
+    var slopOffset = Offset.Zero
+
+    val drag = awaitTouchSlopOrCancellation(down.id) { change, overSlop ->
+      change.consume()
+      slopOffset = overSlop
+    } ?: return@awaitEachGesture
+
+    onDragStart(drag.position)
+    onDrag(drag, slopOffset)
+
+    val completed = drag(drag.id) { change ->
+      onDrag(change, change.positionChange())
+      change.consume()
+    }
+
+    if (completed) onDragEnd() else onDragCancel()
   }
 }
 

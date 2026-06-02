@@ -1,0 +1,103 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.kotlin.compose)
+  alias(libs.plugins.playpublisher)
+}
+
+def versionMajor = project.findProperty('app.versionMajor').toInteger()
+def versionMinor = project.findProperty('app.versionMinor').toInteger()
+def versionPatch = project.findProperty('app.versionPatch').toInteger()
+
+android {
+  namespace 'codes.chrishorner.reverserainbow'
+  compileSdk = 36
+
+  defaultConfig {
+    applicationId "codes.chrishorner.reverserainbow"
+    minSdk 31
+    targetSdk 36
+    versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch
+    versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+  }
+
+  signingConfigs {
+    debug {
+      storeFile file('keys/debug.keystore')
+      storePassword 'android'
+      keyAlias 'androiddebugkey'
+    }
+
+    release {
+      def uploadKey = file('keys/upload.keystore')
+      storeFile uploadKey.exists() ? uploadKey : file('keys/debug.keystore')
+      storePassword System.getenv("connections_planner_password") ?: 'android'
+      keyAlias System.getenv("connections_planner_alias") ?: 'androiddebugkey'
+      keyPassword System.getenv("connections_planner_password") ?: 'android'
+    }
+  }
+
+  buildTypes {
+    debug {
+      signingConfig signingConfigs.debug
+    }
+
+    release {
+      minifyEnabled true
+      shrinkResources true
+      signingConfig signingConfigs.release
+      proguardFiles file('shrinker_rules.pro')
+    }
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+
+  buildFeatures {
+    compose true
+    buildConfig true
+  }
+
+  packaging {
+    resources {
+      excludes += [
+              '**/*.kotlin_metadata',
+              'META-INF/*.kotlin_module',
+              'META-INF/*.properties',
+              '/*.properties',
+      ]
+    }
+  }
+
+  bundle {
+    language {
+      enableSplit = false // We currently only have one language.
+    }
+  }
+
+  testOptions {
+    unitTests {
+      returnDefaultValues = true
+    }
+  }
+}
+
+kotlin {
+  compilerOptions {
+    jvmTarget.set(JvmTarget.JVM_17)
+  }
+}
+
+dependencies {
+  implementation project(':shared')
+  implementation libs.androidx.activity.compose
+}
+
+play {
+  serviceAccountCredentials = file('keys/play_access.json')
+  defaultToAppBundles = true
+  resolutionStrategy = com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE
+}

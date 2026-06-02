@@ -1,0 +1,44 @@
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+
+plugins {
+  alias(libs.plugins.compose.multiplatform)
+  alias(libs.plugins.kotlin.compose)
+  alias(libs.plugins.kotlin.multiplatform)
+}
+
+kotlin {
+  wasmJs {
+    moduleName = "app"
+    browser {
+      def rootDirPath = project.rootDir.path
+      def projectDirPath = project.projectDir.path
+      commonWebpackConfig {
+        outputFileName = "app.js"
+
+        if (devServer == null) {
+          devServer = new KotlinWebpackConfig.DevServer()
+        }
+
+        if (devServer.static == null) {
+          devServer.static = []
+        }
+
+        devServer.static.add(rootDirPath)
+        devServer.static.add(projectDirPath)
+      }
+    }
+    binaries.executable()
+  }
+
+  sourceSets {
+    wasmJsMain.dependencies {
+      implementation project(':shared')
+    }
+  }
+
+  compilerOptions {
+    freeCompilerArgs = [
+            '-opt-in=androidx.compose.ui.ExperimentalComposeUiApi',
+    ]
+  }
+}

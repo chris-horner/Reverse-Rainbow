@@ -25,4 +25,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ReverseRainbow"
-include ':app'
+include ':shared'
+include ':androidApp'
+include ':webApp'

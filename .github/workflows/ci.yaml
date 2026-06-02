@@ -19,17 +19,17 @@ jobs:
           java-version: 17
 
       - name: Run tests
-        run: bash ./gradlew testDebugUnitTest
+        run: bash ./gradlew :shared:jvmTest
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
           name: test-results
-          path: app/build/test-results/testDebugUnitTest/TEST-*.xml
+          path: shared/build/test-results/jvmTest/TEST-*.xml
 
       - name: Build Android app
-        run: bash ./gradlew assembleDebug
+        run: bash ./gradlew :androidApp:assembleDebug
 
       - name: Build wasmJs app
-        run: bash ./gradlew wasmJsBrowserDistribution
+        run: bash ./gradlew :webApp:wasmJsBrowserDistribution

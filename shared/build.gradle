@@ -1,0 +1,99 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+plugins {
+  alias(libs.plugins.kotlin.multiplatform)
+  alias(libs.plugins.android.kotlin.multiplatform.library)
+  alias(libs.plugins.build.konfig)
+  alias(libs.plugins.compose.multiplatform)
+  alias(libs.plugins.kotlin.compose)
+  alias(libs.plugins.kotlin.serialization)
+}
+
+def versionMajor = project.findProperty('app.versionMajor').toInteger()
+def versionMinor = project.findProperty('app.versionMinor').toInteger()
+def versionPatch = project.findProperty('app.versionPatch').toInteger()
+
+kotlin {
+  android {
+    namespace = 'codes.chrishorner.reverserainbow.shared'
+    compileSdk { version = release(36) }
+    minSdk = 31
+    androidResources.enable = true
+    compilerOptions {
+      jvmTarget.set(JvmTarget.JVM_17)
+    }
+  }
+
+  jvm {
+    compilerOptions {
+      jvmTarget.set(JvmTarget.JVM_17)
+    }
+  }
+
+  wasmJs {
+    browser()
+  }
+
+  sourceSets {
+    androidMain.dependencies {
+      implementation libs.ktor.client.okhttp
+    }
+
+    commonMain.dependencies {
+      api compose.runtime
+      api compose.foundation
+      api compose.material3
+      api compose.ui
+      api compose.components.resources
+      implementation compose.components.uiToolingPreview
+
+      api libs.androidx.lifecycle.savedstate
+      api libs.kotlinx.collections.immutable
+      api libs.kotlinx.datetime
+      api libs.logging
+
+      implementation libs.coil.compose
+      implementation libs.coil.ktor
+      implementation libs.coil.svg
+      implementation libs.compose.backhandler
+      implementation libs.compose.material3
+      implementation libs.continuous.corners
+      implementation libs.ktor.client.core
+      implementation libs.ktor.client.content.negotiation
+      implementation libs.ktor.serialization.kotlinx.json
+      implementation libs.navigationevent
+      implementation libs.navigationevent.compose
+    }
+
+    commonTest.dependencies {
+      implementation libs.assertk
+      implementation libs.kotlin.test
+      implementation libs.kotlinx.coroutines.test
+      implementation libs.ktor.client.mock
+    }
+  }
+
+  compilerOptions {
+    freeCompilerArgs = [
+            '-opt-in=androidx.compose.animation.ExperimentalSharedTransitionApi',
+            '-opt-in=androidx.compose.material3.ExperimentalMaterial3Api',
+            '-opt-in=androidx.compose.material3.ExperimentalMaterial3ExpressiveApi',
+            '-opt-in=androidx.compose.ui.ExperimentalComposeUiApi',
+            '-opt-in=kotlin.time.ExperimentalTime',
+            '-opt-in=kotlinx.serialization.ExperimentalSerializationApi',
+    ]
+  }
+}
+
+compose.resources {
+  packageOfResClass = 'codes.chrishorner.reverserainbow.resources'
+  publicResClass = true
+}
+
+buildkonfig {
+  packageName = 'codes.chrishorner.reverserainbow'
+
+  defaultConfigs {
+    buildConfigField 'STRING', 'versionName', versionMajor + '.' + versionMinor + '.' + versionPatch
+  }
+}

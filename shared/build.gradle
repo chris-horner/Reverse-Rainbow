@@ -36,6 +36,7 @@ kotlin {
 
   sourceSets {
     androidMain.dependencies {
+      implementation libs.compose.ui.tooling
       implementation libs.ktor.client.okhttp
     }
 
@@ -45,7 +46,6 @@ kotlin {
       api compose.material3
       api compose.ui
       api compose.components.resources
-      implementation compose.components.uiToolingPreview
 
       api libs.androidx.lifecycle.savedstate
       api libs.kotlinx.collections.immutable
@@ -57,6 +57,7 @@ kotlin {
       implementation libs.coil.svg
       implementation libs.compose.backhandler
       implementation libs.compose.material3
+      implementation libs.compose.ui.tooling.preview
       implementation libs.continuous.corners
       implementation libs.ktor.client.core
       implementation libs.ktor.client.content.negotiation

@@ -107,11 +107,13 @@ private fun PortraitGameUi(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        CategoryActions(
-          categoryStatuses = model.categoryStatuses,
+        CategoryActionsBar(
+          categoryActions = model.categoryActions,
+          expandedCategory = model.expandedCategory,
           boardComplete = model.allTilesAssigned,
           onCategoryClick = { category -> game.applyCategoryAction(category) },
-          onCategorySelect = { category -> game.selectAll(category) },
+          onCategoryClear = { category -> game.clearAll(category) },
+          onCollapseCategories = { game.collapseCategories() },
           modifier = Modifier.zIndex(1f),
         )
 
@@ -147,11 +149,13 @@ private fun LandscapeGameUi(
 
       Spacer(modifier = Modifier.size(16.dp))
 
-      CategoryActions(
-        categoryStatuses = model.categoryStatuses,
+      CategoryActionsBar(
+        categoryActions = model.categoryActions,
+        expandedCategory = model.expandedCategory,
         boardComplete = model.allTilesAssigned,
         onCategoryClick = { category -> game.applyCategoryAction(category) },
-        onCategorySelect = { category -> game.selectAll(category) },
+        onCategoryClear = { category -> game.clearAll(category) },
+        onCollapseCategories = { game.collapseCategories() },
         modifier = Modifier.zIndex(1f),
       )
 

@@ -100,14 +100,14 @@ class GameTest {
 
   @Test
   fun `selecting all in category replaces selection with only that category`() {
-    val oneYellowTileSelected = assignedTiles
+    val tiles = assignedTiles
       .mapIndexed { index, tile ->
         tile.copy(selected = index == 0)
       }
       .toImmutableList()
 
-    val game = Game(oneYellowTileSelected)
-    game.selectAll(Category.GREEN)
+    val game = Game(tiles)
+    game.longSelect(tiles.first { it.category == Category.GREEN})
 
     val selectedTiles = game.tiles.filter { it.selected }
     assertThat(selectedTiles).hasSize(4)
@@ -116,14 +116,14 @@ class GameTest {
 
   @Test
   fun `selecting all in already selected category deselects them`() {
-    val allGreenSelectedTiles = assignedTiles
+    val allBlueSelectedTiles = assignedTiles
       .mapIndexed { index, tile ->
         tile.copy(selected = index in 4..7)
       }
       .toImmutableList()
 
-    val game = Game(allGreenSelectedTiles)
-    game.selectAll(Category.BLUE)
+    val game = Game(allBlueSelectedTiles)
+    game.longSelect(allBlueSelectedTiles.first { it.category == Category.BLUE })
 
     assertThat(game.tiles.none { it.selected }).isTrue()
   }
@@ -211,7 +211,8 @@ class GameTest {
   @Test
   fun `clearing a category clears categorized tiles`() {
     val game = Game(assignedTiles)
-    assertThat(game.model.value.categoryStatuses[Category.GREEN]!!.action)
+    game.longSelect(assignedTiles.first { it.category == Category.GREEN} )
+    assertThat(game.model.value.categoryActions[Category.GREEN])
       .isEqualTo(CategoryAction.CLEAR)
 
     game.applyCategoryAction(Category.GREEN)
@@ -229,10 +230,10 @@ class GameTest {
     val game = Game(assignedTiles)
     game.select(assignedTiles[0])
     game.select(assignedTiles[4])
-    assertThat(game.model.value.categoryStatuses[Category.PURPLE]!!.action)
-      .isEqualTo(CategoryAction.SWAP)
-    assertThat(game.model.value.categoryStatuses[Category.BLUE]!!.action)
-      .isEqualTo(CategoryAction.SWAP)
+    assertThat(game.model.value.categoryActions[Category.PURPLE])
+      .isEqualTo(CategoryAction.SWAP_SELECTED)
+    assertThat(game.model.value.categoryActions[Category.BLUE])
+      .isEqualTo(CategoryAction.SWAP_SELECTED)
 
     game.applyCategoryAction(Category.PURPLE)
 
@@ -250,9 +251,9 @@ class GameTest {
   @Test
   fun `category swap swaps completely selected category`() {
     val game = Game(assignedTiles)
-    game.selectAll(Category.YELLOW)
-    assertThat(game.model.value.categoryStatuses[Category.GREEN]!!.action)
-      .isEqualTo(CategoryAction.SWAP)
+    game.longSelect(assignedTiles.first { it.category == Category.YELLOW })
+    assertThat(game.model.value.categoryActions[Category.GREEN])
+      .isEqualTo(CategoryAction.SWAP_SELECTED)
 
     game.applyCategoryAction(Category.GREEN)
 
@@ -374,25 +375,14 @@ class GameTest {
   }
 
   @Test
-  fun `category status marked as complete when category fully assigned`() {
-    val game = Game(unassignedTiles)
-    assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.complete).isFalse()
-
-    repeat(4) { index -> game.select(unassignedTiles[index]) }
-    game.applyCategoryAction(Category.YELLOW)
-
-    assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.complete).isTrue()
-  }
-
-  @Test
   fun `category action disabled when nothing selected or assigned`() {
     val game = Game(unassignedTiles)
-    val categoryStatuses = game.model.value.categoryStatuses
+    val categoryActions = game.model.value.categoryActions
 
-    assertThat(categoryStatuses[Category.YELLOW]!!.action).isEqualTo(CategoryAction.DISABLED)
-    assertThat(categoryStatuses[Category.GREEN]!!.action).isEqualTo(CategoryAction.DISABLED)
-    assertThat(categoryStatuses[Category.BLUE]!!.action).isEqualTo(CategoryAction.DISABLED)
-    assertThat(categoryStatuses[Category.PURPLE]!!.action).isEqualTo(CategoryAction.DISABLED)
+    assertThat(categoryActions[Category.YELLOW]).isEqualTo(CategoryAction.DISABLED)
+    assertThat(categoryActions[Category.GREEN]).isEqualTo(CategoryAction.DISABLED)
+    assertThat(categoryActions[Category.BLUE]).isEqualTo(CategoryAction.DISABLED)
+    assertThat(categoryActions[Category.PURPLE]).isEqualTo(CategoryAction.DISABLED)
   }
 
   @Test
@@ -400,11 +390,11 @@ class GameTest {
     val game = Game(unassignedTiles)
     game.select(unassignedTiles[0])
 
-    val categoryStatuses = game.model.value.categoryStatuses
-    assertThat(categoryStatuses[Category.YELLOW]!!.action).isEqualTo(CategoryAction.ASSIGN)
-    assertThat(categoryStatuses[Category.GREEN]!!.action).isEqualTo(CategoryAction.ASSIGN)
-    assertThat(categoryStatuses[Category.BLUE]!!.action).isEqualTo(CategoryAction.ASSIGN)
-    assertThat(categoryStatuses[Category.PURPLE]!!.action).isEqualTo(CategoryAction.ASSIGN)
+    val categoryActions = game.model.value.categoryActions
+    assertThat(categoryActions[Category.YELLOW]).isEqualTo(CategoryAction.ASSIGN)
+    assertThat(categoryActions[Category.GREEN]).isEqualTo(CategoryAction.ASSIGN)
+    assertThat(categoryActions[Category.BLUE]).isEqualTo(CategoryAction.ASSIGN)
+    assertThat(categoryActions[Category.PURPLE]).isEqualTo(CategoryAction.ASSIGN)
   }
 
   @Test
@@ -412,37 +402,37 @@ class GameTest {
     val game = Game(assignedTiles)
     game.select(assignedTiles[12])
 
-    val categoryStatuses = game.model.value.categoryStatuses
-    assertThat(categoryStatuses[Category.YELLOW]!!.action).isEqualTo(CategoryAction.CLEAR)
-    assertThat(categoryStatuses[Category.GREEN]!!.action).isEqualTo(CategoryAction.DISABLED)
-    assertThat(categoryStatuses[Category.BLUE]!!.action).isEqualTo(CategoryAction.DISABLED)
-    assertThat(categoryStatuses[Category.PURPLE]!!.action).isEqualTo(CategoryAction.DISABLED)
+    val categoryActions = game.model.value.categoryActions
+    assertThat(categoryActions[Category.YELLOW]).isEqualTo(CategoryAction.CLEAR)
+    assertThat(categoryActions[Category.GREEN]).isEqualTo(CategoryAction.DISABLED)
+    assertThat(categoryActions[Category.BLUE]).isEqualTo(CategoryAction.DISABLED)
+    assertThat(categoryActions[Category.PURPLE]).isEqualTo(CategoryAction.DISABLED)
   }
 
   @Test
-  fun `category action clear for assigned categories when nothing selected`() {
+  fun `category action expand for assigned categories when nothing selected`() {
     val game = Game(assignedTiles)
 
-    val categoryStatuses = game.model.value.categoryStatuses
-    assertThat(categoryStatuses[Category.YELLOW]!!.action).isEqualTo(CategoryAction.CLEAR)
-    assertThat(categoryStatuses[Category.GREEN]!!.action).isEqualTo(CategoryAction.CLEAR)
-    assertThat(categoryStatuses[Category.BLUE]!!.action).isEqualTo(CategoryAction.CLEAR)
-    assertThat(categoryStatuses[Category.PURPLE]!!.action).isEqualTo(CategoryAction.CLEAR)
+    val categoryActions = game.model.value.categoryActions
+    assertThat(categoryActions[Category.YELLOW]).isEqualTo(CategoryAction.EXPAND)
+    assertThat(categoryActions[Category.GREEN]).isEqualTo(CategoryAction.EXPAND)
+    assertThat(categoryActions[Category.BLUE]).isEqualTo(CategoryAction.EXPAND)
+    assertThat(categoryActions[Category.PURPLE]).isEqualTo(CategoryAction.EXPAND)
   }
 
   @Test
-  fun `category action swap when even number of tiles across categories selected`() {
+  fun `category action swap_selected when even number of tiles across categories selected`() {
     val game = Game(assignedTiles)
     game.select(assignedTiles[0])
     game.select(assignedTiles[1])
     game.select(assignedTiles[4])
     game.select(assignedTiles[5])
 
-    val categoryStatuses = game.model.value.categoryStatuses
-    assertThat(categoryStatuses[Category.PURPLE]!!.action).isEqualTo(CategoryAction.SWAP)
-    assertThat(categoryStatuses[Category.BLUE]!!.action).isEqualTo(CategoryAction.SWAP)
-    assertThat(categoryStatuses[Category.GREEN]!!.action).isEqualTo(CategoryAction.DISABLED)
-    assertThat(categoryStatuses[Category.YELLOW]!!.action).isEqualTo(CategoryAction.DISABLED)
+    val categoryActions = game.model.value.categoryActions
+    assertThat(categoryActions[Category.PURPLE]).isEqualTo(CategoryAction.SWAP_SELECTED)
+    assertThat(categoryActions[Category.BLUE]).isEqualTo(CategoryAction.SWAP_SELECTED)
+    assertThat(categoryActions[Category.GREEN]).isEqualTo(CategoryAction.DISABLED)
+    assertThat(categoryActions[Category.YELLOW]).isEqualTo(CategoryAction.DISABLED)
   }
 
   @Test
@@ -452,15 +442,15 @@ class GameTest {
     game.select(assignedTiles[1])
     game.select(assignedTiles[4])
 
-    val categoryStatuses = game.model.value.categoryStatuses
-    assertThat(categoryStatuses[Category.YELLOW]!!.action).isEqualTo(CategoryAction.DISABLED)
-    assertThat(categoryStatuses[Category.GREEN]!!.action).isEqualTo(CategoryAction.DISABLED)
-    assertThat(categoryStatuses[Category.BLUE]!!.action).isEqualTo(CategoryAction.DISABLED)
-    assertThat(categoryStatuses[Category.PURPLE]!!.action).isEqualTo(CategoryAction.DISABLED)
+    val categoryActions = game.model.value.categoryActions
+    assertThat(categoryActions[Category.YELLOW]).isEqualTo(CategoryAction.DISABLED)
+    assertThat(categoryActions[Category.GREEN]).isEqualTo(CategoryAction.DISABLED)
+    assertThat(categoryActions[Category.BLUE]).isEqualTo(CategoryAction.DISABLED)
+    assertThat(categoryActions[Category.PURPLE]).isEqualTo(CategoryAction.DISABLED)
   }
 
   @Test
-  fun `category action swap when even number of categorized and uncategorized tiles selected`() {
+  fun `category action swap_selected when even number of categorized and uncategorized tiles selected`() {
     val firstTwoTilesYellow = unassignedTiles
       .mapIndexed { index, tile ->
         tile.copy(category = if (index < 2) Category.YELLOW else null)
@@ -473,11 +463,11 @@ class GameTest {
     game.select(firstTwoTilesYellow[4])
     game.select(firstTwoTilesYellow[5])
 
-    val categoryStatuses = game.model.value.categoryStatuses
-    assertThat(categoryStatuses[Category.YELLOW]!!.action).isEqualTo(CategoryAction.SWAP)
-    assertThat(categoryStatuses[Category.GREEN]!!.action).isEqualTo(CategoryAction.ASSIGN)
-    assertThat(categoryStatuses[Category.BLUE]!!.action).isEqualTo(CategoryAction.ASSIGN)
-    assertThat(categoryStatuses[Category.PURPLE]!!.action).isEqualTo(CategoryAction.ASSIGN)
+    val categoryActions = game.model.value.categoryActions
+    assertThat(categoryActions[Category.YELLOW]).isEqualTo(CategoryAction.SWAP_SELECTED)
+    assertThat(categoryActions[Category.GREEN]).isEqualTo(CategoryAction.ASSIGN)
+    assertThat(categoryActions[Category.BLUE]).isEqualTo(CategoryAction.ASSIGN)
+    assertThat(categoryActions[Category.PURPLE]).isEqualTo(CategoryAction.ASSIGN)
   }
 
   @Test
@@ -493,64 +483,54 @@ class GameTest {
     game.select(firstTwoTilesYellow[5])
     game.select(firstTwoTilesYellow[6])
 
-    val categoryStatuses = game.model.value.categoryStatuses
-    assertThat(categoryStatuses[Category.YELLOW]!!.action).isEqualTo(CategoryAction.DISABLED)
-    assertThat(categoryStatuses[Category.GREEN]!!.action).isEqualTo(CategoryAction.ASSIGN)
-    assertThat(categoryStatuses[Category.BLUE]!!.action).isEqualTo(CategoryAction.ASSIGN)
-    assertThat(categoryStatuses[Category.PURPLE]!!.action).isEqualTo(CategoryAction.ASSIGN)
+    val categoryActions = game.model.value.categoryActions
+    assertThat(categoryActions[Category.YELLOW]).isEqualTo(CategoryAction.DISABLED)
+    assertThat(categoryActions[Category.GREEN]).isEqualTo(CategoryAction.ASSIGN)
+    assertThat(categoryActions[Category.BLUE]).isEqualTo(CategoryAction.ASSIGN)
+    assertThat(categoryActions[Category.PURPLE]).isEqualTo(CategoryAction.ASSIGN)
   }
 
   @Test
-  fun `selecting all and only tiles in category marks it as selected`() {
+  fun `category action expand expands category`() {
     val game = Game(assignedTiles)
-    game.select(assignedTiles[0])
-    game.select(assignedTiles[1])
-    game.select(assignedTiles[2])
-    assertThat(game.model.value.categoryStatuses[Category.PURPLE]!!.allSelected).isFalse()
+    val actionsBeforeExpand = game.model.value.categoryActions
+    assertThat(actionsBeforeExpand[Category.YELLOW]).isEqualTo(CategoryAction.EXPAND)
 
-    game.select(assignedTiles[3])
-    assertThat(game.model.value.categoryStatuses[Category.PURPLE]!!.allSelected).isTrue()
+    game.applyCategoryAction(Category.YELLOW)
+
+    val actionsAfterExpand = game.model.value.categoryActions
+    assertThat(actionsAfterExpand[Category.YELLOW]).isEqualTo(CategoryAction.COLLAPSE)
+    assertThat(actionsAfterExpand[Category.GREEN]).isEqualTo(CategoryAction.SWAP_EXPANDED)
+    assertThat(actionsAfterExpand[Category.BLUE]).isEqualTo(CategoryAction.SWAP_EXPANDED)
+    assertThat(actionsAfterExpand[Category.PURPLE]).isEqualTo(CategoryAction.SWAP_EXPANDED)
   }
 
   @Test
-  fun `selecting all of a category and one other does not mark it as selected`() {
-    val tiles = unassignedTiles
-      .mapIndexed { index, tile ->
-        tile.copy(
-          category = when (index) {
-            0, 1 -> Category.YELLOW
-            4 -> Category.GREEN
-            else -> null
-          },
-          selected = index == 0 || index == 1 || index == 4,
-        )
-      }
-      .toImmutableList()
+  fun `category action swap_expanded swaps categories`() {
+    val game = Game(assignedTiles)
+    val actionsBeforeExpand = game.model.value.categoryActions
+    assertThat(actionsBeforeExpand[Category.YELLOW]).isEqualTo(CategoryAction.EXPAND)
+    game.applyCategoryAction(Category.YELLOW)
 
-    val game = Game(tiles)
-    // Even though all yellow tiles are selected, a green tile is too.
-    assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.allSelected).isFalse()
-  }
+    val actionsAfterExpand = game.model.value.categoryActions
+    assertThat(actionsAfterExpand[Category.PURPLE]).isEqualTo(CategoryAction.SWAP_EXPANDED)
 
-  @Test
-  fun `category is bulk selectable when there is at least one tile in category`() {
-    val tiles = unassignedTiles
-      .mapIndexed { index, tile ->
-        tile.copy(
-          category = when (index) {
-            0, 1 -> Category.PURPLE
-            4 -> Category.BLUE
-            else -> null
-          },
-        )
-      }
-      .toImmutableList()
+    game.applyCategoryAction(Category.PURPLE)
 
-    val game = Game(tiles)
-    assertThat(game.model.value.categoryStatuses[Category.PURPLE]!!.bulkSelectable).isTrue()
-    assertThat(game.model.value.categoryStatuses[Category.BLUE]!!.bulkSelectable).isTrue()
-    assertThat(game.model.value.categoryStatuses[Category.GREEN]!!.bulkSelectable).isFalse()
-    assertThat(game.model.value.categoryStatuses[Category.YELLOW]!!.bulkSelectable).isFalse()
+    val actionsAfterSwap = game.model.value.categoryActions
+    actionsAfterSwap.values.forEach { assertThat(it).isEqualTo(CategoryAction.EXPAND) }
+
+    // Tiles that were originally in the yellow positions are now in purple.
+    assertThat(game.tiles[0].initialPosition).isEqualTo(12)
+    assertThat(game.tiles[1].initialPosition).isEqualTo(13)
+    assertThat(game.tiles[2].initialPosition).isEqualTo(14)
+    assertThat(game.tiles[3].initialPosition).isEqualTo(15)
+
+    // Tiles that were originally in the purple positions are now in yellow.
+    assertThat(game.tiles[12].initialPosition).isEqualTo(0)
+    assertThat(game.tiles[13].initialPosition).isEqualTo(1)
+    assertThat(game.tiles[14].initialPosition).isEqualTo(2)
+    assertThat(game.tiles[15].initialPosition).isEqualTo(3)
   }
 
   @Test
@@ -566,11 +546,11 @@ class GameTest {
       .toImmutableList()
 
     val game = Game(tiles)
-    val categoryStatuses = game.model.value.categoryStatuses
-    assertThat(categoryStatuses[Category.YELLOW]!!.action).isEqualTo(CategoryAction.CLEAR)
-    assertThat(categoryStatuses[Category.GREEN]!!.action).isEqualTo(CategoryAction.CLEAR)
-    assertThat(categoryStatuses[Category.BLUE]!!.action).isEqualTo(CategoryAction.CLEAR)
-    assertThat(categoryStatuses[Category.PURPLE]!!.action).isEqualTo(CategoryAction.FINISH)
+    val categoryActions = game.model.value.categoryActions
+    assertThat(categoryActions[Category.YELLOW]).isEqualTo(CategoryAction.EXPAND)
+    assertThat(categoryActions[Category.GREEN]).isEqualTo(CategoryAction.EXPAND)
+    assertThat(categoryActions[Category.BLUE]).isEqualTo(CategoryAction.EXPAND)
+    assertThat(categoryActions[Category.PURPLE]).isEqualTo(CategoryAction.FINISH)
   }
 
   private val Game.tiles

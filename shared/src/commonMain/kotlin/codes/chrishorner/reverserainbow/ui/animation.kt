@@ -4,6 +4,9 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.runtime.compositionLocalOf
 
 val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope> {
@@ -25,4 +28,11 @@ class OvershootEasing(private val tension: Float) : Easing {
     val fraction = fraction - 1f
     return fraction * fraction * ((tension + 1) * fraction + tension) + 1f
   }
+}
+
+fun <T> tileSpringSpec(): FiniteAnimationSpec<T> {
+  return spring(
+    dampingRatio = Spring.DampingRatioLowBouncy,
+    stiffness = Spring.StiffnessMediumLow,
+  )
 }

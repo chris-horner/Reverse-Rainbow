@@ -9,6 +9,10 @@
   <string name="about">About</string>
   <string name="reset">Reset</string>
   <string name="shuffle">Shuffle</string>
+  <string name="cancel_selection">Cancel selection</string>
+  <string name="expand_category">Expand category options</string>
+  <string name="collapse_category">Collapse category options</string>
+  <string name="clear_category">Clear all in category</string>
 
   <string name="back_description">Back</string>
   <string name="about_app_name">Reverse Rainbow</string>

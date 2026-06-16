@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import codes.chrishorner.reverserainbow.data.Tile
 import codes.chrishorner.reverserainbow.data.Category
 import codes.chrishorner.reverserainbow.data.CategoryAction
-import codes.chrishorner.reverserainbow.data.CategoryStatus
 import codes.chrishorner.reverserainbow.data.GameModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -19,6 +18,7 @@ import kotlinx.collections.immutable.toImmutableMap
 @Stable
 class Game(tiles: ImmutableList<Tile>) {
   private val tiles = tiles.toMutableList()
+  private var expandedCategory: Category? = null
 
   private val _model: MutableState<GameModel>
   val model: State<GameModel>
@@ -51,6 +51,8 @@ class Game(tiles: ImmutableList<Tile>) {
     if (!tile.selected && selectionCount >= 4) return
 
     tiles[tile.currentPosition] = tile.copy(selected = !tile.selected)
+
+    expandedCategory = null
     publishModelUpdate()
   }
 
@@ -58,33 +60,37 @@ class Game(tiles: ImmutableList<Tile>) {
     if (tile.category != null) {
       // Select (or deselect) all tiles in the long-selected tile's category.
       tiles.replaceAll { it.copy(selected = !tile.selected && it.category == tile.category) }
+      expandedCategory = null
       publishModelUpdate()
     }
   }
 
-  fun selectAll(category: Category) {
-    val categoryStatus = determineCategoryStatus(category)
+  fun clearAll(category: Category) {
+    applyCategoryAction(category, CategoryAction.CLEAR)
+  }
 
-    if (categoryStatus.allSelected) {
-      // If all tiles in the category are already selected, deselect them.
-      tiles.replaceAll { if (it.category == category) it.copy(selected = false) else it }
-    } else {
-      // Otherwise select _only_ these tiles.
-      tiles.replaceAll { it.copy(selected = it.category == category) }
-    }
-
+  fun collapseCategories() {
+    expandedCategory = null
     publishModelUpdate()
   }
 
-  fun applyCategoryAction(category: Category) {
-    val action = determineCategoryStatus(category).action
-
+  fun applyCategoryAction(
+    category: Category,
+    action: CategoryAction = determineCategoryAction(category),
+  ) {
     when (action) {
       CategoryAction.DISABLED -> return
       CategoryAction.ASSIGN -> assignTiles(category)
       CategoryAction.CLEAR -> clearTiles(category)
-      CategoryAction.SWAP -> swapSelectedToCategory(category)
+      CategoryAction.SWAP_EXPANDED -> swapExpandedToCategory(category)
+      CategoryAction.SWAP_SELECTED -> swapSelectedToCategory(category)
       CategoryAction.FINISH -> assignAllUnassigned(category)
+      CategoryAction.EXPAND -> { expandedCategory = category }
+      CategoryAction.COLLAPSE -> { expandedCategory = null }
+    }
+
+    if (action != CategoryAction.EXPAND) {
+      expandedCategory = null
     }
 
     tiles.replaceAll { it.copy(selected = false) }
@@ -194,6 +200,20 @@ class Game(tiles: ImmutableList<Tile>) {
     }
   }
 
+  private fun swapExpandedToCategory(category: Category) {
+    val expandedCategory = checkNotNull(expandedCategory) {
+      "Trying to swap $category with expanded category, but there is no expanded category."
+    }
+
+    for ((index, tile) in tiles.withIndex()) {
+      if (tile.category == expandedCategory) {
+        tiles[index] = tile.copy(category = category)
+      } else if (tile.category == category) {
+        tiles[index] = tile.copy(category = expandedCategory)
+      }
+    }
+  }
+
   private fun assignAllUnassigned(category: Category) {
     tiles.filter { it.category == null }.forEach { tile ->
       tiles[tile.currentPosition] = tile.copy(category = category)
@@ -241,22 +261,29 @@ class Game(tiles: ImmutableList<Tile>) {
   }
 
   private fun generateModel(): GameModel {
-    val categoryStatuses = Category.entries.associateWith { determineCategoryStatus(it) }
-    val completedCategoryCount = categoryStatuses.count { it.value.complete }
+    val categoryActions = Category.entries.associateWith { determineCategoryAction(it) }
+
+    val completedYellow = tiles.count { it.category == Category.YELLOW } == 4
+    val completedGreen = tiles.count { it.category == Category.GREEN } == 4
+    val completedBlue = tiles.count { it.category == Category.BLUE } == 4
+    val completedPurple = tiles.count { it.category == Category.PURPLE } == 4
+    val completedCategoryCount =
+      listOf(completedYellow, completedGreen, completedBlue, completedPurple).count { it }
 
     return GameModel(
       tiles = tiles.toImmutableList(),
-      categoryStatuses = categoryStatuses.toImmutableMap(),
+      categoryActions = categoryActions.toImmutableMap(),
       allTilesAssigned = tiles.all { it.category != null },
       mostlyComplete = completedCategoryCount >= 3,
+      expandedCategory = expandedCategory,
     )
   }
 
   /**
    * Look at the current state of the board - including currently assigned categories and selected
-   * tiles. Use this to work out the current status of a given category
+   * tiles. Use this to work out the current valid action for a category.
    */
-  private fun determineCategoryStatus(category: Category): CategoryStatus {
+  private fun determineCategoryAction(category: Category): CategoryAction {
     val selectedTiles = tiles.filter { it.selected }
     val selectionCount = selectedTiles.count()
     val thisCategorySelected = selectedTiles.any { it.category == category }
@@ -269,10 +296,6 @@ class Game(tiles: ImmutableList<Tile>) {
 
     val otherCategorySelectionCount = otherCategoriesSelected.count()
 
-    val allAndOnlyThisCategorySelected = tilesInThisCategoryCount > 0 &&
-      otherCategorySelectionCount == 0 &&
-      tiles.filter { it.category == category }.all { it.selected }
-
     val allOfOneOtherCategorySelected = otherCategorySelectionCount == 1 && tiles
       .filter { it.category == otherCategoriesSelected.single() }
       .all { it.selected }
@@ -284,28 +307,25 @@ class Game(tiles: ImmutableList<Tile>) {
       .map { otherCategory -> tiles.count { it.category == otherCategory } }
       .all { tileCount -> tileCount == 4 }
 
-    val action = when {
+    return when {
+      expandedCategory == category -> CategoryAction.COLLAPSE
+
+      expandedCategory != null -> CategoryAction.SWAP_EXPANDED
+
       selectionCount > 0 -> when {
         tilesInThisCategoryCount + selectionCount <= 4 && !thisCategorySelected -> CategoryAction.ASSIGN
-        allOfOneOtherCategorySelected -> CategoryAction.SWAP
-        equalNumberFromOtherCategorySelected -> CategoryAction.SWAP
+        allOfOneOtherCategorySelected -> CategoryAction.SWAP_SELECTED
+        equalNumberFromOtherCategorySelected -> CategoryAction.SWAP_SELECTED
         selectedTiles.all { it.category == category } -> CategoryAction.CLEAR
         else -> CategoryAction.DISABLED
       }
 
       tilesInThisCategoryCount < 4 && allOtherCategoriesCompletelyAssigned -> CategoryAction.FINISH
 
-      tiles.any { it.category == category } -> CategoryAction.CLEAR
+      tiles.any { it.category == category } -> CategoryAction.EXPAND
 
       else -> CategoryAction.DISABLED
     }
-
-    return CategoryStatus(
-      complete = tilesInThisCategoryCount == 4,
-      allSelected = allAndOnlyThisCategorySelected,
-      bulkSelectable = tilesInThisCategoryCount > 0,
-      action = action,
-    )
   }
 
   private inline fun <T> MutableList<T>.replaceAll(operator: (T) -> T) {

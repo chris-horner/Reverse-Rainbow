@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import codes.chrishorner.reverserainbow.data.Category
 
 interface PlannerColors {
   val primary: Color
@@ -70,3 +71,21 @@ object ColorsDark : PlannerColors {
   override val purpleSurface = Color(0xFFAC9DF2)
   override val onPurpleSurface = Color(0xFF2C2140)
 }
+
+val Category.iconColor
+  @Composable
+  get() = when (this) {
+    Category.YELLOW -> MaterialTheme.plannerColors.onYellowSurface
+    Category.GREEN -> MaterialTheme.plannerColors.onGreenSurface
+    Category.BLUE -> MaterialTheme.plannerColors.onBlueSurface
+    Category.PURPLE -> MaterialTheme.plannerColors.onPurpleSurface
+  }
+
+val Category.backgroundColor
+  @Composable
+  get() = when (this) {
+    Category.YELLOW -> MaterialTheme.plannerColors.yellowSurface
+    Category.GREEN -> MaterialTheme.plannerColors.greenSurface
+    Category.BLUE -> MaterialTheme.plannerColors.blueSurface
+    Category.PURPLE -> MaterialTheme.plannerColors.purpleSurface
+  }

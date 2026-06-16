@@ -11,7 +11,6 @@ import codes.chrishorner.reverserainbow.GameLoaderTest.TestData.loadedTiles
 import codes.chrishorner.reverserainbow.GameLoaderTest.TestData.melbourneTimeZone
 import codes.chrishorner.reverserainbow.data.Category
 import codes.chrishorner.reverserainbow.data.CategoryAction
-import codes.chrishorner.reverserainbow.data.CategoryStatus
 import codes.chrishorner.reverserainbow.data.GameModel
 import codes.chrishorner.reverserainbow.data.Tile
 import codes.chrishorner.reverserainbow.data.Tile.Content
@@ -29,6 +28,7 @@ import kotlinx.datetime.toInstant
 import kotlin.test.Test
 import kotlin.time.Clock
 import kotlin.time.Instant
+import kotlin.to
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GameLoaderTest {
@@ -238,31 +238,11 @@ class GameLoaderTest {
 
     val loadedGameModel = GameModel(
       tiles = loadedTiles,
-      categoryStatuses = persistentMapOf(
-        Category.YELLOW to CategoryStatus(
-          complete = false,
-          allSelected = false,
-          bulkSelectable = false,
-          action = CategoryAction.DISABLED,
-        ),
-        Category.GREEN to CategoryStatus(
-          complete = false,
-          allSelected = false,
-          bulkSelectable = false,
-          action = CategoryAction.DISABLED,
-        ),
-        Category.BLUE to CategoryStatus(
-          complete = false,
-          allSelected = false,
-          bulkSelectable = false,
-          action = CategoryAction.DISABLED,
-        ),
-        Category.PURPLE to CategoryStatus(
-          complete = false,
-          allSelected = false,
-          bulkSelectable = false,
-          action = CategoryAction.DISABLED,
-        ),
+      categoryActions = persistentMapOf(
+        Category.YELLOW to CategoryAction.DISABLED,
+        Category.GREEN to CategoryAction.DISABLED,
+        Category.BLUE to CategoryAction.DISABLED,
+        Category.PURPLE to CategoryAction.DISABLED,
       ),
       allTilesAssigned = false,
       mostlyComplete = false,

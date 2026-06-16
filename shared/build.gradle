@@ -82,6 +82,7 @@ kotlin {
             '-opt-in=androidx.compose.ui.ExperimentalComposeUiApi',
             '-opt-in=kotlin.time.ExperimentalTime',
             '-opt-in=kotlinx.serialization.ExperimentalSerializationApi',
+            '-Xcontext-parameters', // Remove once AS adopts fix KTIJ-38416
     ]
   }
 }

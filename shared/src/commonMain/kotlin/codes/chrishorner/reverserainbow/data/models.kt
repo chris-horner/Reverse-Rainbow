@@ -54,20 +54,16 @@ enum class CategoryAction {
   DISABLED,
   ASSIGN,
   CLEAR,
-  SWAP,
+  SWAP_SELECTED,
+  SWAP_EXPANDED,
   FINISH,
+  EXPAND,
+  COLLAPSE,
 }
-
-data class CategoryStatus(
-  val complete: Boolean,
-  val allSelected: Boolean,
-  val bulkSelectable: Boolean,
-  val action: CategoryAction,
-)
 
 data class GameModel(
   val tiles: ImmutableList<Tile>,
-  val categoryStatuses: ImmutableMap<Category, CategoryStatus>,
+  val categoryActions: ImmutableMap<Category, CategoryAction>,
   val allTilesAssigned: Boolean,
 
   /**
@@ -75,4 +71,6 @@ data class GameModel(
    * button.
    */
   val mostlyComplete: Boolean,
+
+  val expandedCategory: Category? = null,
 )

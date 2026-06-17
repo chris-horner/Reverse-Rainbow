@@ -7,6 +7,7 @@ plugins {
   alias(libs.plugins.compose.multiplatform)
   alias(libs.plugins.kotlin.compose)
   alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.roborazzi)
 }
 
 def versionMajor = project.findProperty('app.versionMajor').toInteger()
@@ -71,6 +72,14 @@ kotlin {
       implementation libs.kotlin.test
       implementation libs.kotlinx.coroutines.test
       implementation libs.ktor.client.mock
+    }
+
+    jvmTest.dependencies {
+      implementation compose.desktop.currentOs
+      implementation compose.uiTest
+      implementation libs.roborazzi.compose.desktop
+      implementation libs.preview.scanner
+      implementation libs.junit
     }
   }
 

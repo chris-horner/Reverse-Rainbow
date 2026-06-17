@@ -19,13 +19,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.reverserainbow.data.Category
 import codes.chrishorner.reverserainbow.data.CategoryAction
 import codes.chrishorner.reverserainbow.ui.LayoutOrientation
 import codes.chrishorner.reverserainbow.ui.LocalLayoutOrientation
+import codes.chrishorner.reverserainbow.ui.util.PreviewUi
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentMapOf
 
 val CategoryActionBarPadding = 8.dp
 val CategoryActionBarSize = CategoryActionButtonSize + (CategoryActionBarPadding * 2)
@@ -42,9 +45,9 @@ fun CategoryActionsBar(
   categoryActions: ImmutableMap<Category, CategoryAction>,
   expandedCategory: Category? = null,
   boardComplete: Boolean,
-  onCategoryClick: (Category) -> Unit,
-  onCategoryClear: (Category) -> Unit,
-  onCollapseCategories: () -> Unit,
+  onCategoryClick: (Category) -> Unit = {},
+  onCategoryClear: (Category) -> Unit = {},
+  onCollapseCategories: () -> Unit = {},
   modifier: Modifier = Modifier,
 ) {
 
@@ -192,4 +195,19 @@ private fun CategoryAnimationScope.VerticalCollapsedCategoryActions(
       )
     }
   }
+}
+
+@PreviewLightDark
+@Composable
+internal fun CategoryActionsBarPreview() = PreviewUi(modifier = Modifier.width(412.dp)) {
+  CategoryActionsBar(
+    categoryActions = persistentMapOf(
+      Category.YELLOW to CategoryAction.ASSIGN,
+      Category.GREEN to CategoryAction.DISABLED,
+      Category.BLUE to CategoryAction.SWAP_SELECTED,
+      Category.PURPLE to CategoryAction.CLEAR,
+    ),
+    expandedCategory = null,
+    boardComplete = false,
+  )
 }

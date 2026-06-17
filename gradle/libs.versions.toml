@@ -7,6 +7,7 @@ coil = "3.4.0"
 composeMaterial3 = "1.11.0-alpha07"
 composeMultiplatform = "1.11.0"
 continuousCorners = "1.0.6"
+junit = "4.13.2"
 kotlin = "2.4.0"
 kotlinxCollections = "0.4.0"
 kotlinxCoroutines = "1.10.2"
@@ -16,6 +17,8 @@ lifecycle = "2.9.6"
 logging = "2.1.0"
 navigationevent = "1.1.0-alpha01"
 playPublisher = "4.0.0"
+previewScanner = "0.9.0"
+roborazzi = "1.64.0"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -29,6 +32,7 @@ compose-material3 = { group = "org.jetbrains.compose.material3", name = "materia
 compose-ui-tooling = { group = "org.jetbrains.compose.ui", name = "ui-tooling", version.ref = "composeMultiplatform" }
 compose-ui-tooling-preview = { group = "org.jetbrains.compose.ui", name = "ui-tooling-preview", version.ref = "composeMultiplatform" }
 continuous-corners = { group = "com.adamglin", name = "compose-continuous-rounded-corner-shape", version.ref = "continuousCorners" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxCollections" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
@@ -41,6 +45,8 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 logging = { group = "com.diamondedge", name = "logging", version.ref = "logging" }
 navigationevent = { module = "androidx.navigationevent:navigationevent", version.ref = "navigationevent" }
 navigationevent-compose = { module = "androidx.navigationevent:navigationevent-compose", version.ref = "navigationevent" }
+preview-scanner = { group = "io.github.sergio-sastre.ComposablePreviewScanner", name = "android", version.ref = "previewScanner" }
+roborazzi-compose-desktop = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose-desktop", version.ref = "roborazzi" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -51,3 +57,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 playpublisher = { id = "com.github.triplet.play", version.ref = "playPublisher" }
+roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }

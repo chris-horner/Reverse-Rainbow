@@ -10,20 +10,26 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import codes.chrishorner.reverserainbow.ui.LocalAnimatedContentScope
 import codes.chrishorner.reverserainbow.ui.LocalSharedTransitionScope
+import codes.chrishorner.reverserainbow.ui.theme.ReverseRainbowTheme
 
 /**
  * Render the app background, and provide some defaults for composition locals.
  */
 @Composable
-fun PreviewUi(content: @Composable () -> Unit) {
-  SharedTransitionLayout {
-    AnimatedContent(targetState = Unit) { _ ->
-      CompositionLocalProvider(
-        LocalSharedTransitionScope provides this@SharedTransitionLayout,
-        LocalAnimatedContentScope provides this@AnimatedContent,
-      ) {
-        Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-          content()
+fun PreviewUi(
+  modifier: Modifier = Modifier,
+  content: @Composable () -> Unit,
+) {
+  ReverseRainbowTheme {
+    SharedTransitionLayout {
+      AnimatedContent(targetState = Unit) { _ ->
+        CompositionLocalProvider(
+          LocalSharedTransitionScope provides this@SharedTransitionLayout,
+          LocalAnimatedContentScope provides this@AnimatedContent,
+        ) {
+          Box(modifier = modifier.background(MaterialTheme.colorScheme.background)) {
+            content()
+          }
         }
       }
     }

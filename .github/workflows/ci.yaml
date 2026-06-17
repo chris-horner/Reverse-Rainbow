@@ -28,6 +28,13 @@ jobs:
           name: test-results
           path: shared/build/test-results/jvmTest/TEST-*.xml
 
+      - name: Upload snapshot diffs
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: snapshot-diffs
+          path: shared/build/outputs/roborazzi/
+
       - name: Build Android app
         run: bash ./gradlew :androidApp:assembleDebug
 

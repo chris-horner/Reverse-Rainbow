@@ -14,6 +14,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -31,8 +32,8 @@ suspend fun fetchTiles(
 ): TileFetchResult {
   val today = clock.now().toLocalDateTime(timeZone)
   val year = today.year
-  val month = today.monthNumber.toString().padStart(2, '0')
-  val day = today.dayOfMonth.toString().padStart(2, '0')
+  val month = today.month.number.toString().padStart(2, '0')
+  val day = today.day.toString().padStart(2, '0')
   val url = "$ApiEndpoint$year-$month-$day.json"
 
   return try {

@@ -28,12 +28,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.reverserainbow.BuildKonfig
 import codes.chrishorner.reverserainbow.data.Category
-import codes.chrishorner.reverserainbow.ui.Icons
-import codes.chrishorner.reverserainbow.ui.LocalAnimatedContentScope
-import codes.chrishorner.reverserainbow.ui.LocalSharedTransitionScope
-import codes.chrishorner.reverserainbow.ui.theme.TileShape
-import codes.chrishorner.reverserainbow.ui.util.CappedWidthContainer
-import org.jetbrains.compose.resources.stringResource
 import codes.chrishorner.reverserainbow.resources.Res
 import codes.chrishorner.reverserainbow.resources.about
 import codes.chrishorner.reverserainbow.resources.about_app_name
@@ -42,8 +36,17 @@ import codes.chrishorner.reverserainbow.resources.about_point2
 import codes.chrishorner.reverserainbow.resources.about_point3
 import codes.chrishorner.reverserainbow.resources.about_point4
 import codes.chrishorner.reverserainbow.resources.back_description
+import codes.chrishorner.reverserainbow.ui.Icons
+import codes.chrishorner.reverserainbow.ui.LocalAnimatedContentScope
+import codes.chrishorner.reverserainbow.ui.LocalSharedTransitionScope
+import codes.chrishorner.reverserainbow.ui.theme.TileShape
 import codes.chrishorner.reverserainbow.ui.theme.backgroundColor
 import codes.chrishorner.reverserainbow.ui.theme.foregroundColor
+import codes.chrishorner.reverserainbow.ui.util.CappedWidthContainer
+import codes.chrishorner.reverserainbow.ui.util.PreviewLandscapeSmall
+import codes.chrishorner.reverserainbow.ui.util.PreviewLightDarkPortraitSmall
+import codes.chrishorner.reverserainbow.ui.util.PreviewUi
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AboutUi(onBack: () -> Unit) {
@@ -154,4 +157,16 @@ private fun Block(
       tint = category.foregroundColor,
     )
   }
+}
+
+@PreviewLightDarkPortraitSmall
+@Composable
+internal fun AboutUiPreview() = PreviewUi {
+  AboutUi(onBack = {})
+}
+
+@PreviewLandscapeSmall
+@Composable
+internal fun AboutUiLandscapePreview() = PreviewUi {
+  AboutUi(onBack = {})
 }

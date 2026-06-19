@@ -1,9 +1,12 @@
 package codes.chrishorner.reverserainbow
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import codes.chrishorner.reverserainbow.data.Tile
 import codes.chrishorner.reverserainbow.data.Category
 import codes.chrishorner.reverserainbow.data.CategoryAction
@@ -17,11 +20,10 @@ import kotlinx.collections.immutable.toImmutableMap
  */
 @Stable
 class Game(tiles: ImmutableList<Tile>) {
-  private val tiles = tiles.toMutableList()
-  private var expandedCategory: Category? = null
+  private val tiles = tiles.toMutableStateList()
+  private var expandedCategory by mutableStateOf<Category?>(null)
 
-  private val _model: MutableState<GameModel>
-  val model: State<GameModel>
+  val model: State<GameModel> = derivedStateOf { generateModel() }
 
   init {
     require(tiles.size == 16) {
@@ -39,29 +41,27 @@ class Game(tiles: ImmutableList<Tile>) {
         "Category $category must have between 0 to 4 tiles, but had $tileCountInCategory"
       }
     }
-
-    _model = mutableStateOf(generateModel())
-    model = _model
   }
 
   fun select(tile: Tile) {
     val selectionCount = tiles.count { it.selected }
+    val index = currentIndexOf(tile)
+    val target = tiles[index]
 
     // Prevent selecting more than 4 tiles.
-    if (!tile.selected && selectionCount >= 4) return
+    if (!target.selected && selectionCount >= 4) return
 
-    tiles[tile.currentPosition] = tile.copy(selected = !tile.selected)
-
+    tiles[index] = target.copy(selected = !target.selected)
     expandedCategory = null
-    publishModelUpdate()
   }
 
   fun longSelect(tile: Tile) {
-    if (tile.category != null) {
+    val target = tiles[currentIndexOf(tile)]
+
+    if (target.category != null) {
       // Select (or deselect) all tiles in the long-selected tile's category.
-      tiles.replaceAll { it.copy(selected = !tile.selected && it.category == tile.category) }
+      tiles.replaceAll { it.copy(selected = !target.selected && it.category == target.category) }
       expandedCategory = null
-      publishModelUpdate()
     }
   }
 
@@ -71,7 +71,6 @@ class Game(tiles: ImmutableList<Tile>) {
 
   fun collapseCategories() {
     expandedCategory = null
-    publishModelUpdate()
   }
 
   fun applyCategoryAction(
@@ -95,7 +94,6 @@ class Game(tiles: ImmutableList<Tile>) {
 
     tiles.replaceAll { it.copy(selected = false) }
     sortGrid()
-    publishModelUpdate()
   }
 
   fun onDragOver(source: Tile, destination: Tile) {
@@ -107,47 +105,21 @@ class Game(tiles: ImmutableList<Tile>) {
 
     tiles.replaceAll { it.copy(selected = false) }
     sortGrid()
-    publishModelUpdate()
   }
 
   fun reset() {
-    tiles.replaceAll { tile ->
-      tile.copy(
-        currentPosition = tile.initialPosition,
-        selected = false,
-        category = null,
-      )
-    }
-
-    tiles.sortBy { it.currentPosition }
-    publishModelUpdate()
+    tiles.replaceAll { it.copy(selected = false, category = null) }
+    tiles.sortBy { it.initialPosition }
   }
 
   fun shuffle() {
-    val newPositions = tiles
-      .filter { it.category == null }
-      .map { it.currentPosition }
-      .shuffled()
-      .toMutableList()
-
-    tiles.replaceAll { tile ->
-      if (tile.category == null) {
-        tile.copy(currentPosition = newPositions.removeAt(0))
-      } else {
-        tile
-      }
-    }
-
-    tiles.sortBy { it.currentPosition }
-    publishModelUpdate()
+    val unassignedIndices = tiles.indices.filter { index -> tiles[index].category == null }
+    val shuffledTiles = unassignedIndices.map { index -> tiles[index] }.shuffled()
+    unassignedIndices.forEachIndexed { i, index -> tiles[index] = shuffledTiles[i] }
   }
 
   private fun assignTiles(selectedCategory: Category) {
-    tiles
-      .filter { it.selected }
-      .forEach { tile ->
-        tiles[tile.currentPosition] = tile.copy(category = selectedCategory)
-      }
+    tiles.replaceAll { if (it.selected) it.copy(category = selectedCategory) else it }
   }
 
   private fun clearTiles(selectedCategory: Category) {
@@ -170,14 +142,15 @@ class Game(tiles: ImmutableList<Tile>) {
 
     if (selectedCategories.size == 1) {
       val selectedTilesCategory = selectedCategories.single()
-      val originalTilesInCategory = tiles.filter { it.category == category }
+      val selectedIds = selectedTiles.map { it.id }
+      val originalIds = tiles.filter { it.category == category }.map { it.id }
 
-      for (tile in selectedTiles) {
-        tiles[tile.currentPosition] = tile.copy(category = category)
-      }
-
-      for (tile in originalTilesInCategory) {
-        tiles[tile.currentPosition] = tile.copy(category = selectedTilesCategory)
+      tiles.replaceAll { tile ->
+        when (tile.id) {
+          in selectedIds -> tile.copy(category = category)
+          in originalIds -> tile.copy(category = selectedTilesCategory)
+          else -> tile
+        }
       }
     } else {
       // Selected tiles should span across two categories, and there should be an even number
@@ -205,28 +178,30 @@ class Game(tiles: ImmutableList<Tile>) {
       "Trying to swap $category with expanded category, but there is no expanded category."
     }
 
-    for ((index, tile) in tiles.withIndex()) {
-      if (tile.category == expandedCategory) {
-        tiles[index] = tile.copy(category = category)
-      } else if (tile.category == category) {
-        tiles[index] = tile.copy(category = expandedCategory)
+    tiles.replaceAll { tile ->
+      when (tile.category) {
+        expandedCategory -> tile.copy(category = category)
+        category -> tile.copy(category = expandedCategory)
+        else -> tile
       }
     }
   }
 
   private fun assignAllUnassigned(category: Category) {
-    tiles.filter { it.category == null }.forEach { tile ->
-      tiles[tile.currentPosition] = tile.copy(category = category)
-    }
+    tiles.replaceAll { if (it.category == null) it.copy(category = category) else it }
   }
 
+  /**
+   * Swaps the board positions of [tile1] and [tile2], applying any other field changes carried by
+   * the passed copies. Tiles are located by their stable [Tile.id].
+   */
   private fun swapTiles(tile1: Tile, tile2: Tile) {
     if (tile1 == tile2) return
 
-    val tile1Position = tile1.currentPosition
-    val tile2Position = tile2.currentPosition
-    tiles[tile1Position] = tile2.copy(currentPosition = tile1Position)
-    tiles[tile2Position] = tile1.copy(currentPosition = tile2Position)
+    val index1 = currentIndexOf(tile1)
+    val index2 = currentIndexOf(tile2)
+    tiles[index1] = tile2
+    tiles[index2] = tile1
   }
 
   /**
@@ -256,22 +231,21 @@ class Game(tiles: ImmutableList<Tile>) {
     }
   }
 
-  private fun publishModelUpdate() {
-    _model.value = generateModel()
+  private fun currentIndexOf(tile: Tile): Int {
+    val index =  tiles.indexOfFirst { it.id == tile.id }
+    require(index >= 0) { "Tile not found in tiles collection." }
+    return index
   }
 
   private fun generateModel(): GameModel {
     val categoryActions = Category.entries.associateWith { determineCategoryAction(it) }
 
-    val completedYellow = tiles.count { it.category == Category.YELLOW } == 4
-    val completedGreen = tiles.count { it.category == Category.GREEN } == 4
-    val completedBlue = tiles.count { it.category == Category.BLUE } == 4
-    val completedPurple = tiles.count { it.category == Category.PURPLE } == 4
-    val completedCategoryCount =
-      listOf(completedYellow, completedGreen, completedBlue, completedPurple).count { it }
+    val completedCategoryCount = Category.entries.count { category ->
+      tiles.count { it.category == category } == 4
+    }
 
     return GameModel(
-      tiles = tiles.toImmutableList(),
+      tiles = tiles.mapIndexed { index, tile -> tile.copy(currentPosition = index) }.toImmutableList(),
       categoryActions = categoryActions.toImmutableMap(),
       allTilesAssigned = tiles.all { it.category != null },
       mostlyComplete = completedCategoryCount >= 3,
@@ -327,6 +301,13 @@ class Game(tiles: ImmutableList<Tile>) {
       else -> CategoryAction.DISABLED
     }
   }
+
+  /**
+   * Tiles don't actually have a unique identifier, but their initial position we get from the
+   * server is totally good enough.
+   */
+  private val Tile.id: Int
+    get() = initialPosition
 
   private inline fun <T> MutableList<T>.replaceAll(operator: (T) -> T) {
     for (index in indices) {

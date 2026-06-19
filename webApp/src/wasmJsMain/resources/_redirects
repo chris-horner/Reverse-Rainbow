@@ -1,0 +1,2 @@
+# Proxy NYT Connections requests through Netlify to avoid browser CORS restrictions.
+/api/connections/*  https://www.nytimes.com/svc/connections/v2/:splat  200

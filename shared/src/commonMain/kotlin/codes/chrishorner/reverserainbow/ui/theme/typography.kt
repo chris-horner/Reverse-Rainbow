@@ -27,7 +27,7 @@ val Typography.tile: TextStyle
   get() {
     val uiMode = LocalUiMode.current
     val density = LocalDensity.current
-    val fontFamily = getInter()
+    val fontFamily = MaterialTheme.typography.bodyMedium.fontFamily
 
     val style = remember(uiMode, density) {
       when (uiMode) {

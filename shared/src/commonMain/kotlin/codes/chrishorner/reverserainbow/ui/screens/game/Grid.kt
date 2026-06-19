@@ -61,6 +61,7 @@ fun Grid(
   }
 }
 
+// TODO: Consider replacing with the new Grid composable.
 @Composable
 private fun ConnectionsLayout(
   modifier: Modifier,

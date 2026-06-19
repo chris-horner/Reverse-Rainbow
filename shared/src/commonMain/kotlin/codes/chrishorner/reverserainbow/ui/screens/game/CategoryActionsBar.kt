@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -186,7 +187,7 @@ private fun CategoryAnimationScope.VerticalCollapsedCategoryActions(
       .width(CategoryActionLayoutSize)
       .padding(horizontal = CategoryActionBarPadding)
   ) {
-    for (category in Category.entries) {
+    for (category in Category.entries.reversed()) {
       CategoryAction(
         category = category,
         action = categoryActions.getValue(category),
@@ -199,7 +200,25 @@ private fun CategoryAnimationScope.VerticalCollapsedCategoryActions(
 
 @PreviewLightDark
 @Composable
-internal fun CategoryActionsBarPreview() = PreviewUi(modifier = Modifier.width(412.dp)) {
+private fun CategoryActionsBarPreview() = PreviewUi(width = 360.dp) {
+  CategoryActionsBar(
+    categoryActions = persistentMapOf(
+      Category.YELLOW to CategoryAction.ASSIGN,
+      Category.GREEN to CategoryAction.DISABLED,
+      Category.BLUE to CategoryAction.SWAP_SELECTED,
+      Category.PURPLE to CategoryAction.CLEAR,
+    ),
+    expandedCategory = null,
+    boardComplete = false,
+  )
+}
+
+@Preview
+@Composable
+private fun VerticalCategoryActionsBarPreview() = PreviewUi(
+  height = 360.dp,
+  orientation = LayoutOrientation.Landscape,
+) {
   CategoryActionsBar(
     categoryActions = persistentMapOf(
       Category.YELLOW to CategoryAction.ASSIGN,

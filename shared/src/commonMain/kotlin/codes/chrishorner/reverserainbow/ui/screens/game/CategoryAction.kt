@@ -198,8 +198,8 @@ private fun CategoryAnimationScope.getVerticalExitPositionFor(category: Category
 
   val gap = (containerHeight - (itemHeight * Category.entries.size)) / (Category.entries.size + 1)
 
-  val selectedCategoryIndex = Category.entries.indexOf(lastSelectedCategory)
-  val thisCategoryIndex = Category.entries.indexOf(category)
+  val selectedCategoryIndex = Category.entries.reversed().indexOf(lastSelectedCategory)
+  val thisCategoryIndex = Category.entries.reversed().indexOf(category)
 
   val indexOffset = thisCategoryIndex - selectedCategoryIndex
   val containerEdge = if (indexOffset > 0) containerHeight else 0

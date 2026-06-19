@@ -119,7 +119,7 @@ private fun CategoryAnimationScope.VerticalExpandedCategoryActionsBar(
         .fillMaxHeight()
         .padding(horizontal = CategoryActionBarPadding)
     ) {
-      for (category in Category.entries) {
+      for (category in Category.entries.reversed()) {
         if (category == expandedCategory) {
           ExpandedCategoryCancelAndClear(
             category = category,

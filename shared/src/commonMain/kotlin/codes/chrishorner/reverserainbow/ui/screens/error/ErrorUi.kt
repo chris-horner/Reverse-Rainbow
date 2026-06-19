@@ -41,6 +41,9 @@ import codes.chrishorner.reverserainbow.ui.theme.TileShape
 import codes.chrishorner.reverserainbow.ui.theme.backgroundColor
 import codes.chrishorner.reverserainbow.ui.theme.foregroundColor
 import codes.chrishorner.reverserainbow.ui.util.CappedWidthContainer
+import codes.chrishorner.reverserainbow.ui.util.PreviewLandscapeSmall
+import codes.chrishorner.reverserainbow.ui.util.PreviewLightDarkPortraitSmall
+import codes.chrishorner.reverserainbow.ui.util.PreviewUi
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -153,4 +156,16 @@ private fun CategoryBlock(
       colorFilter = ColorFilter.tint(category.foregroundColor),
     )
   }
+}
+
+@PreviewLightDarkPortraitSmall
+@Composable
+internal fun ErrorUiPreview() = PreviewUi {
+  ErrorUi(failureType = FailureType.NETWORK, onRetry = {})
+}
+
+@PreviewLandscapeSmall
+@Composable
+internal fun ErrorUiLandscapePreview() = PreviewUi {
+  ErrorUi(failureType = FailureType.HTTP, onRetry = {})
 }

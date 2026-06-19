@@ -16,6 +16,7 @@ import androidx.compose.ui.test.v2.runDesktopComposeUiTest
 import androidx.compose.ui.tooling.preview.AndroidUiModes
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import com.github.takahirom.roborazzi.RoborazziOptions
 import io.github.takahirom.roborazzi.captureRoboImage
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,7 +53,15 @@ class PreviewScreenshotTest(
       .ignoreIdFor("uiMode")
       .build()
 
-    onRoot().captureRoboImage(filePath = "src/jvmTest/snapshots/$filename.png")
+    onRoot().captureRoboImage(
+      filePath = "src/jvmTest/snapshots/$filename.png",
+      roborazziOptions = RoborazziOptions(
+        compareOptions = RoborazziOptions.CompareOptions(
+          // Account for differences between environments when rendering fonts.
+          changeThreshold = 0.02f,
+        ),
+      ),
+    )
   }
 }
 

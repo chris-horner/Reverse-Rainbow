@@ -22,6 +22,7 @@ interface PlannerColors {
   val onPurpleSurface: Color
 }
 
+@Suppress("UnusedReceiverParameter") // Desirable API shape.
 val MaterialTheme.plannerColors: PlannerColors
   @Composable
   get() = if (isSystemInDarkTheme()) ColorsDark else ColorsLight
@@ -72,20 +73,22 @@ object ColorsDark : PlannerColors {
   override val onPurpleSurface = Color(0xFF2C2140)
 }
 
-val Category.iconColor
+val Category?.foregroundColor
   @Composable
   get() = when (this) {
     Category.YELLOW -> MaterialTheme.plannerColors.onYellowSurface
     Category.GREEN -> MaterialTheme.plannerColors.onGreenSurface
     Category.BLUE -> MaterialTheme.plannerColors.onBlueSurface
     Category.PURPLE -> MaterialTheme.plannerColors.onPurpleSurface
+    null -> MaterialTheme.colorScheme.onSurface
   }
 
-val Category.backgroundColor
+val Category?.backgroundColor
   @Composable
   get() = when (this) {
     Category.YELLOW -> MaterialTheme.plannerColors.yellowSurface
     Category.GREEN -> MaterialTheme.plannerColors.greenSurface
     Category.BLUE -> MaterialTheme.plannerColors.blueSurface
     Category.PURPLE -> MaterialTheme.plannerColors.purpleSurface
+    null -> MaterialTheme.colorScheme.surfaceContainer
   }

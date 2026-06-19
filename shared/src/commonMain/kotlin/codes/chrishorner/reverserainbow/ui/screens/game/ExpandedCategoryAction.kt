@@ -36,7 +36,7 @@ import codes.chrishorner.reverserainbow.ui.LayoutOrientation
 import codes.chrishorner.reverserainbow.ui.LocalLayoutOrientation
 import codes.chrishorner.reverserainbow.ui.theme.TileShape
 import codes.chrishorner.reverserainbow.ui.theme.backgroundColor
-import codes.chrishorner.reverserainbow.ui.theme.iconColor
+import codes.chrishorner.reverserainbow.ui.theme.foregroundColor
 import codes.chrishorner.reverserainbow.ui.tileSpringSpec
 import org.jetbrains.compose.resources.stringResource
 
@@ -60,7 +60,7 @@ fun CategoryAnimationScope.ExpandedSwapButton(
     Icon(
       imageVector = Icons.SwapVert,
       contentDescription = null,
-      tint = category.iconColor,
+      tint = category.foregroundColor,
     )
   }
 }
@@ -178,7 +178,7 @@ private fun CategoryAnimationScope.CancelButton(category: Category, onClick: () 
   ) {
     Icon(
       imageVector = Icons.Clear,
-      tint = category.iconColor,
+      tint = category.foregroundColor,
       contentDescription = stringResource(Res.string.collapse_category),
       modifier = Modifier
         .renderInSharedTransitionScopeOverlay()
@@ -204,7 +204,7 @@ private fun CategoryAnimationScope.ClearButton(category: Category, onClick: (Cat
   ) {
     Icon(
       imageVector = Icons.Delete,
-      tint = category.iconColor,
+      tint = category.foregroundColor,
       contentDescription = stringResource(Res.string.clear_category),
     )
   }

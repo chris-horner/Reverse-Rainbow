@@ -1,5 +1,6 @@
 package codes.chrishorner.reverserainbow.ui.screens.loading
 
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.VectorConverter
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -35,7 +35,7 @@ import codes.chrishorner.reverserainbow.ui.LocalSharedTransitionScope
 import codes.chrishorner.reverserainbow.ui.OvershootEasing
 import codes.chrishorner.reverserainbow.ui.SplashScreenFadeMillis
 import codes.chrishorner.reverserainbow.ui.theme.TileShape
-import codes.chrishorner.reverserainbow.ui.theme.plannerColors
+import codes.chrishorner.reverserainbow.ui.theme.backgroundColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -76,48 +76,23 @@ private fun LoadingTiles(
     if (state.completedIntro) onAnimationDone()
   }
 
-  Box(
-    modifier = Modifier
-      .offset { intOffsetFrom(state.yellowOffset) }
-      .sharedBounds(
-        sharedContentState = rememberSharedContentState(Category.YELLOW),
-        animatedVisibilityScope = LocalAnimatedContentScope.current,
-      )
-      .size(64.dp)
-      .background(MaterialTheme.plannerColors.yellowSurface, shape = TileShape)
-  )
+  LoadingTile(Category.YELLOW, offsetProvider = { state.yellowOffset })
+  LoadingTile(Category.GREEN, offsetProvider = { state.greenOffset })
+  LoadingTile(Category.BLUE, offsetProvider = { state.blueOffset })
+  LoadingTile(Category.PURPLE, offsetProvider = { state.purpleOffset })
+}
 
+@Composable
+private fun SharedTransitionScope.LoadingTile(category: Category, offsetProvider: () -> DpOffset) {
   Box(
     modifier = Modifier
-      .offset { intOffsetFrom(state.greenOffset) }
+      .offset { intOffsetFrom(offsetProvider()) }
       .sharedBounds(
-        sharedContentState = rememberSharedContentState(Category.GREEN),
+        sharedContentState = rememberSharedContentState(category),
         animatedVisibilityScope = LocalAnimatedContentScope.current,
       )
       .size(64.dp)
-      .background(MaterialTheme.plannerColors.greenSurface, shape = TileShape)
-  )
-
-  Box(
-    modifier = Modifier
-      .offset { intOffsetFrom(state.blueOffset) }
-      .sharedBounds(
-        sharedContentState = rememberSharedContentState(Category.BLUE),
-        animatedVisibilityScope = LocalAnimatedContentScope.current,
-      )
-      .size(64.dp)
-      .background(MaterialTheme.plannerColors.blueSurface, shape = TileShape)
-  )
-
-  Box(
-    modifier = Modifier
-      .offset { intOffsetFrom(state.purpleOffset) }
-      .sharedBounds(
-        sharedContentState = rememberSharedContentState(Category.PURPLE),
-        animatedVisibilityScope = LocalAnimatedContentScope.current,
-      )
-      .size(64.dp)
-      .background(MaterialTheme.plannerColors.purpleSurface, shape = TileShape)
+      .background(category.backgroundColor, shape = TileShape)
   )
 }
 

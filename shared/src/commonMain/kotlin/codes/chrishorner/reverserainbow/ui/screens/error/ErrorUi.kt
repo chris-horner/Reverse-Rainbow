@@ -22,18 +22,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.reverserainbow.GameLoader.FailureType
 import codes.chrishorner.reverserainbow.data.Category
-import codes.chrishorner.reverserainbow.ui.LocalAnimatedContentScope
-import codes.chrishorner.reverserainbow.ui.LocalSharedTransitionScope
-import codes.chrishorner.reverserainbow.ui.theme.TileShape
-import codes.chrishorner.reverserainbow.ui.theme.plannerColors
-import codes.chrishorner.reverserainbow.ui.util.CappedWidthContainer
-import org.jetbrains.compose.resources.stringResource
 import codes.chrishorner.reverserainbow.resources.Res
 import codes.chrishorner.reverserainbow.resources.error_message_http
 import codes.chrishorner.reverserainbow.resources.error_message_network
@@ -42,6 +35,13 @@ import codes.chrishorner.reverserainbow.resources.error_retry_button
 import codes.chrishorner.reverserainbow.resources.error_title_http
 import codes.chrishorner.reverserainbow.resources.error_title_network
 import codes.chrishorner.reverserainbow.resources.error_title_parsing
+import codes.chrishorner.reverserainbow.ui.LocalAnimatedContentScope
+import codes.chrishorner.reverserainbow.ui.LocalSharedTransitionScope
+import codes.chrishorner.reverserainbow.ui.theme.TileShape
+import codes.chrishorner.reverserainbow.ui.theme.backgroundColor
+import codes.chrishorner.reverserainbow.ui.theme.foregroundColor
+import codes.chrishorner.reverserainbow.ui.util.CappedWidthContainer
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Shows various messages depending on the `failureType`.
@@ -81,26 +81,18 @@ fun ErrorUi(failureType: FailureType, onRetry: () -> Unit) {
       ) {
         CategoryBlock(
           category = Category.YELLOW,
-          backgroundColor = MaterialTheme.plannerColors.yellowSurface,
-          foregroundColor = MaterialTheme.plannerColors.onYellowSurface,
           image = ErrorImages.SadFace1,
         )
         CategoryBlock(
           category = Category.GREEN,
-          backgroundColor = MaterialTheme.plannerColors.greenSurface,
-          foregroundColor = MaterialTheme.plannerColors.onYellowSurface,
           image = ErrorImages.SadFace2,
         )
         CategoryBlock(
           category = Category.BLUE,
-          backgroundColor = MaterialTheme.plannerColors.blueSurface,
-          foregroundColor = MaterialTheme.plannerColors.onBlueSurface,
           image = ErrorImages.SadFace3,
         )
         CategoryBlock(
           category = Category.PURPLE,
-          backgroundColor = MaterialTheme.plannerColors.purpleSurface,
-          foregroundColor = MaterialTheme.plannerColors.onPurpleSurface,
           image = ErrorImages.SadFace4,
         )
       }
@@ -140,8 +132,6 @@ fun ErrorUi(failureType: FailureType, onRetry: () -> Unit) {
 @Composable
 private fun CategoryBlock(
   category: Category,
-  backgroundColor: Color,
-  foregroundColor: Color,
   image: ImageVector,
 ) = with(LocalSharedTransitionScope.current) {
   Box(
@@ -153,14 +143,14 @@ private fun CategoryBlock(
       )
       .size(52.dp)
       .background(
-        color = backgroundColor,
+        color = category.backgroundColor,
         shape = TileShape,
       )
   ) {
     Image(
       imageVector = image,
       contentDescription = null,
-      colorFilter = ColorFilter.tint(foregroundColor),
+      colorFilter = ColorFilter.tint(category.foregroundColor),
     )
   }
 }

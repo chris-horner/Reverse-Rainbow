@@ -32,7 +32,6 @@ import codes.chrishorner.reverserainbow.ui.Icons
 import codes.chrishorner.reverserainbow.ui.LocalAnimatedContentScope
 import codes.chrishorner.reverserainbow.ui.LocalSharedTransitionScope
 import codes.chrishorner.reverserainbow.ui.theme.TileShape
-import codes.chrishorner.reverserainbow.ui.theme.plannerColors
 import codes.chrishorner.reverserainbow.ui.util.CappedWidthContainer
 import org.jetbrains.compose.resources.stringResource
 import codes.chrishorner.reverserainbow.resources.Res
@@ -43,6 +42,8 @@ import codes.chrishorner.reverserainbow.resources.about_point2
 import codes.chrishorner.reverserainbow.resources.about_point3
 import codes.chrishorner.reverserainbow.resources.about_point4
 import codes.chrishorner.reverserainbow.resources.back_description
+import codes.chrishorner.reverserainbow.ui.theme.backgroundColor
+import codes.chrishorner.reverserainbow.ui.theme.foregroundColor
 
 @Composable
 fun AboutUi(onBack: () -> Unit) {
@@ -128,20 +129,6 @@ private fun Block(
   category: Category,
   icon: ImageVector,
 ) = with(LocalSharedTransitionScope.current) {
-  val backgroundColor = when (category) {
-    Category.YELLOW -> MaterialTheme.plannerColors.yellowSurface
-    Category.GREEN -> MaterialTheme.plannerColors.greenSurface
-    Category.BLUE -> MaterialTheme.plannerColors.blueSurface
-    Category.PURPLE -> MaterialTheme.plannerColors.purpleSurface
-  }
-
-  val foregroundColor = when (category) {
-    Category.YELLOW -> MaterialTheme.plannerColors.onYellowSurface
-    Category.GREEN -> MaterialTheme.plannerColors.onGreenSurface
-    Category.BLUE -> MaterialTheme.plannerColors.onBlueSurface
-    Category.PURPLE -> MaterialTheme.plannerColors.onPurpleSurface
-  }
-
   Box(
     contentAlignment = Alignment.Center,
     modifier = Modifier
@@ -157,14 +144,14 @@ private fun Block(
       )
       .size(48.dp)
       .background(
-        color = backgroundColor,
+        color = category.backgroundColor,
         shape = TileShape,
       )
   ) {
     Icon(
       imageVector = icon,
       contentDescription = null,
-      tint = foregroundColor,
+      tint = category.foregroundColor,
     )
   }
 }

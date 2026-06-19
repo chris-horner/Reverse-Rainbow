@@ -5,7 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import codes.chrishorner.reverserainbow.data.Category
 import codes.chrishorner.reverserainbow.data.Tile
-import codes.chrishorner.reverserainbow.ui.theme.plannerColors
+import codes.chrishorner.reverserainbow.ui.theme.backgroundColor
+import codes.chrishorner.reverserainbow.ui.theme.foregroundColor
 
 class TileColors(
   val background: Color,
@@ -20,35 +21,8 @@ class TileColors(
 @Composable
 fun getColorsFor(tile: Tile, dragState: TileDragState): TileColors {
   val dragStatus = dragState.status
-  val primaryColor: Color
-  val secondaryColor: Color
-
-  when (tile.category) {
-    Category.YELLOW -> {
-      primaryColor = MaterialTheme.plannerColors.yellowSurface
-      secondaryColor = MaterialTheme.plannerColors.onYellowSurface
-    }
-
-    Category.GREEN -> {
-      primaryColor = MaterialTheme.plannerColors.greenSurface
-      secondaryColor = MaterialTheme.plannerColors.onGreenSurface
-    }
-
-    Category.BLUE -> {
-      primaryColor = MaterialTheme.plannerColors.blueSurface
-      secondaryColor = MaterialTheme.plannerColors.onBlueSurface
-    }
-
-    Category.PURPLE -> {
-      primaryColor = MaterialTheme.plannerColors.purpleSurface
-      secondaryColor = MaterialTheme.plannerColors.onPurpleSurface
-    }
-
-    null -> {
-      primaryColor = MaterialTheme.colorScheme.surfaceContainer
-      secondaryColor = MaterialTheme.colorScheme.onSurface
-    }
-  }
+  val primaryColor = tile.category.backgroundColor
+  val secondaryColor = tile.category.foregroundColor
 
   val hoveredTile = (dragStatus as? DragStatus.Dragged)?.hoveredTile
   val foreground = if (tile.selected && dragStatus !is DragStatus.Dragged) {
@@ -89,19 +63,11 @@ fun getColorsFor(tile: Tile, dragState: TileDragState): TileColors {
 }
 
 @Composable
-private fun getSlotBorderColorFor(category: Category?): Color = when (category) {
-  Category.YELLOW -> MaterialTheme.plannerColors.yellowSurface
-  Category.GREEN -> MaterialTheme.plannerColors.greenSurface
-  Category.BLUE -> MaterialTheme.plannerColors.blueSurface
-  Category.PURPLE -> MaterialTheme.plannerColors.purpleSurface
-  null -> MaterialTheme.colorScheme.secondary
+private fun getSlotBorderColorFor(category: Category?): Color {
+  return category?.backgroundColor ?: MaterialTheme.colorScheme.secondary
 }
 
 @Composable
-private fun getSwapTextColorFor(category: Category?): Color = when (category) {
-  Category.YELLOW -> MaterialTheme.plannerColors.yellowSurface
-  Category.GREEN -> MaterialTheme.plannerColors.greenSurface
-  Category.BLUE -> MaterialTheme.plannerColors.blueSurface
-  Category.PURPLE -> MaterialTheme.plannerColors.purpleSurface
-  null -> MaterialTheme.colorScheme.onBackground
+private fun getSwapTextColorFor(category: Category?): Color {
+  return category?.backgroundColor ?: MaterialTheme.colorScheme.onBackground
 }

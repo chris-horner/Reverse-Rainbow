@@ -40,7 +40,7 @@ import codes.chrishorner.reverserainbow.ui.LocalLayoutOrientation
 import codes.chrishorner.reverserainbow.ui.LocalSharedTransitionScope
 import codes.chrishorner.reverserainbow.ui.theme.TileShape
 import codes.chrishorner.reverserainbow.ui.theme.backgroundColor
-import codes.chrishorner.reverserainbow.ui.theme.iconColor
+import codes.chrishorner.reverserainbow.ui.theme.foregroundColor
 import codes.chrishorner.reverserainbow.ui.tileSpringSpec
 
 val CategoryActionButtonSize = 64.dp
@@ -112,7 +112,7 @@ fun CategoryAnimationScope.CategoryAction(
       Icon(
         imageVector = iconVector,
         contentDescription = null,
-        tint = category.iconColor,
+        tint = category.foregroundColor,
         modifier = Modifier
           .sharedBounds(
             sharedContentState = rememberSharedContentState(

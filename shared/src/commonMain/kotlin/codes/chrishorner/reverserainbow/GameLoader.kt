@@ -1,5 +1,6 @@
 package codes.chrishorner.reverserainbow
 
+import androidx.annotation.MainThread
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -7,6 +8,7 @@ import codes.chrishorner.reverserainbow.data.TileFetchResult
 import codes.chrishorner.reverserainbow.data.fetchTiles
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -49,28 +51,36 @@ class GameLoader(
   private var _state = mutableStateOf(initialState)
   val state: State<LoaderState> = _state
 
-  fun refresh() = scope.launch(start = CoroutineStart.UNDISPATCHED) {
-    _state.value = LoaderState.Loading
+  private var refreshJob: Job? = null
 
-    val fetchTilesJob = async { tileFetcher() }
-    val loadResourcesJob = async { resourceLoader() }
+  @MainThread
+  fun refresh(): Job {
+    refreshJob?.cancel()
 
-    loadResourcesJob.await()
-    val tilesResult = fetchTilesJob.await()
-    val currentLocalDate = clock.now().toLocalDateTime(timeZoneProvider()).date
+    return scope.launch(start = CoroutineStart.UNDISPATCHED) {
+      _state.value = LoaderState.Loading
 
-    _state.value = when (tilesResult) {
-      is TileFetchResult.Success -> LoaderState.Success(currentLocalDate, Game(tilesResult.tiles))
-      is TileFetchResult.Failure -> LoaderState.Failure(
-        type = when (tilesResult) {
-          TileFetchResult.HttpFailure -> FailureType.HTTP
-          TileFetchResult.NetworkFailure -> FailureType.NETWORK
-          TileFetchResult.ParsingFailure -> FailureType.PARSING
-        }
-      )
-    }
+      val fetchTilesJob = async { tileFetcher() }
+      val loadResourcesJob = async { resourceLoader() }
+
+      loadResourcesJob.await()
+      val tilesResult = fetchTilesJob.await()
+      val currentLocalDate = clock.now().toLocalDateTime(timeZoneProvider()).date
+
+      _state.value = when (tilesResult) {
+        is TileFetchResult.Success -> LoaderState.Success(currentLocalDate, Game(tilesResult.tiles))
+        is TileFetchResult.Failure -> LoaderState.Failure(
+          type = when (tilesResult) {
+            TileFetchResult.HttpFailure -> FailureType.HTTP
+            TileFetchResult.NetworkFailure -> FailureType.NETWORK
+            TileFetchResult.ParsingFailure -> FailureType.PARSING
+          }
+        )
+      }
+    }.also { refreshJob = it }
   }
 
+  @MainThread
   fun refreshIfNecessary() {
     val currentState = _state.value
     val currentLocalDate = clock.now().toLocalDateTime(timeZoneProvider()).date

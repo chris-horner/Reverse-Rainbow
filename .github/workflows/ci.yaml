@@ -23,14 +23,14 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Run tests
-        run: bash ./gradlew :shared:jvmTest
+        run: bash ./gradlew :shared:testAndroidHostTest
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
           name: test-results
-          path: shared/build/test-results/jvmTest/TEST-*.xml
+          path: shared/build/test-results/testAndroidHostTest/TEST-*.xml
 
       - name: Upload snapshot diffs
         uses: actions/upload-artifact@v4

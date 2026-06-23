@@ -19,6 +19,7 @@ navigationevent = "1.1.1"
 playPublisher = "4.0.0"
 previewScanner = "0.9.0"
 roborazzi = "1.64.0"
+robolectric = "4.16.1"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -46,7 +47,14 @@ logging = { group = "com.diamondedge", name = "logging", version.ref = "logging"
 navigationevent = { module = "androidx.navigationevent:navigationevent", version.ref = "navigationevent" }
 navigationevent-compose = { module = "androidx.navigationevent:navigationevent-compose", version.ref = "navigationevent" }
 preview-scanner = { group = "io.github.sergio-sastre.ComposablePreviewScanner", name = "android", version.ref = "previewScanner" }
-roborazzi-compose-desktop = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose-desktop", version.ref = "roborazzi" }
+# Use Roborazzi + Robolectric to get more deterministic snapshot tests of :shared:commonMain.
+# Roborazzi's experimental Compose Desktop has wildly different font rendering between envionments,
+# and Paprazzi would require us to stand up a shim com.android.library module, making this the
+# best compromise for now.
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
+roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose", version.ref = "roborazzi" }
+roborazzi-junit-rule = { group = "io.github.takahirom.roborazzi", name = "roborazzi-junit-rule", version.ref = "roborazzi" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

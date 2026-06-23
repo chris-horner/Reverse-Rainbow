@@ -23,12 +23,15 @@ kotlin {
     compilerOptions {
       jvmTarget.set(JvmTarget.JVM_17)
     }
+
+    withHostTest {
+      includeAndroidResources = true
+      returnDefaultValues = true
+    }
   }
 
-  jvm {
-    compilerOptions {
-      jvmTarget.set(JvmTarget.JVM_17)
-    }
+  roborazzi {
+    outputDir.set(file('src/androidHostTest/snapshots'))
   }
 
   wasmJs {
@@ -74,12 +77,14 @@ kotlin {
       implementation libs.ktor.client.mock
     }
 
-    jvmTest.dependencies {
-      implementation compose.desktop.currentOs
+    androidHostTest.dependencies {
       implementation compose.uiTest
-      implementation libs.roborazzi.compose.desktop
-      implementation libs.preview.scanner
       implementation libs.junit
+      implementation libs.preview.scanner
+      implementation libs.robolectric
+      implementation libs.roborazzi
+      implementation libs.roborazzi.compose
+      implementation libs.roborazzi.junit.rule
     }
   }
 

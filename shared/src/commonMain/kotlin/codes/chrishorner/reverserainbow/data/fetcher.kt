@@ -37,7 +37,10 @@ suspend fun fetchTiles(
   val url = "$ApiEndpoint$year-$month-$day.json"
 
   return try {
-    HttpClient(httpEngine).get(url).toResult()
+    // We generally only make one request, then we never need an HttpClient again. If we need to
+    // retry then we pay the price of instantiating a new client object every time - no biggy in an
+    // app of this size.
+    HttpClient(httpEngine).use { it.get(url).toResult() }
   } catch (e: Exception) {
     logging("Reverse Rainbow").e(e) { "Failed to fetch tiles." }
     TileFetchResult.NetworkFailure

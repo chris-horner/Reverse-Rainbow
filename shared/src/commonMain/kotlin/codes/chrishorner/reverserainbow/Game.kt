@@ -110,6 +110,7 @@ class Game(tiles: ImmutableList<Tile>) {
   fun reset() {
     tiles.replaceAll { it.copy(selected = false, category = null) }
     tiles.sortBy { it.initialPosition }
+    expandedCategory = null
   }
 
   fun shuffle() {

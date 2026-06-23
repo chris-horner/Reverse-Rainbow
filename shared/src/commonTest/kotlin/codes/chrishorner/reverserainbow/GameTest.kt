@@ -304,8 +304,12 @@ class GameTest {
     game.select(unassignedTiles[8])
     game.applyCategoryAction(Category.YELLOW)
 
+    game.applyCategoryAction(Category.YELLOW)
+    assertThat(game.model.value.expandedCategory).isEqualTo(Category.YELLOW)
+
     game.reset()
     assertThat(game.tiles).isEqualTo(unassignedTiles)
+    assertThat(game.model.value.expandedCategory).isNull()
   }
 
   @Test

@@ -19,6 +19,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Clock
 
 /**
@@ -41,6 +42,8 @@ suspend fun fetchTiles(
     // retry then we pay the price of instantiating a new client object every time - no biggy in an
     // app of this size.
     HttpClient(httpEngine).use { it.get(url).toResult() }
+  } catch (e: CancellationException) {
+    throw e
   } catch (e: Exception) {
     logging("Reverse Rainbow").e(e) { "Failed to fetch tiles." }
     TileFetchResult.NetworkFailure
@@ -85,8 +88,10 @@ private suspend fun HttpResponse.toResult(): TileFetchResult {
       .map { it.asTile() }
       .toImmutableList()
     return TileFetchResult.Success(tiles)
+  } catch (e: CancellationException) {
+    throw e
   } catch (e: Exception) {
-    logging("Reverse Rainbow").e( e) { "Failed to parse tiles from server response." }
+    logging("Reverse Rainbow").e(e) { "Failed to parse tiles from server response." }
     return TileFetchResult.ParsingFailure
   }
 }

@@ -230,3 +230,18 @@ private fun VerticalCategoryActionsBarPreview() = PreviewUi(
     boardComplete = false,
   )
 }
+
+@Preview
+@Composable
+private fun CategoryActionsBarExpandedPreview() = PreviewUi(width = 360.dp) {
+  CategoryActionsBar(
+    categoryActions = persistentMapOf(
+      Category.YELLOW to CategoryAction.ASSIGN,
+      Category.GREEN to CategoryAction.DISABLED,
+      Category.BLUE to CategoryAction.SWAP_SELECTED,
+      Category.PURPLE to CategoryAction.CLEAR,
+    ),
+    expandedCategory = Category.GREEN,
+    boardComplete = false,
+  )
+}

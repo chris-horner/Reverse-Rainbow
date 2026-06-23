@@ -9,6 +9,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,25 +43,31 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun CategoryAnimationScope.ExpandedSwapButton(
-  category: Category,
+  expandedCategory: Category,
+  swapCategory: Category,
   onClick: () -> Unit,
 ) {
   Box(
     contentAlignment = Alignment.Center,
     modifier = Modifier
       .renderInSharedTransitionScopeOverlay()
-      .animateExpandedSwapEnterExit(category)
+      .animateExpandedSwapEnterExit(swapCategory)
       .size(CategoryActionButtonSize)
       .background(
         shape = TileShape,
-        color = category.backgroundColor,
+        color = swapCategory.backgroundColor,
+      )
+      .border(
+        width = 1.dp,
+        color = expandedCategory.foregroundColor.copy(alpha = 0.4f),
+        shape = TileShape,
       )
       .clickable(onClick = onClick)
   ) {
     Icon(
       imageVector = Icons.SwapVert,
       contentDescription = null,
-      tint = category.foregroundColor,
+      tint = swapCategory.foregroundColor,
     )
   }
 }

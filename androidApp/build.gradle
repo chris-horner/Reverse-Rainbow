@@ -12,12 +12,12 @@ def versionPatch = project.findProperty('app.versionPatch').toInteger()
 
 android {
   namespace 'codes.chrishorner.reverserainbow'
-  compileSdk = 36
+  compileSdk = 37
 
   defaultConfig {
     applicationId "codes.chrishorner.reverserainbow"
     minSdk 31
-    targetSdk 36
+    targetSdk 37
     versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch
     versionName "${versionMajor}.${versionMinor}.${versionPatch}"
   }

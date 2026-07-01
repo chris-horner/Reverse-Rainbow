@@ -17,7 +17,7 @@ def versionPatch = project.findProperty('app.versionPatch').toInteger()
 kotlin {
   android {
     namespace = 'codes.chrishorner.reverserainbow.shared'
-    compileSdk { version = release(36) }
+    compileSdk { version = release(37) }
     minSdk = 31
     androidResources.enable = true
     compilerOptions {

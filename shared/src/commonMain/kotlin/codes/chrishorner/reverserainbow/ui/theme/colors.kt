@@ -20,6 +20,7 @@ interface PlannerColors {
   val onBlueSurface: Color
   val purpleSurface: Color
   val onPurpleSurface: Color
+  val logoBackgroundTile: Color
 }
 
 @Suppress("UnusedReceiverParameter") // Desirable API shape.
@@ -56,6 +57,7 @@ object ColorsLight : PlannerColors {
   override val onBlueSurface = Color(0xFF00424C)
   override val purpleSurface = Color(0xFFA597F1)
   override val onPurpleSurface = Color(0xFF2C2140)
+  override val logoBackgroundTile = Color(0xFF484463)
 }
 
 object ColorsDark : PlannerColors {
@@ -71,6 +73,7 @@ object ColorsDark : PlannerColors {
   override val onBlueSurface = Color(0xFF00424C)
   override val purpleSurface = Color(0xFFAC9DF2)
   override val onPurpleSurface = Color(0xFF2C2140)
+  override val logoBackgroundTile = Color(0xFF484463)
 }
 
 val Category?.foregroundColor

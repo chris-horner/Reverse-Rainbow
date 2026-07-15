@@ -85,7 +85,6 @@ private fun CategoryAnimationScope.HorizontalExpandedCategoryActionsBar(
           )
         } else {
           ExpandedSwapButton(
-            expandedCategory = expandedCategory,
             swapCategory = category,
             onClick = { onClick(category) },
           )
@@ -129,7 +128,6 @@ private fun CategoryAnimationScope.VerticalExpandedCategoryActionsBar(
           )
         } else {
           ExpandedSwapButton(
-            expandedCategory = expandedCategory,
             swapCategory = category,
             onClick = { onClick(category) },
           )

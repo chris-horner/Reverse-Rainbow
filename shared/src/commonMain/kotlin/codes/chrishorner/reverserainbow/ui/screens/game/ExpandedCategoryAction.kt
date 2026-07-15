@@ -9,13 +9,13 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.FilledIconButton
@@ -39,11 +39,11 @@ import codes.chrishorner.reverserainbow.ui.theme.TileShape
 import codes.chrishorner.reverserainbow.ui.theme.backgroundColor
 import codes.chrishorner.reverserainbow.ui.theme.foregroundColor
 import codes.chrishorner.reverserainbow.ui.tileSpringSpec
+import com.adamglin.composecontinuousroundedcornershape.ContinuousRoundedCornerShape
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun CategoryAnimationScope.ExpandedSwapButton(
-  expandedCategory: Category,
   swapCategory: Category,
   onClick: () -> Unit,
 ) {
@@ -53,16 +53,16 @@ fun CategoryAnimationScope.ExpandedSwapButton(
       .renderInSharedTransitionScopeOverlay()
       .animateExpandedSwapEnterExit(swapCategory)
       .size(CategoryActionButtonSize)
+      .clickable(onClick = onClick)
+      .background(
+        shape = ContinuousRoundedCornerShape(8.dp),
+        color = swapCategory.foregroundColor.copy(alpha = 0.4f),
+      )
+      .padding(3.dp)
       .background(
         shape = TileShape,
         color = swapCategory.backgroundColor,
       )
-      .border(
-        width = 1.dp,
-        color = expandedCategory.foregroundColor.copy(alpha = 0.4f),
-        shape = TileShape,
-      )
-      .clickable(onClick = onClick)
   ) {
     Icon(
       imageVector = Icons.SwapVert,

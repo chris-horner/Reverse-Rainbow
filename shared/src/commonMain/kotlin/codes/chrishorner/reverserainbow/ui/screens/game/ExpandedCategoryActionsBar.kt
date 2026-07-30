@@ -1,8 +1,8 @@
 package codes.chrishorner.reverserainbow.ui.screens.game
 
 import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -147,7 +147,7 @@ private fun Modifier.sharedBoundsForExpandedCategory(
     animatedVisibilityScope = this,
     resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
     enter = EnterTransition.None,
-    exit = ExitTransition.None,
+    exit = fadeOut(),
     boundsTransform = { _, _ -> tileSpringSpec() }
   )
 }

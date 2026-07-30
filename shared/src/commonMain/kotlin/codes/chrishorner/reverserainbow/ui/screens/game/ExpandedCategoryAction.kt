@@ -18,11 +18,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalRippleConfiguration
+import androidx.compose.material3.RippleConfiguration
+import androidx.compose.material3.RippleDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -179,21 +184,39 @@ fun CategoryAnimationScope.ExpandedCategoryCancelAndClear(
 
 @Composable
 private fun CategoryAnimationScope.CancelButton(category: Category, onClick: () -> Unit) {
-  IconButton(
-    onClick = onClick,
-    modifier = Modifier.size(CategoryActionButtonSize)
+  CompositionLocalProvider(
+    LocalRippleConfiguration provides RippleConfiguration(
+      rippleAlpha = RippleAlpha(
+        draggedAlpha = RippleDefaults.RippleAlpha.draggedAlpha,
+        focusedAlpha = RippleDefaults.RippleAlpha.focusedAlpha,
+        hoveredAlpha = RippleDefaults.RippleAlpha.hoveredAlpha,
+        // Having the touch ripple play out over the top of the cancel button as the expanded
+        // category runs its collapse animation looks subtly weird.
+        pressedAlpha = 0f,
+      ),
+    ),
   ) {
-    Icon(
-      imageVector = Icons.Clear,
-      tint = category.foregroundColor,
-      contentDescription = stringResource(Res.string.collapse_category),
-      modifier = Modifier
-        .renderInSharedTransitionScopeOverlay()
-        .sharedBounds(
-          sharedContentState = rememberSharedContentState(key = getCategoryActionIconKey(category)),
-          animatedVisibilityScope = this,
-        ),
-    )
+    IconButton(
+      onClick = onClick,
+      shape = TileShape,
+      colors = IconButtonDefaults.iconButtonColors(contentColor = category.foregroundColor),
+      modifier = Modifier.size(CategoryActionButtonSize)
+    ) {
+      Icon(
+        imageVector = Icons.Clear,
+        contentDescription = stringResource(Res.string.collapse_category),
+        modifier = Modifier
+          .renderInSharedTransitionScopeOverlay()
+          .sharedBounds(
+            sharedContentState = rememberSharedContentState(
+              key = getCategoryActionIconKey(category)
+            ),
+            animatedVisibilityScope = this,
+            enter = fadeIn(spring(stiffness = Spring.StiffnessMedium)),
+            exit = fadeOut(spring(stiffness = Spring.StiffnessMedium)),
+          ),
+      )
+    }
   }
 }
 
@@ -228,11 +251,11 @@ private fun Modifier.animateClearButtonEnterExit() = with(animationScope) {
         enter = slideInVertically(
           initialOffsetY = { fullHeight -> -fullHeight - gapHeightPx },
           animationSpec = tileSpringSpec(),
-        ),
+        ) + fadeIn(spring(stiffness = Spring.StiffnessMedium)),
         exit = slideOutVertically(
           targetOffsetY = { fullHeight -> -fullHeight - gapHeightPx },
           animationSpec = tileSpringSpec(),
-        ),
+        ) + fadeOut(spring(stiffness = Spring.StiffnessMedium)),
       )
     }
 

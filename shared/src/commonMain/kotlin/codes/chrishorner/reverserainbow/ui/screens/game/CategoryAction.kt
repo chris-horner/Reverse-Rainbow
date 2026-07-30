@@ -1,6 +1,5 @@
 package codes.chrishorner.reverserainbow.ui.screens.game
 
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector2D
 import androidx.compose.animation.core.VectorConverter
@@ -13,10 +12,13 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -65,66 +67,77 @@ fun CategoryAnimationScope.CategoryAction(
 
   val jumpAnimatable = rememberJumpAnimatable(category, boardComplete)
 
-  Box(
-    contentAlignment = Alignment.Center,
-    modifier = modifier
-      .recordCategoryActionPosition()
-      .animateCategoryEnterExit(category)
-      // This first sharedBounds is within CategoryAnimationScope, allowing this action button to
-      // visually transform when it's expanded.
-      .sharedBounds(
-        sharedContentState = rememberSharedContentState(category),
-        animatedVisibilityScope = this@CategoryAction,
-        boundsTransform = { _, _ -> tileSpringSpec() }
-      )
-      // This second sharedBounds is for the global navigation scope, allowing this action button to
-      // be a shared element when navigating between Loading, About, and Error screens.
-      .then(
-        with(LocalSharedTransitionScope.current) {
-          Modifier.sharedBounds(
-            sharedContentState = rememberSharedContentState(category),
-            animatedVisibilityScope = LocalAnimatedContentScope.current,
-            boundsTransform = { _, _ -> tileSpringSpec() }
-          )
-        }
-      )
-      .offset { jumpAnimatable.value }
-      .alpha(alpha)
-      .size(CategoryActionButtonSize)
-      .background(
-        shape = TileShape,
-        color = category.backgroundColor,
-      )
-      .clickable(
-        enabled = action != CategoryAction.DISABLED,
-        onClick = { onClick(category) },
-      )
+  CompositionLocalProvider(
+    LocalContentColor provides category.foregroundColor,
   ) {
-    val iconVector = when (action) {
-      CategoryAction.CLEAR -> Icons.Delete
-      CategoryAction.SWAP_SELECTED -> Icons.SwapVert
-      CategoryAction.FINISH -> Icons.Check
-      CategoryAction.EXPAND -> Icons.MoreHoriz
-      else -> null
-    }
+    Box(
+      contentAlignment = Alignment.Center,
+      modifier = modifier
+        .recordCategoryActionPosition()
+        .animateCategoryEnterExit(category)
+        // This first sharedBounds is within CategoryAnimationScope, allowing this action button to
+        // visually transform when it's expanded.
+        .sharedBounds(
+          sharedContentState = rememberSharedContentState(category),
+          animatedVisibilityScope = this@CategoryAction,
+          boundsTransform = { _, _ -> tileSpringSpec() },
+        )
+        // This second sharedBounds is for the global navigation scope, allowing this action button
+        // to be a shared element when navigating between Loading, About, and Error screens.
+        .then(
+          with(LocalSharedTransitionScope.current) {
+            Modifier.sharedBounds(
+              sharedContentState = rememberSharedContentState(category),
+              animatedVisibilityScope = LocalAnimatedContentScope.current,
+              boundsTransform = { _, _ -> tileSpringSpec() }
+            )
+          }
+        )
+        .offset { jumpAnimatable.value }
+        .graphicsLayer { this.alpha = alpha }
+        .size(CategoryActionButtonSize)
+        .background(
+          shape = TileShape,
+          color = category.backgroundColor,
+        )
+        .clickable(
+          enabled = action != CategoryAction.DISABLED,
+          onClick = { onClick(category) },
+        )
+    ) {
+      val iconVector = when (action) {
+        CategoryAction.CLEAR -> Icons.Delete
+        CategoryAction.SWAP_SELECTED -> Icons.SwapVert
+        CategoryAction.FINISH -> Icons.Check
+        CategoryAction.EXPAND -> Icons.MoreHoriz
+        else -> null
+      }
 
-    if (iconVector != null) {
-      Icon(
-        imageVector = iconVector,
-        contentDescription = null,
-        tint = category.foregroundColor,
-        modifier = Modifier
-          .sharedBounds(
-            sharedContentState = rememberSharedContentState(
-              key = getCategoryActionIconKey(category),
-              config = object : SharedTransitionScope.SharedContentConfig {
-                override val SharedTransitionScope.SharedContentState.isEnabled: Boolean
-                  get() = action == CategoryAction.EXPAND
-              },
+      if (iconVector != null) {
+        Icon(
+          imageVector = iconVector,
+          contentDescription = null,
+          modifier = Modifier
+            .sharedBounds(
+              sharedContentState = rememberSharedContentState(
+                key = getCategoryActionIconKey(category),
+              ),
+              animatedVisibilityScope = this@CategoryAction,
             ),
-            animatedVisibilityScope = this@CategoryAction,
-          ),
-      )
+        )
+      } else {
+        // Even if we don't need to show an icon, give the shared element API _something_ to use as
+        // a target to avoid rendering issues.
+        Spacer(
+          modifier = Modifier
+            .sharedBounds(
+              sharedContentState = rememberSharedContentState(
+                key = getCategoryActionIconKey(category),
+              ),
+              animatedVisibilityScope = this@CategoryAction,
+            ),
+        )
+      }
     }
   }
 }

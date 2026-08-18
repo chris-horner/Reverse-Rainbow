@@ -20,7 +20,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +53,8 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun Tile(
@@ -89,6 +95,19 @@ fun Tile(
     animationSpec = spring(stiffness = Spring.StiffnessHigh)
   )
 
+  // A little gross, but this is just one of those things that needs to exist to make the animations
+  // feel just right. animateBounds()'s LookaheadLayout has no (nice) mechanism of telling us when
+  // an item is in the middle of moving, but we want animating tiles to render above those that are
+  // static. To that end, if the position changes we bump the zOffset by an arbitrary amount - even
+  // more if it has a category. Colored tiles look nicer when they move themselves over top of gray
+  // tiles.
+  var animationZOffset by remember { mutableFloatStateOf(0f) }
+  LaunchedEffect(tile.currentPosition) {
+    animationZOffset = 50f + if (tile.category != null) 50f else 0f
+    delay(500.milliseconds)
+    animationZOffset = 0f
+  }
+
   // When a tile is being dragged, make sure it renders over the others with a grace period,
   // allowing it to continue being on top while it animates back into position.
   val dragZOffset by animateFloatAsState(
@@ -109,9 +128,7 @@ fun Tile(
 
   Box(
     contentAlignment = Alignment.Center,
-    modifier = modifier
-      // Make sure tiles animating to the top, or being dragged render over others.
-      .zIndex(4f - tile.currentPosition + dragZOffset)
+    modifier = modifier.zIndex(dragZOffset + animationZOffset)
   ) {
     val proposedSwapTile = (dragState.status as? DragStatus.Dragged)?.hoveredTile
 

@@ -3,6 +3,7 @@ package codes.chrishorner.reverserainbow.ui.screens.about
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.reverserainbow.BuildKonfig
 import codes.chrishorner.reverserainbow.data.Category
@@ -35,6 +41,7 @@ import codes.chrishorner.reverserainbow.resources.about_point1
 import codes.chrishorner.reverserainbow.resources.about_point2
 import codes.chrishorner.reverserainbow.resources.about_point3
 import codes.chrishorner.reverserainbow.resources.about_point4
+import codes.chrishorner.reverserainbow.resources.about_point4_hyperlink
 import codes.chrishorner.reverserainbow.resources.back_description
 import codes.chrishorner.reverserainbow.ui.Icons
 import codes.chrishorner.reverserainbow.ui.LocalAnimatedContentScope
@@ -50,6 +57,8 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AboutUi(onBack: () -> Unit) {
+  val uriHandler = LocalUriHandler.current
+
   Scaffold(topBar = { TopBar(onBack) }) { paddingValues ->
     CappedWidthContainer {
       Column(
@@ -75,14 +84,56 @@ fun AboutUi(onBack: () -> Unit) {
 
         Spacer(modifier = Modifier.size(32.dp))
 
-        Entry(Category.YELLOW, Icons.Construction, stringResource(Res.string.about_point1))
-        Entry(Category.GREEN, Icons.Warning, stringResource(Res.string.about_point2))
-        Entry(Category.BLUE, Icons.EditNote, stringResource(Res.string.about_point3))
-        Entry(Category.PURPLE, Icons.GitHub, stringResource(Res.string.about_point4))
+        Entry(
+          category = Category.YELLOW,
+          icon = Icons.Construction,
+          text = AnnotatedString(stringResource(Res.string.about_point1))
+        )
+        Entry(
+          category = Category.GREEN,
+          icon = Icons.Warning,
+          text = AnnotatedString(stringResource(Res.string.about_point2))
+        )
+        Entry(
+          category = Category.BLUE,
+          icon = Icons.EditNote,
+          text = AnnotatedString(stringResource(Res.string.about_point3))
+        )
+        Entry(
+          category = Category.PURPLE, icon = Icons.GitHub, text = Entry4Text,
+          modifier = Modifier.clickable {
+            uriHandler.openUri("https://github.com/chris-horner/Reverse-Rainbow")
+          }
+        )
       }
     }
   }
 }
+
+private val Entry4Text: AnnotatedString
+  @Composable
+  get() {
+    val text = stringResource(Res.string.about_point4)
+    val hyperlinkText = stringResource(Res.string.about_point4_hyperlink)
+    val start = text.indexOf(hyperlinkText)
+    val end = start + hyperlinkText.length
+
+    require(start >= 0) {
+      "Hyperlink text: $hyperlinkText - not found in $text"
+    }
+
+    return buildAnnotatedString {
+      append(text)
+      addStyle(
+        style = SpanStyle(
+          color = MaterialTheme.colorScheme.primary,
+          textDecoration = TextDecoration.Underline,
+        ),
+        start = start,
+        end = end,
+      )
+    }
+  }
 
 @Composable
 private fun TopBar(onBack: () -> Unit) {
@@ -108,12 +159,13 @@ private fun TopBar(onBack: () -> Unit) {
 private fun Entry(
   category: Category,
   icon: ImageVector,
-  text: String,
+  text: AnnotatedString,
+  modifier: Modifier = Modifier,
 ) {
   Row(
     horizontalArrangement = Arrangement.spacedBy(16.dp),
     verticalAlignment = Alignment.CenterVertically,
-    modifier = Modifier
+    modifier = modifier
       .fillMaxWidth()
       .heightIn(min = 72.dp)
       .padding(16.dp)

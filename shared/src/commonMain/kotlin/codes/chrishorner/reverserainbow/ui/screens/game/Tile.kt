@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -141,47 +143,49 @@ fun Tile(
       )
     }
 
-    Box(
-      contentAlignment = Alignment.Center,
-      modifier = Modifier
-        .matchParentSize()
-        .padding(1.dp)
-        .dashedBorder(color = { dragSlotBorderColor })
-        .offset { dragState.status.offset }
-        .animateBounds(
-          lookaheadScope = this@with,
-          boundsTransform = { _, _ ->
-            if (dragState.status !is DragStatus.Dragged) {
-              spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = Spring.StiffnessMediumLow,
-                visibilityThreshold = Rect.VisibilityThreshold,
-              )
-            } else {
-              SnapSpec()
+    CompositionLocalProvider(LocalContentColor provides foregroundColor) {
+      Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+          .matchParentSize()
+          .padding(1.dp)
+          .dashedBorder(color = { dragSlotBorderColor })
+          .offset { dragState.status.offset }
+          .animateBounds(
+            lookaheadScope = this@with,
+            boundsTransform = { _, _ ->
+              if (dragState.status !is DragStatus.Dragged) {
+                spring(
+                  dampingRatio = Spring.DampingRatioLowBouncy,
+                  stiffness = Spring.StiffnessMediumLow,
+                  visibilityThreshold = Rect.VisibilityThreshold,
+                )
+              } else {
+                SnapSpec()
+              }
             }
+          )
+          .dashedBorder(color = { hoverSlotBorderColor })
+          .padding(3.dp)
+          .graphicsLayer {
+            transformOrigin = dragState.status.transformOrigin
+            scaleX = scale
+            scaleY = scale
           }
-        )
-        .dashedBorder(color = { hoverSlotBorderColor })
-        .padding(3.dp)
-        .graphicsLayer {
-          transformOrigin = dragState.status.transformOrigin
-          scaleX = scale
-          scaleY = scale
-        }
-        .background(
-          color = backgroundColor,
-          shape = TileShape,
-        )
-        .border(width = 6.dp, color = dragBorderColor, shape = TileShape)
-        .clip(TileShape)
-        .combinedClickable(
-          onClick = onClick,
-          onLongClick = onLongClick,
-        )
-        .padding(4.dp)
-    ) {
-      TileContent(tile.content, color = foregroundColor)
+          .background(
+            color = backgroundColor,
+            shape = TileShape,
+          )
+          .border(width = 6.dp, color = dragBorderColor, shape = TileShape)
+          .clip(TileShape)
+          .combinedClickable(
+            onClick = onClick,
+            onLongClick = onLongClick,
+          )
+          .padding(4.dp)
+      ) {
+        TileContent(tile.content)
+      }
     }
   }
 }
@@ -189,7 +193,7 @@ fun Tile(
 @Composable
 private fun TileContent(
   content: Tile.Content,
-  color: Color,
+  color: Color = LocalContentColor.current,
 ) {
   when (content) {
     is Tile.Content.Image -> TileImage(content, color)

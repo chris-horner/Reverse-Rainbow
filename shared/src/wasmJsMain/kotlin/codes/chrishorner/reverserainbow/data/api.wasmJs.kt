@@ -1,7 +1,16 @@
 package codes.chrishorner.reverserainbow.data
 
-// Requests go through a Netlify proxy rewrite (see webApp/src/wasmJsMain/resources/_redirects)
-// which forwards to https://www.nytimes.com/svc/connections/v2/ server-side, avoiding browser CORS.
+import io.ktor.http.Url
+
+// In the browser we need to worry about CORS, so we proxy the requests through Netlify.
+// See webApp/src/wasmJsMain/resources/_redirects
+
 actual val ApiEndpoint: String = "${currentOrigin()}/api/connections/"
 
+actual fun imageUrl(apiUrl: String): String {
+  val protocol = Url(apiUrl).protocol.name
+  return "${currentOrigin()}/api/proxy/${apiUrl.removePrefix("$protocol://")}"
+}
+
+@OptIn(ExperimentalWasmJsInterop::class)
 private fun currentOrigin(): String = js("window.location.origin")

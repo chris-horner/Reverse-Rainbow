@@ -1,2 +1,5 @@
 # Proxy NYT Connections requests through Netlify to avoid browser CORS restrictions.
 /api/connections/*  https://www.nytimes.com/svc/connections/v2/:splat  200
+# Tile images come from a variety of domains, so the host is part of the path and gets
+# substituted into the target. /api/proxy/example.com/thing.svg -> https://example.com/thing.svg
+/api/proxy/*  https://:splat  200

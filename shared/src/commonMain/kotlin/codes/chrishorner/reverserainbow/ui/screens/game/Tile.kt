@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.zIndex
 import codes.chrishorner.reverserainbow.data.Tile
+import codes.chrishorner.reverserainbow.data.imageUrl
 import codes.chrishorner.reverserainbow.ui.Icons
 import codes.chrishorner.reverserainbow.ui.LocalSharedTransitionScope
 import codes.chrishorner.reverserainbow.ui.theme.TileShape
@@ -252,7 +253,7 @@ private fun TileImage(
 ) {
   AsyncImage(
     model = ImageRequest.Builder(LocalPlatformContext.current)
-      .data(content.url)
+      .data(imageUrl(content.url))
       .crossfade(true)
       .build(),
     contentDescription = content.description,

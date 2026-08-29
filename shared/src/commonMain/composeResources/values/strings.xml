@@ -24,6 +24,8 @@
   <string name="about_point3_hyperlink">Connections</string>
   <string name="about_point4">All code is open source, and can be found here on GitHub.</string>
   <string name="about_point4_hyperlink">found here on GitHub</string>
+  <string name="about_play_badge_description">Link to app on Google Play</string>
+  <string name="about_android_message">This app started out life as an Android app. You can find it here on Google Play.</string>
 
   <string name="error_title_network">Connection issues!</string>
   <string name="error_title_http">They OK?</string>

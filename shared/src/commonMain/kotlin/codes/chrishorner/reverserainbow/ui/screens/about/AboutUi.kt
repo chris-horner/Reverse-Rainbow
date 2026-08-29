@@ -113,6 +113,8 @@ fun AboutUi(onBack: () -> Unit) {
           hyperlinkText = stringResource(Res.string.about_point4_hyperlink),
           url = "https://github.com/chris-horner/Reverse-Rainbow",
         )
+
+        PlayStoreMessage()
       }
     }
   }
@@ -220,6 +222,9 @@ private fun String.styleWithHyperlink(hyperlinkText: String): AnnotatedString {
     )
   }
 }
+
+@Composable
+expect fun PlayStoreMessage()
 
 @PreviewLightDarkPortraitSmall
 @Composable

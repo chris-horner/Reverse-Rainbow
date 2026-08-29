@@ -38,8 +38,11 @@ import codes.chrishorner.reverserainbow.resources.Res
 import codes.chrishorner.reverserainbow.resources.about
 import codes.chrishorner.reverserainbow.resources.about_app_name
 import codes.chrishorner.reverserainbow.resources.about_point1
+import codes.chrishorner.reverserainbow.resources.about_point1_hyperlink
 import codes.chrishorner.reverserainbow.resources.about_point2
+import codes.chrishorner.reverserainbow.resources.about_point2_hyperlink
 import codes.chrishorner.reverserainbow.resources.about_point3
+import codes.chrishorner.reverserainbow.resources.about_point3_hyperlink
 import codes.chrishorner.reverserainbow.resources.about_point4
 import codes.chrishorner.reverserainbow.resources.about_point4_hyperlink
 import codes.chrishorner.reverserainbow.resources.back_description
@@ -57,8 +60,6 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AboutUi(onBack: () -> Unit) {
-  val uriHandler = LocalUriHandler.current
-
   Scaffold(topBar = { TopBar(onBack) }) { paddingValues ->
     CappedWidthContainer {
       Column(
@@ -87,53 +88,35 @@ fun AboutUi(onBack: () -> Unit) {
         Entry(
           category = Category.YELLOW,
           icon = Icons.Construction,
-          text = AnnotatedString(stringResource(Res.string.about_point1))
+          text = stringResource(Res.string.about_point1),
+          hyperlinkText = stringResource(Res.string.about_point1_hyperlink),
+          url = "https://chrishorner.codes",
         )
         Entry(
           category = Category.GREEN,
           icon = Icons.Warning,
-          text = AnnotatedString(stringResource(Res.string.about_point2))
+          text = stringResource(Res.string.about_point2),
+          hyperlinkText = stringResource(Res.string.about_point2_hyperlink),
+          url = "https://www.nytimes.com",
         )
         Entry(
           category = Category.BLUE,
           icon = Icons.EditNote,
-          text = AnnotatedString(stringResource(Res.string.about_point3))
+          text = stringResource(Res.string.about_point3),
+          hyperlinkText = stringResource(Res.string.about_point3_hyperlink),
+          url = "https://www.nytimes.com/games/connections",
         )
         Entry(
-          category = Category.PURPLE, icon = Icons.GitHub, text = Entry4Text,
-          modifier = Modifier.clickable {
-            uriHandler.openUri("https://github.com/chris-horner/Reverse-Rainbow")
-          }
+          category = Category.PURPLE,
+          icon = Icons.GitHub,
+          text = stringResource(Res.string.about_point4),
+          hyperlinkText = stringResource(Res.string.about_point4_hyperlink),
+          url = "https://github.com/chris-horner/Reverse-Rainbow",
         )
       }
     }
   }
 }
-
-private val Entry4Text: AnnotatedString
-  @Composable
-  get() {
-    val text = stringResource(Res.string.about_point4)
-    val hyperlinkText = stringResource(Res.string.about_point4_hyperlink)
-    val start = text.indexOf(hyperlinkText)
-    val end = start + hyperlinkText.length
-
-    require(start >= 0) {
-      "Hyperlink text: $hyperlinkText - not found in $text"
-    }
-
-    return buildAnnotatedString {
-      append(text)
-      addStyle(
-        style = SpanStyle(
-          color = MaterialTheme.colorScheme.primary,
-          textDecoration = TextDecoration.Underline,
-        ),
-        start = start,
-        end = end,
-      )
-    }
-  }
 
 @Composable
 private fun TopBar(onBack: () -> Unit) {
@@ -159,20 +142,25 @@ private fun TopBar(onBack: () -> Unit) {
 private fun Entry(
   category: Category,
   icon: ImageVector,
-  text: AnnotatedString,
+  text: String,
+  hyperlinkText: String,
+  url: String,
   modifier: Modifier = Modifier,
 ) {
+  val uriHandler = LocalUriHandler.current
+
   Row(
     horizontalArrangement = Arrangement.spacedBy(16.dp),
     verticalAlignment = Alignment.CenterVertically,
     modifier = modifier
+      .clickable { uriHandler.openUri(url) }
       .fillMaxWidth()
       .heightIn(min = 72.dp)
       .padding(16.dp)
   ) {
     Block(category, icon)
     Text(
-      text = text,
+      text = text.styleWithHyperlink(hyperlinkText),
       color = MaterialTheme.colorScheme.onBackground,
       style = MaterialTheme.typography.bodyLarge,
     )
@@ -207,6 +195,28 @@ private fun Block(
       imageVector = icon,
       contentDescription = null,
       tint = category.foregroundColor,
+    )
+  }
+}
+
+@Composable
+private fun String.styleWithHyperlink(hyperlinkText: String): AnnotatedString {
+  val start = this.indexOf(hyperlinkText)
+  val end = start + hyperlinkText.length
+
+  require(start >= 0) {
+    "Hyperlink text: $hyperlinkText - not found in $this"
+  }
+
+  return buildAnnotatedString {
+    append(this@styleWithHyperlink)
+    addStyle(
+      style = SpanStyle(
+        color = MaterialTheme.colorScheme.primary,
+        textDecoration = TextDecoration.Underline,
+      ),
+      start = start,
+      end = end,
     )
   }
 }

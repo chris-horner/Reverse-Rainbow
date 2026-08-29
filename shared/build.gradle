@@ -17,8 +17,8 @@ def versionPatch = project.findProperty('app.versionPatch').toInteger()
 kotlin {
   android {
     namespace = 'codes.chrishorner.reverserainbow.shared'
-    compileSdk { version = release(37) }
-    minSdk = 31
+    compileSdk { version = release(project.property('app.compileSdk').toInteger()) }
+    minSdk = project.property('app.minSdk').toInteger()
     androidResources.enable = true
     compilerOptions {
       jvmTarget.set(JvmTarget.JVM_17)

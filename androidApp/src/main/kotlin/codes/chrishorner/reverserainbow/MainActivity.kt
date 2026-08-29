@@ -7,7 +7,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -38,17 +43,23 @@ class MainActivity : ComponentActivity() {
 
     setContent {
       ReverseRainbowTheme {
-        MainUi(
-          loaderState = gameLoader.state.value,
-          splashIconSize = splashIconSize.value,
-          onRefresh = { gameLoader.refresh() },
-          onOpenNyt = {
-            startActivity(
-              Intent(Intent.ACTION_VIEW, "https://www.nytimes.com/games/connections".toUri())
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-            )
-          }
-        )
+        Box(
+          modifier = Modifier
+            .fillMaxSize()
+            .semantics { testTagsAsResourceId = true }
+        ) {
+          MainUi(
+            loaderState = gameLoader.state.value,
+            splashIconSize = splashIconSize.value,
+            onRefresh = { gameLoader.refresh() },
+            onOpenNyt = {
+              startActivity(
+                Intent(Intent.ACTION_VIEW, "https://www.nytimes.com/games/connections".toUri())
+                  .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+              )
+            }
+          )
+        }
       }
     }
   }

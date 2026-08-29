@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   alias(libs.plugins.android.application)
+  alias(libs.plugins.androidx.baselineprofile)
   alias(libs.plugins.kotlin.compose)
   alias(libs.plugins.playpublisher)
 }
@@ -12,12 +13,12 @@ def versionPatch = project.findProperty('app.versionPatch').toInteger()
 
 android {
   namespace 'codes.chrishorner.reverserainbow'
-  compileSdk = 37
+  compileSdk = project.property('app.compileSdk').toInteger()
 
   defaultConfig {
     applicationId "codes.chrishorner.reverserainbow"
-    minSdk 31
-    targetSdk 37
+    minSdk project.property('app.minSdk').toInteger()
+    targetSdk project.property('app.targetSdk').toInteger()
     versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch
     versionName "${versionMajor}.${versionMinor}.${versionPatch}"
   }
@@ -94,6 +95,7 @@ kotlin {
 dependencies {
   implementation project(':shared')
   implementation libs.androidx.activity.compose
+  baselineProfile project(':baselineProfile')
 }
 
 play {

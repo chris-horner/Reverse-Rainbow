@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.reverserainbow.data.Category
@@ -73,6 +74,7 @@ fun CategoryAnimationScope.CategoryAction(
     Box(
       contentAlignment = Alignment.Center,
       modifier = modifier
+        .testTag("category_action_${category.name}")
         .recordCategoryActionPosition()
         .animateCategoryEnterExit(category)
         // This first sharedBounds is within CategoryAnimationScope, allowing this action button to

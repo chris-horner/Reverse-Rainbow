@@ -13,6 +13,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
@@ -37,6 +38,7 @@ fun Grid(
 
   ConnectionsLayout(
     modifier = modifier
+      .testTag("grid")
       .padding(4.dp)
       .pointerInput(tiles) { tileDragStates.detectDragGestures(this) }
   ) {
@@ -50,6 +52,7 @@ fun Grid(
           onClick = { onSelect(tile) },
           onLongClick = { onLongSelect(tile) },
           modifier = Modifier
+            .testTag("tile_$index")
             .animateEnterExit(
               enter = getEnterTransitionFor(index),
               exit = fadeOut(),

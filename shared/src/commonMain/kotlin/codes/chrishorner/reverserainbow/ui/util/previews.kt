@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.AndroidUiModes
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.isSpecified
+import codes.chrishorner.reverserainbow.data.LocalPersistence
+import codes.chrishorner.reverserainbow.data.Persistence
 import codes.chrishorner.reverserainbow.ui.LayoutOrientation
 import codes.chrishorner.reverserainbow.ui.LocalAnimatedContentScope
 import codes.chrishorner.reverserainbow.ui.LocalLayoutOrientation
@@ -37,6 +41,7 @@ fun PreviewUi(
           LocalSharedTransitionScope provides this@SharedTransitionLayout,
           LocalAnimatedContentScope provides this@AnimatedContent,
           LocalLayoutOrientation provides orientation,
+          LocalPersistence provides PreviewPersistence,
         ) {
           Box(
             modifier = Modifier
@@ -71,3 +76,12 @@ annotation class PreviewLightDarkPortraitSmall
   heightDp = 360,
 )
 annotation class PreviewLandscapeSmall
+
+/**
+ * We don't need this to function for previews.
+ */
+private object PreviewPersistence : Persistence {
+  override val hasDismissedWelcomeMessage: State<Boolean> = mutableStateOf(true)
+  override suspend fun load() = Unit
+  override suspend fun dismissWelcomeMessage() = Unit
+}

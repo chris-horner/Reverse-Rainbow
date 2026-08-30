@@ -1,5 +1,6 @@
 package codes.chrishorner.reverserainbow
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -7,6 +8,8 @@ import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeViewport
+import codes.chrishorner.reverserainbow.data.LocalPersistence
+import codes.chrishorner.reverserainbow.data.WebPersistence
 import codes.chrishorner.reverserainbow.ui.screens.MainUi
 import codes.chrishorner.reverserainbow.ui.theme.ReverseRainbowTheme
 import codes.chrishorner.reverserainbow.ui.theme.getInter
@@ -31,17 +34,19 @@ fun main() {
     }
     LaunchedEffect(Unit) { gameLoader.refresh() }
 
-    ReverseRainbowTheme {
-      MainUi(
-        loaderState = gameLoader.state.value,
-        onRefresh = {
-          gameLoader.refresh()
-        },
-        splashIconSize = DpSize(260.dp, 260.dp),
-        onOpenNyt = {
-          window.location.href = "https://www.nytimes.com/games/connections"
-        },
-      )
+    CompositionLocalProvider(LocalPersistence provides WebPersistence()) {
+      ReverseRainbowTheme {
+        MainUi(
+          loaderState = gameLoader.state.value,
+          onRefresh = {
+            gameLoader.refresh()
+          },
+          splashIconSize = DpSize(260.dp, 260.dp),
+          onOpenNyt = {
+            window.location.href = "https://www.nytimes.com/games/connections"
+          },
+        )
+      }
     }
   }
 }

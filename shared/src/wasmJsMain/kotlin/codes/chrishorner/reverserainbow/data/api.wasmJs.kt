@@ -12,5 +12,4 @@ actual fun imageUrl(apiUrl: String): String {
   return "${currentOrigin()}/api/proxy/${apiUrl.removePrefix("$protocol://")}"
 }
 
-@OptIn(ExperimentalWasmJsInterop::class)
 private fun currentOrigin(): String = js("window.location.origin")

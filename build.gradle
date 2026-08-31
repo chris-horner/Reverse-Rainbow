@@ -11,3 +11,12 @@ plugins {
   alias(libs.plugins.playpublisher) apply false
   alias(libs.plugins.roborazzi) apply false
 }
+
+subprojects {
+  plugins.withId('org.jetbrains.kotlin.plugin.compose') {
+    composeCompiler {
+      stabilityConfigurationFiles
+              .add(rootProject.layout.projectDirectory.file('compose_stability.conf'))
+    }
+  }
+}

@@ -1,10 +1,6 @@
 package codes.chrishorner.reverserainbow.ui.screens.game
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -21,8 +17,8 @@ import androidx.compose.ui.util.fastMap
 import codes.chrishorner.reverserainbow.data.Tile
 import codes.chrishorner.reverserainbow.ui.LocalAnimatedContentScope
 import codes.chrishorner.reverserainbow.ui.LocalUiMode
-import codes.chrishorner.reverserainbow.ui.OvershootEasing
 import codes.chrishorner.reverserainbow.ui.UiMode
+import codes.chrishorner.reverserainbow.ui.getGridEnterTransitionFor
 import kotlinx.collections.immutable.ImmutableList
 import kotlin.math.min
 
@@ -54,7 +50,7 @@ fun Grid(
           modifier = Modifier
             .testTag("tile_$index")
             .animateEnterExit(
-              enter = getEnterTransitionFor(index),
+              enter = getGridEnterTransitionFor(row = index / 4),
               exit = fadeOut(),
             )
             .onPlaced { coordinates -> dragState.bounds = coordinates.boundsInParent() }
@@ -139,26 +135,4 @@ private fun WideConnectionsLayout(
       }
     }
   }
-}
-
-/**
- * Slides and fades an individual tiles when the `Grid` enters the screen.
- */
-private fun getEnterTransitionFor(index: Int): EnterTransition {
-  val duration = 200
-  // Animate tiles lower down in the grid earlier than those higher up to create a nice effect.
-  val delay = 200 - ((index / 4) * 50)
-
-  return slideInVertically(
-    animationSpec = tween(
-      durationMillis = duration,
-      delayMillis = delay,
-      easing = OvershootEasing(1f),
-    ),
-  ) + fadeIn(
-    animationSpec = tween(
-      durationMillis = duration,
-      delayMillis = delay,
-    )
-  )
 }

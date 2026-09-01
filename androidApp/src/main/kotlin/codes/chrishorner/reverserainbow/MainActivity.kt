@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.core.view.doOnLayout
-import codes.chrishorner.reverserainbow.data.AndroidPersistence
 import codes.chrishorner.reverserainbow.data.LocalPersistence
 import codes.chrishorner.reverserainbow.ui.SplashScreenFadeMillis
 import codes.chrishorner.reverserainbow.ui.screens.MainUi
@@ -45,7 +44,7 @@ class MainActivity : ComponentActivity() {
     val gameLoader = viewModel.gameLoader
 
     setContent {
-      CompositionLocalProvider(LocalPersistence provides AndroidPersistence(this)) {
+      CompositionLocalProvider(LocalPersistence provides viewModel.persistence) {
         ReverseRainbowTheme {
           Box(
             modifier = Modifier

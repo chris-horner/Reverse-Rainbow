@@ -1,9 +1,9 @@
 <resources>
   <string name="app_name">Planner</string>
 
+  <string name="welcome_message">Welcome to Reverse Rainbow! A tool for NYT Connections players to plan their answers for today's puzzle.</string>
+  <string name="welcome_dismiss_button">Dismiss</string>
   <string name="menu_description">Menu</string>
-  <string name="make_rainbow_button">Make a rainbow</string>
-  <string name="reverse_rainbow_button">Reverse the rainbow</string>
   <string name="open_nyt">Open NYT</string>
   <string name="menu">Menu</string>
   <string name="about">About</string>

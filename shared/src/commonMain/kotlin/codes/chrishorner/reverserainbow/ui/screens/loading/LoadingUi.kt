@@ -136,7 +136,7 @@ private class LoadingAnimationState(
   private val angleAnimatable = Animatable(0f)
   private val scaleAnimatable = Animatable(1.05f)
   private val colorAnimatables = Category.entries.associateWith {
-    Animatable(colors.logoBackgroundTile)
+    Animatable(colors.launcherBackgroundTile)
   }
 
   var completedIntro by mutableStateOf(false)

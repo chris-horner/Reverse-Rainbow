@@ -25,16 +25,18 @@ fun main() {
     val scope = rememberCoroutineScope()
     val fontResolver = LocalFontFamilyResolver.current
     val fontFamily = getInter()
+    val persistence = WebPersistence()
 
     val gameLoader = remember {
       GameLoader(
         scope = scope,
         resourceLoader = { fontResolver.preload(fontFamily) },
+        persistence = persistence,
       )
     }
     LaunchedEffect(Unit) { gameLoader.refresh() }
 
-    CompositionLocalProvider(LocalPersistence provides WebPersistence()) {
+    CompositionLocalProvider(LocalPersistence provides persistence) {
       ReverseRainbowTheme {
         MainUi(
           loaderState = gameLoader.state.value,

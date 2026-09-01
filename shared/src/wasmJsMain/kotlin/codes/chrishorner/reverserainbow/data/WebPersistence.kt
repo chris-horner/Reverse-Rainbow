@@ -9,7 +9,7 @@ import kotlinx.browser.localStorage
 class WebPersistence : Persistence {
 
   override val hasDismissedWelcomeMessage: State<Boolean>
-    field: MutableState<Boolean> = mutableStateOf(false)
+    field: MutableState<Boolean> = mutableStateOf(true)
 
   override suspend fun load() {
     val dismissed = try {

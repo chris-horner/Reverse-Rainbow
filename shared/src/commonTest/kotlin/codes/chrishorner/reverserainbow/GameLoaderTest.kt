@@ -1,5 +1,7 @@
 package codes.chrishorner.reverserainbow
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
@@ -12,6 +14,7 @@ import codes.chrishorner.reverserainbow.GameLoaderTest.TestData.melbourneTimeZon
 import codes.chrishorner.reverserainbow.data.Category
 import codes.chrishorner.reverserainbow.data.CategoryAction
 import codes.chrishorner.reverserainbow.data.GameModel
+import codes.chrishorner.reverserainbow.data.Persistence
 import codes.chrishorner.reverserainbow.data.Tile
 import codes.chrishorner.reverserainbow.data.Tile.Content
 import codes.chrishorner.reverserainbow.data.TileFetchResult
@@ -41,6 +44,7 @@ class GameLoaderTest {
       tileFetcher = resultProvider::receive,
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
+      persistence = NoOpPersistence,
     )
 
     loader.refresh()
@@ -59,6 +63,7 @@ class GameLoaderTest {
       tileFetcher = resultProvider::receive,
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
+      persistence = NoOpPersistence,
     )
 
     loader.refresh()
@@ -75,6 +80,7 @@ class GameLoaderTest {
       tileFetcher = resultProvider::receive,
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
+      persistence = NoOpPersistence,
       initialState = LoaderState.Success(
         date = LocalDate.parse("2025-06-14"),
         game = Game(loadedTiles),
@@ -96,6 +102,7 @@ class GameLoaderTest {
       tileFetcher = resultProvider::receive,
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
+      persistence = NoOpPersistence,
       initialState = LoaderState.Failure(type = FailureType.NETWORK),
     )
 
@@ -115,6 +122,7 @@ class GameLoaderTest {
       // Current date is June 14h.
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
+      persistence = NoOpPersistence,
       initialState = LoaderState.Success(
         // Mark current game as loaded from June 13th.
         date = LocalDate.parse("2025-06-13"),
@@ -138,6 +146,7 @@ class GameLoaderTest {
       // Current date is June 14h.
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
+      persistence = NoOpPersistence,
       initialState = LoaderState.Success(
         // Mark current game as loaded from June 14th.
         date = LocalDate.parse("2025-06-14"),
@@ -166,6 +175,7 @@ class GameLoaderTest {
         override fun now() = vancouver3pmJune14
       },
       timeZoneProvider = { currentTimeZone },
+      persistence = NoOpPersistence,
       initialState = LoaderState.Success(
         // Mark current game as loaded from June 14th.
         date = LocalDate.parse("2025-06-14"),
@@ -194,6 +204,7 @@ class GameLoaderTest {
       resourceLoader = resourceResults::receive,
       clock = june14at9am,
       timeZoneProvider = { melbourneTimeZone },
+      persistence = NoOpPersistence,
     )
 
     loader.refresh()
@@ -247,5 +258,11 @@ class GameLoaderTest {
       allTilesAssigned = false,
       mostlyComplete = false,
     )
+  }
+
+  private object NoOpPersistence : Persistence {
+    override val hasDismissedWelcomeMessage: State<Boolean> = mutableStateOf(true)
+    override suspend fun load() = Unit
+    override suspend fun dismissWelcomeMessage() = Unit
   }
 }

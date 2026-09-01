@@ -4,6 +4,7 @@ import androidx.annotation.MainThread
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import codes.chrishorner.reverserainbow.data.Persistence
 import codes.chrishorner.reverserainbow.data.TileFetchResult
 import codes.chrishorner.reverserainbow.data.fetchTiles
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,7 @@ import kotlin.time.Clock
 class GameLoader(
   private val scope: CoroutineScope,
   initialState: LoaderState = LoaderState.Loading,
+  private val persistence: Persistence,
   private val tileFetcher: suspend () -> TileFetchResult = ::fetchTiles,
   /**
    * Resources on web are fetched asynchronously, so we give web clients the opportunity to
@@ -62,8 +64,10 @@ class GameLoader(
 
       val fetchTilesJob = async { tileFetcher() }
       val loadResourcesJob = async { resourceLoader() }
+      val persistenceJob = async { persistence.load() }
 
       loadResourcesJob.await()
+      persistenceJob.await()
       val tilesResult = fetchTilesJob.await()
       val currentLocalDate = clock.now().toLocalDateTime(timeZoneProvider()).date
 

@@ -1,5 +1,6 @@
 package codes.chrishorner.reverserainbow.ui.screens.game
 
+import androidx.compose.animation.animateBounds
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,6 +39,10 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.widthIn
+import codes.chrishorner.reverserainbow.ui.LocalSharedTransitionScope
+import codes.chrishorner.reverserainbow.ui.tileSpringSpec
 
 /**
  * Shows the Connections grid, the category assignment buttons, as well as the action bar. Uses
@@ -99,8 +106,12 @@ private fun PortraitGameUi(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
           .padding(paddingValues)
+          .fillMaxHeight()
+          .verticalScroll(rememberScrollState())
       ) {
         Spacer(modifier = Modifier.weight(1f))
+
+        WelcomeMessage(modifier = Modifier.padding(horizontal = 8.dp))
 
         Grid(
           tiles = model.tiles,
@@ -121,7 +132,12 @@ private fun PortraitGameUi(
           onCategoryClick = { category -> game.applyCategoryAction(category) },
           onCategoryClear = { category -> game.clearAll(category) },
           onCollapseCategories = { game.collapseCategories() },
-          modifier = Modifier.zIndex(1f),
+          modifier = Modifier
+            .zIndex(1f)
+            .animateBounds(
+              lookaheadScope = LocalSharedTransitionScope.current,
+              boundsTransform = { _, _ -> tileSpringSpec() }
+            )
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -139,45 +155,54 @@ private fun LandscapeGameUi(
   val model = game.model.value
 
   Scaffold { paddingValues ->
-    Row(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+    Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
 
-      Spacer(modifier = Modifier.weight(2f))
+      Row(modifier = Modifier.fillMaxSize()) {
 
-      Grid(
-        tiles = model.tiles,
-        onSelect = game::select,
-        onLongSelect = game::longSelect,
-        onDragOver = game::onDragOver,
+        Spacer(modifier = Modifier.weight(2f))
+
+        Grid(
+          tiles = model.tiles,
+          onSelect = game::select,
+          onLongSelect = game::longSelect,
+          onDragOver = game::onDragOver,
+          modifier = Modifier
+            .fillMaxHeight()
+            .wrapContentWidth()
+            .zIndex(2f),
+        )
+
+        Spacer(modifier = Modifier.size(16.dp))
+
+        CategoryActionsBar(
+          categoryActions = model.categoryActions,
+          expandedCategory = model.expandedCategory,
+          boardComplete = model.allTilesAssigned,
+          onCategoryClick = { category -> game.applyCategoryAction(category) },
+          onCategoryClear = { category -> game.clearAll(category) },
+          onCollapseCategories = { game.collapseCategories() },
+          modifier = Modifier.zIndex(1f),
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        VerticalToolbar(
+          showNytButton = model.mostlyComplete,
+          onResetClick = { game.reset() },
+          onShuffleClick = { game.shuffle() },
+          onAboutClick = onClickAbout,
+          onOpenNytClick = onOpenNyt,
+          modifier = Modifier.padding(top = 4.dp, end = 4.dp)
+        )
+
+        Spacer(modifier = Modifier.size(8.dp))
+      }
+
+      WelcomeMessage(
         modifier = Modifier
-          .fillMaxHeight()
-          .wrapContentWidth()
-          .zIndex(2f),
+          .widthIn(max = 400.dp)
+          .align(Alignment.Center)
       )
-
-      Spacer(modifier = Modifier.size(16.dp))
-
-      CategoryActionsBar(
-        categoryActions = model.categoryActions,
-        expandedCategory = model.expandedCategory,
-        boardComplete = model.allTilesAssigned,
-        onCategoryClick = { category -> game.applyCategoryAction(category) },
-        onCategoryClear = { category -> game.clearAll(category) },
-        onCollapseCategories = { game.collapseCategories() },
-        modifier = Modifier.zIndex(1f),
-      )
-
-      Spacer(modifier = Modifier.weight(1f))
-
-      VerticalToolbar(
-        showNytButton = model.mostlyComplete,
-        onResetClick = { game.reset() },
-        onShuffleClick = { game.shuffle() },
-        onAboutClick = onClickAbout,
-        onOpenNytClick = onOpenNyt,
-        modifier = Modifier.padding(top = 4.dp, end = 4.dp)
-      )
-
-      Spacer(modifier = Modifier.size(8.dp))
     }
   }
 }

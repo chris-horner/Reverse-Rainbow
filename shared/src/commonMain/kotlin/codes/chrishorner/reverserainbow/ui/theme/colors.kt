@@ -5,9 +5,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import codes.chrishorner.reverserainbow.data.Category
 
+@Immutable
 interface PlannerColors {
   val primary: Color
   val background: Color
@@ -21,7 +23,9 @@ interface PlannerColors {
   val onBlueSurface: Color
   val purpleSurface: Color
   val onPurpleSurface: Color
+  val launcherBackgroundTile: Color
   val logoBackgroundTile: Color
+  val logoOutline: Color
 }
 
 @Suppress("UnusedReceiverParameter") // Desirable API shape.
@@ -58,7 +62,9 @@ object ColorsLight : PlannerColors {
   override val onBlueSurface = Color(0xFF00424C)
   override val purpleSurface = Color(0xFFA597F1)
   override val onPurpleSurface = Color(0xFF2C2140)
-  override val logoBackgroundTile = Color(0xFF484463)
+  override val launcherBackgroundTile = Color(0xFF484463)
+  override val logoBackgroundTile = Color(0xFFD7C6C0)
+  override val logoOutline = Color(0xFF382924)
 }
 
 object ColorsDark : PlannerColors {
@@ -74,7 +80,9 @@ object ColorsDark : PlannerColors {
   override val onBlueSurface = Color(0xFF00424C)
   override val purpleSurface = Color(0xFFAC9DF2)
   override val onPurpleSurface = Color(0xFF2C2140)
+  override val launcherBackgroundTile = Color(0xFF484463)
   override val logoBackgroundTile = Color(0xFF484463)
+  override val logoOutline = Color(0xFF292C46)
 }
 
 val Category?.foregroundColor

@@ -1,13 +1,15 @@
 package codes.chrishorner.reverserainbow
 
+import android.app.Application
 import android.os.Bundle
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.savedstate.SavedState
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
 import codes.chrishorner.reverserainbow.GameLoader.LoaderState
+import codes.chrishorner.reverserainbow.data.AndroidPersistence
 import codes.chrishorner.reverserainbow.data.Tile
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -18,10 +20,12 @@ import kotlinx.datetime.LocalDate
  * Use as little of the ViewModel API as possible to persist the game's loaded state and survive
  * Activity restarts.
  */
-class GameLoaderViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
+class GameLoaderViewModel(app: Application, savedStateHandle: SavedStateHandle) : AndroidViewModel(app) {
   val gameLoader: GameLoader
+  val persistence = AndroidPersistence(app)
 
   init {
+
     val savedTiles: List<Tile>? = savedStateHandle
       .get<Bundle>("tiles")
       ?.let { decodeFromSavedState(it) }
@@ -39,6 +43,7 @@ class GameLoaderViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     gameLoader = GameLoader(
       scope = CoroutineScope(viewModelScope.coroutineContext),
       initialState = initialLoaderState,
+      persistence = persistence,
     )
 
     savedStateHandle.setSavedStateProvider("tiles") {

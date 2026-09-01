@@ -32,6 +32,7 @@ fun PreviewUi(
   orientation: LayoutOrientation = LayoutOrientation.Portrait,
   width: Dp = Dp.Unspecified,
   height: Dp = Dp.Unspecified,
+  dismissedWelcomeMessage: Boolean = true,
   content: @Composable () -> Unit,
 ) {
   ReverseRainbowTheme {
@@ -41,7 +42,7 @@ fun PreviewUi(
           LocalSharedTransitionScope provides this@SharedTransitionLayout,
           LocalAnimatedContentScope provides this@AnimatedContent,
           LocalLayoutOrientation provides orientation,
-          LocalPersistence provides PreviewPersistence,
+          LocalPersistence provides PreviewPersistence(dismissedWelcomeMessage),
         ) {
           Box(
             modifier = Modifier
@@ -77,11 +78,8 @@ annotation class PreviewLightDarkPortraitSmall
 )
 annotation class PreviewLandscapeSmall
 
-/**
- * We don't need this to function for previews.
- */
-private object PreviewPersistence : Persistence {
-  override val hasDismissedWelcomeMessage: State<Boolean> = mutableStateOf(true)
+private class PreviewPersistence(dismissedWelcomeMessage: Boolean) : Persistence {
+  override val hasDismissedWelcomeMessage: State<Boolean> = mutableStateOf(dismissedWelcomeMessage)
   override suspend fun load() = Unit
   override suspend fun dismissWelcomeMessage() = Unit
 }

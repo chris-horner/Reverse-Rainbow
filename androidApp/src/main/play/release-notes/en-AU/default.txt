@@ -1,5 +1,3 @@
-- 🌈 Fixed a bug that allowed more than 4 tiles to be assigned to a category.
-- 💥 Fixed 2 crashes that could occur when restoring from process death.
-- 👓 Gave tile titles slightly more space to allow for better readability.
-- 👇 Improved the tile drag experience by adding a preview of the title and categories that will be swapped on release.
-- 🔀 Added shuffle and reset actions
+- 🌈 Tiles are now always in reverse rainbow order
+- 🔀 Categories with assigned cards now have a set of actions available to them
+- 🗒️ There's now a little welcome message and more links in the about screen

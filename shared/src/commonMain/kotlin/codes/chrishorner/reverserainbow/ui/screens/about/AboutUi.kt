@@ -59,7 +59,13 @@ import codes.chrishorner.reverserainbow.ui.util.PreviewUi
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun AboutUi(onBack: () -> Unit) {
+fun AboutUi(
+  onBack: () -> Unit,
+  /**
+   * Configurable so snapshot tests don't invalidate when changing versions.
+   */
+  versionName: String = BuildKonfig.versionName,
+) {
   Scaffold(topBar = { TopBar(onBack) }) { paddingValues ->
     CappedWidthContainer {
       Column(
@@ -77,7 +83,7 @@ fun AboutUi(onBack: () -> Unit) {
         )
 
         Text(
-          text = BuildKonfig.versionName,
+          text = versionName,
           color = MaterialTheme.colorScheme.onBackground,
           style = MaterialTheme.typography.titleSmall,
           modifier = Modifier.padding(horizontal = 16.dp)
@@ -229,11 +235,11 @@ expect fun PlayStoreMessage()
 @PreviewLightDarkPortraitSmall
 @Composable
 internal fun AboutUiPreview() = PreviewUi {
-  AboutUi(onBack = {})
+  AboutUi(versionName = "1.0.0", onBack = {})
 }
 
 @PreviewLandscapeSmall
 @Composable
 internal fun AboutUiLandscapePreview() = PreviewUi {
-  AboutUi(onBack = {})
+  AboutUi(versionName = "1.0.0", onBack = {})
 }

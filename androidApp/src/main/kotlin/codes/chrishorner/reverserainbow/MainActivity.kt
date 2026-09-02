@@ -1,5 +1,6 @@
 package codes.chrishorner.reverserainbow
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.Dp
@@ -44,7 +47,10 @@ class MainActivity : ComponentActivity() {
     val gameLoader = viewModel.gameLoader
 
     setContent {
-      CompositionLocalProvider(LocalPersistence provides viewModel.persistence) {
+      CompositionLocalProvider(
+        LocalPersistence provides viewModel.persistence,
+        LocalUriHandler provides NewTaskUriHandler(this),
+      ) {
         ReverseRainbowTheme {
           Box(
             modifier = Modifier
@@ -55,12 +61,6 @@ class MainActivity : ComponentActivity() {
               loaderState = gameLoader.state.value,
               splashIconSize = splashIconSize.value,
               onRefresh = { gameLoader.refresh() },
-              onOpenNyt = {
-                startActivity(
-                  Intent(Intent.ACTION_VIEW, "https://www.nytimes.com/games/connections".toUri())
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                )
-              }
             )
           }
         }
@@ -95,5 +95,18 @@ class MainActivity : ComponentActivity() {
   private fun Int.pxToDp(): Dp {
     val value = this / (resources.displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT)
     return value.dp
+  }
+
+  /**
+   * When opening URLs on Android we want the browser to spin up a new task, rather than exist in
+   * this Activity's task. The main reason is that it's common for people to switch back and forth
+   * between this app and the NYT app, so we don't want them sharing the same back-stack.
+   */
+  private class NewTaskUriHandler(private val context: Context) : UriHandler {
+    override fun openUri(uri: String) {
+      context.startActivity(
+        Intent(Intent.ACTION_VIEW, uri.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+      )
+    }
   }
 }

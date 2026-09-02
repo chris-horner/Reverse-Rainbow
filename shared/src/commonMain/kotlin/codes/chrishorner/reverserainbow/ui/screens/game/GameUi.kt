@@ -52,14 +52,13 @@ import codes.chrishorner.reverserainbow.ui.tileSpringSpec
 fun GameUi(
   game: Game,
   date: LocalDate,
-  onOpenNyt: () -> Unit,
   onClickAbout: () -> Unit,
 ) {
   val orientation = LocalLayoutOrientation.current
 
   when (orientation) {
-    LayoutOrientation.Portrait -> PortraitGameUi(game, date, onOpenNyt, onClickAbout)
-    LayoutOrientation.Landscape -> LandscapeGameUi(game, onOpenNyt, onClickAbout)
+    LayoutOrientation.Portrait -> PortraitGameUi(game, date, onClickAbout)
+    LayoutOrientation.Landscape -> LandscapeGameUi(game, onClickAbout)
   }
 }
 
@@ -67,7 +66,6 @@ fun GameUi(
 private fun PortraitGameUi(
   game: Game,
   date: LocalDate,
-  onOpenNyt: () -> Unit,
   onClickAbout: () -> Unit,
 ) {
   val model = game.model.value
@@ -90,7 +88,6 @@ private fun PortraitGameUi(
             onResetClick = { game.reset() },
             onShuffleClick = { game.shuffle() },
             onAboutClick = onClickAbout,
-            onOpenNytClick = onOpenNyt,
           )
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -149,7 +146,6 @@ private fun PortraitGameUi(
 @Composable
 private fun LandscapeGameUi(
   game: Game,
-  onOpenNyt: () -> Unit,
   onClickAbout: () -> Unit
 ) {
   val model = game.model.value
@@ -191,7 +187,6 @@ private fun LandscapeGameUi(
           onResetClick = { game.reset() },
           onShuffleClick = { game.shuffle() },
           onAboutClick = onClickAbout,
-          onOpenNytClick = onOpenNyt,
           modifier = Modifier.padding(top = 4.dp, end = 4.dp)
         )
 
@@ -213,7 +208,6 @@ internal fun GameUiEmptyPreview() = PreviewUi {
   GameUi(
     game = PreviewData.game,
     date = LocalDate(2025, 6, 14),
-    onOpenNyt = {},
     onClickAbout = {},
   )
 }
@@ -225,7 +219,6 @@ internal fun GameUiEmptyLandscapePreview() = PreviewUi {
     GameUi(
       game = PreviewData.game,
       date = LocalDate(2025, 6, 14),
-      onOpenNyt = {},
       onClickAbout = {},
     )
   }

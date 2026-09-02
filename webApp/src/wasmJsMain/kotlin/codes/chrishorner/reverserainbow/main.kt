@@ -16,7 +16,6 @@ import codes.chrishorner.reverserainbow.ui.theme.getInter
 import com.diamondedge.logging.KmLogging
 import com.diamondedge.logging.LogLevel
 import kotlinx.browser.document
-import kotlinx.browser.window
 
 fun main() {
   KmLogging.setLogLevel(LogLevel.Verbose)
@@ -44,9 +43,6 @@ fun main() {
             gameLoader.refresh()
           },
           splashIconSize = DpSize(260.dp, 260.dp),
-          onOpenNyt = {
-            window.location.href = "https://www.nytimes.com/games/connections"
-          },
         )
       }
     }

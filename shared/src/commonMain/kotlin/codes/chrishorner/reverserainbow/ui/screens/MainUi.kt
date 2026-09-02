@@ -66,7 +66,6 @@ fun MainUi(
   loaderState: LoaderState,
   splashIconSize: DpSize,
   onRefresh: () -> Unit,
-  onOpenNyt: () -> Unit,
 ) {
   var loadingAnimationDone by remember { mutableStateOf(loaderState !is LoaderState.Loading) }
   var destination by rememberSaveable { mutableStateOf(NavDestination.Game) }
@@ -109,7 +108,6 @@ fun MainUi(
                   when (action) {
                     ScreenAction.FinishLoading -> loadingAnimationDone = true
                     is ScreenAction.Navigate -> destination = action.destination
-                    ScreenAction.OpenNyt -> onOpenNyt()
                     ScreenAction.Refresh -> onRefresh()
                   }
                 }
@@ -215,7 +213,6 @@ private sealed interface Screen {
 private sealed interface ScreenAction {
   data class Navigate(val destination: NavDestination) : ScreenAction
   data object Refresh : ScreenAction
-  data object OpenNyt : ScreenAction
   data object FinishLoading : ScreenAction
 }
 
@@ -255,7 +252,6 @@ private fun ShowScreen(
     is Screen.Loaded -> GameUi(
       game = screen.game,
       date = screen.date,
-      onOpenNyt = { onAction(ScreenAction.OpenNyt) },
       onClickAbout = { onAction(ScreenAction.Navigate(NavDestination.About)) }
     )
 

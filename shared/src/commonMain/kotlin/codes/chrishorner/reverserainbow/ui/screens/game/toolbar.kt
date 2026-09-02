@@ -31,15 +31,17 @@ import androidx.compose.material3.VerticalFloatingToolbar
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
-import codes.chrishorner.reverserainbow.ui.Icons
-import org.jetbrains.compose.resources.stringResource
+import codes.chrishorner.reverserainbow.data.NytConnectionsUrl
 import codes.chrishorner.reverserainbow.resources.Res
 import codes.chrishorner.reverserainbow.resources.about
 import codes.chrishorner.reverserainbow.resources.menu
 import codes.chrishorner.reverserainbow.resources.open_nyt
 import codes.chrishorner.reverserainbow.resources.reset
 import codes.chrishorner.reverserainbow.resources.shuffle
+import codes.chrishorner.reverserainbow.ui.Icons
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Game actions to be shown in an `AppBar` when in a portrait layout.
@@ -50,8 +52,9 @@ fun HorizontalAppBarActions(
   onResetClick: () -> Unit,
   onShuffleClick: () -> Unit,
   onAboutClick: () -> Unit,
-  onOpenNytClick: () -> Unit,
 ) {
+  val uriHandler = LocalUriHandler.current
+
   AppBarRow(
     maxItemCount = 2,
     overflowIndicator = { state -> MenuButton(state) },
@@ -64,7 +67,7 @@ fun HorizontalAppBarActions(
           ) { targetState ->
             if (targetState) {
               TextButton(
-                onClick = onOpenNytClick,
+                onClick = { uriHandler.openUri(NytConnectionsUrl) },
                 colors = ButtonDefaults.outlinedButtonColors(
                   contentColor = MaterialTheme.colorScheme.primary,
                 ),
@@ -96,7 +99,7 @@ fun HorizontalAppBarActions(
             },
             onClick = {
               state.dismiss()
-              onOpenNytClick()
+              uriHandler.openUri(NytConnectionsUrl)
             },
           )
         },
@@ -116,9 +119,10 @@ fun VerticalToolbar(
   onResetClick: () -> Unit,
   onShuffleClick: () -> Unit,
   onAboutClick: () -> Unit,
-  onOpenNytClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
+  val uriHandler = LocalUriHandler.current
+
   VerticalFloatingToolbar(
     expanded = showNytButton,
     trailingContent = {
@@ -128,7 +132,7 @@ fun VerticalToolbar(
         state = rememberTooltipState(),
       ) {
         IconButton(
-          onClick = onOpenNytClick,
+          onClick = { uriHandler.openUri(NytConnectionsUrl) },
         ) {
           Icon(
             imageVector = Icons.OpenInNew,

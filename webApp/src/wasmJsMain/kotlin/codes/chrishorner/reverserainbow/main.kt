@@ -24,7 +24,7 @@ fun main() {
     val scope = rememberCoroutineScope()
     val fontResolver = LocalFontFamilyResolver.current
     val fontFamily = getInter()
-    val persistence = WebPersistence()
+    val persistence = remember { WebPersistence() }
 
     val gameLoader = remember {
       GameLoader(

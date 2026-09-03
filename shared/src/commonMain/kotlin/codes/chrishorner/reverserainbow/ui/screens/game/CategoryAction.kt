@@ -21,10 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -226,7 +223,7 @@ private fun CategoryAnimationScope.getVerticalExitPositionFor(category: Category
  * Provides an `Animatable` for each category action button to "jump" when the board is completed.
  */
 @Composable
-private fun rememberJumpAnimatable(
+private fun CategoryAnimationScope.rememberJumpAnimatable(
   category: Category,
   boardComplete: Boolean,
 ): Animatable<IntOffset, AnimationVector2D> {
@@ -234,13 +231,10 @@ private fun rememberJumpAnimatable(
   val density = LocalDensity.current
   val orientation = LocalLayoutOrientation.current
 
-  // TODO: Fix this running when changing expanded category.
-  var runCelebration by rememberSaveable { mutableStateOf(false) }
-
   LaunchedEffect(boardComplete, density) {
-    if (!boardComplete) runCelebration = false
+    if (!boardComplete) state.runCelebration = false
 
-    if (!boardComplete || runCelebration) return@LaunchedEffect
+    if (!boardComplete || state.runCelebration) return@LaunchedEffect
 
     val delay = when (category) {
       Category.YELLOW -> 0
@@ -264,7 +258,7 @@ private fun rememberJumpAnimatable(
       animationSpec = tween(durationMillis = 220, easing = JumpEndEasing)
     )
 
-    runCelebration = true
+    state.runCelebration = true
   }
 
   return jumpAnimatable

@@ -16,7 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,7 +53,7 @@ fun CategoryActionsBar(
   modifier: Modifier = Modifier,
 ) {
 
-  val animationState = remember { CategoryAnimationScope.State() }
+  val animationState = CategoryAnimationScope.State.rememberSaveableState()
   animationState.recordExpandedCategory(expandedCategory)
 
   SharedTransitionLayout(modifier = modifier) {
@@ -110,10 +111,27 @@ class CategoryAnimationScope(
     var itemSize: IntSize = IntSize.Zero
     var containerSize: IntSize = IntSize.Zero
     var lastExpandedCategory: Category? = null
+    var runCelebration = false
 
     fun recordExpandedCategory(expandedCategory: Category?) {
       if (expandedCategory != null) {
         lastExpandedCategory = expandedCategory
+      }
+    }
+
+    companion object {
+      // We only need to bother saving the runCelebration state (the four squares bouncing on
+      // puzzle completion). The remaining values are all derived every layout pass.
+      private val stateSaver = Saver<State, Boolean>(
+        save = { it.runCelebration },
+        restore = { savedRunCelebration ->
+          State().apply { runCelebration = savedRunCelebration }
+        },
+      )
+
+      @Composable
+      fun rememberSaveableState(): State {
+        return rememberSaveable(saver = stateSaver) { State() }
       }
     }
   }

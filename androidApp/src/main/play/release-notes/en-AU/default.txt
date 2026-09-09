@@ -1,3 +1,2 @@
-- 🌈 Tiles are now always in reverse rainbow order
-- 🔀 Categories with assigned cards now have a set of actions available to them
-- 🗒️ There's now a little welcome message and more links in the about screen
+- 🎉 1.0 release!
+- 🎊 Fixed a bug where the celebration jump animation would play when it shouldn't

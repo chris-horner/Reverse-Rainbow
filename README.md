@@ -13,7 +13,6 @@ Initially built as an Android application, it's also available on the web at [re
 
 <p align="center">
   <img src="androidApp/src/main/play/listings/en-AU/graphics/phone-screenshots/1.png" width="300">
-  <img src="androidApp/src/main/play/listings/en-AU/graphics/phone-screenshots/2.png" width="300">
   <img src="androidApp/src/main/play/listings/en-AU/graphics/phone-screenshots/4.png" width="300">
 </p>
 
@@ -24,6 +23,8 @@ project that aims to have a smaller number of dependencies. (Though if you look 
 `gradle/libs.versions.toml` you can see it wasn't that successful). However it does at least shirk
 the usual plethora of dependency injection and navigation libraries while still trying to be a
 simple, testable Compose UI codebase.
+
+https://github.com/user-attachments/assets/7536696c-506e-4b5d-b2f9-6071c58736ad
 
 ## License
 

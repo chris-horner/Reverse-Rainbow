@@ -1,6 +1,14 @@
 # Reverse Rainbow
 
-<img src="webApp/src/wasmJsMain/resources/favicon.svg" width="72">
+  <p>
+    <a href="https://reverserainbow.app">
+      <img src="webApp/src/wasmJsMain/resources/favicon.svg" width="72">
+    </a>
+  
+  <a href="https://play.google.com/store/apps/details?id=codes.chrishorner.reverserainbow">
+    <img src="shared/src/wasmJsMain/composeResources/drawable/play_badge.svg" height="68">
+  </a>
+</p>
 
 An app for those who like to solve the New York Times Connections puzzles in reverse order, this
 application allows you to plan your answers for today's game ahead of time.
